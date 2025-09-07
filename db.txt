@@ -1,0 +1,95 @@
+CREATE TABLE Rol (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Especialidad (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Persona (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    celular VARCHAR(20),
+    correo VARCHAR(100) UNIQUE NOT NULL,
+    contraseña VARCHAR(100) NOT NULL,
+    rol_id INT REFERENCES Rol(id),
+    especialidad_id INT REFERENCES Especialidad(id)
+);
+
+CREATE TABLE Prioridad (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Servicio (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(100) NOT NULL,
+    tecnico_id INT REFERENCES Persona(id),
+    horas INT
+);
+
+CREATE TABLE Marca (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE TipoEquipo (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Ubicacion (
+    id SERIAL PRIMARY KEY,
+    edificio VARCHAR(100) NOT NULL,
+    aula VARCHAR(100) NOT NULL,
+    persona_id INT REFERENCES Persona(id)
+);
+
+CREATE TABLE Equipo (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    fecha DATE,
+    ubicacion_id INT REFERENCES Ubicacion(id),
+    marca_id INT REFERENCES Marca(id),
+    tipo_id INT REFERENCES TipoEquipo(id)
+);
+
+CREATE TABLE TipoPieza (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Equipo_Pieza (
+    equipo_id INT REFERENCES Equipo(id),
+    pieza_id INT REFERENCES Pieza(id),
+    PRIMARY KEY (equipo_id, pieza_id)
+);
+
+CREATE TABLE Pieza (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    fecha DATE,
+    tipo_id INT REFERENCES TipoPieza(id),
+    marca_id INT REFERENCES Marca(id)
+);
+
+CREATE TYPE estado_incidente AS ENUM ('NO INICIADO', 'EN PROCESO', 'TERMINADO', 'LIBERADO');
+
+CREATE TABLE Incidente (
+    id SERIAL PRIMARY KEY,
+    fecha DATE,
+    descripcion VARCHAR(100) NOT NULL,
+    usuario_id INT REFERENCES Persona(id),
+    tecnico_id INT REFERENCES Persona(id),
+    equipo_id INT REFERENCES Equipo(id),
+    tipo_incidente_id INT REFERENCES Especialidad(id),
+    prioridad_id INT REFERENCES Prioridad(id),
+    servicio_id INT REFERENCES Servicio(id),
+    finalizado BOOLEAN DEFAULT false,
+    calificacion INT,
+    autorizada BOOLEAN DEFAULT false,
+    estado estado_incidente DEFAULT 'NO INICIADO' NOT NULL
+);

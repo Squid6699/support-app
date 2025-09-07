@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
   backend:
@@ -16,6 +15,24 @@ services:
       - support-app-network
     env_file:
       - ./backend/.env
+
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: support_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - support-app-network
+
+volumes:
+  pgdata:
 
 networks:
   support-app-network:

@@ -1,0 +1,7 @@
+Para acceder a la base de datos
+docker exec -it postgres_db psql -U postgres -d support_app
+
+Para iniciar el contenedor
+docker compose up --build
+
+

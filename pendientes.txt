@@ -1,0 +1,62 @@
+Rutas para registrar:
+    -Edificios
+    -Usuarios (Personas)
+    -Especialidad
+        -Tecnico Software
+        -Tecnico Hardware
+        -Administrador
+        -Encargado Edificio
+    -Rol
+        -Administrador
+        -Tecnico
+        -Encargado Edificio
+    -Prioridad
+        -Alta
+        -Media
+        -Baja
+        -Preventiva
+    -Equipo
+    -TipoEquipo
+    -Pieza
+    -Marca
+    -TipoPieza
+    -Incidente
+
+Ruta para editar
+    -Edificios
+    -Usuarios (Personas)
+    -Especialidad
+    -Rol
+    -Prioridad
+    -Equipo
+    -TipoEquipo
+    -Pieza
+    -Marca
+    -TipoPieza
+    -Incidente
+
+Rutas para eliminar
+    -Edificios
+    -Usuarios (Personas)
+    -Especialidad
+    -Rol
+    -Prioridad
+    -Equipo
+    -TipoEquipo
+    -Pieza
+    -Marca
+    -TipoPieza
+    -Incidente
+
+-Ruta para que el encargado de edificio pueda ver sus equipos.
+-Ruta para que el encargado de edificio pueda ver la incidencia de un equipo
+-Ruta para que el encargado de edificio pueda ver sus incidencias.
+-Ruta para que el encargado de edificio acepte o rechace una incidencia.
+-Ruta para que el encargado asigne un tecnico.
+-Ruta para que el tecnico pueda ver sus incidencias asignadas.
+-Ruta para que el tecnico pueda ver detalles de la incidencia asignada (Nombre, ubicacion, marca, tipo, piezas, incidencias anteriores).
+-Ruta para que el tecnico pueda dar detalle sobre el servicio.
+-Ruta para que el tecnico pueda terminar una incidencia.
+-Ruta para que el encargado pueda dar una calificacion a la incidencia.
+-Ruta para que el encargado de edificio pueda liberar las incidencias en estado terminado.
+-Ruta para que el encargado de edificio pueda filtrar entre las incidencias (AUTORIZADO, NO AUTORIZADO, NO INICIADO, EN PROCESO, TERMINADO, LIBERADO)
