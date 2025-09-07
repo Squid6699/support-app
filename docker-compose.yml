@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    ports:
+      - "3001:3001"
+    # depends_on:
+    #   - mongo
+    volumes:
+      - ./backend:/usr/src/app   # Monta tu código en el contenedor
+      - /usr/src/app/node_modules # Evita conflictos de dependencias
+    networks:
+      - support-app-network
+    env_file:
+      - ./backend/.env
+
+networks:
+  support-app-network:
