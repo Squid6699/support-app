@@ -4,4 +4,6 @@ docker exec -it postgres_db psql -U postgres -d support_app
 Para iniciar el contenedor
 docker compose up --build
 
+Para ver todas las tablas en postgresql
+\dt 
 
