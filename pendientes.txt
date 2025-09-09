@@ -1,5 +1,5 @@
 Rutas para registrar:
-    -Edificios
+    -Edificios 
     -Usuarios (Personas)
     -Especialidad
         -Tecnico Software
@@ -60,3 +60,4 @@ Rutas para eliminar
 -Ruta para que el encargado pueda dar una calificacion a la incidencia.
 -Ruta para que el encargado de edificio pueda liberar las incidencias en estado terminado.
 -Ruta para que el encargado de edificio pueda filtrar entre las incidencias (AUTORIZADO, NO AUTORIZADO, NO INICIADO, EN PROCESO, TERMINADO, LIBERADO)
+
