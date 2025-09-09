@@ -55,7 +55,7 @@ UbicacionRouter.put("/editarUbicacion/:id", async (req, res) => {
 
     try {
         const result = await pool.query(
-            "UPDATE Ubicacion SET edificio=$1, aula=$2, persona_id=$3 WHERE id=$4 RETURNING *",
+            "UPDATE Ubicacion SET edificio=$1, aula=$2, persona_id=$3 WHERE id=$4 ",
             [edificio, aula, persona_id, id]
         );
         res.json({ success: true, message: "Ubicacion actualizada correctamente", result: result.rows[0] });
