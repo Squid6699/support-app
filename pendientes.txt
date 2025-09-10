@@ -1,21 +1,23 @@
 Rutas para registrar:
-    -Edificios 
-    -Usuarios (Personas)
-    -Especialidad
+    -Ubicacion --Listo 
+    -Personas -- Listo 
+    -Especialidad -- No se hace (ya no hiciste esta tabla )
         -Tecnico Software
         -Tecnico Hardware
         -Administrador
         -Encargado Edificio
-    -Rol
+    -Rol. ------ Listo 
         -Administrador
         -Tecnico
         -Encargado Edificio
-    -Prioridad
+    -Prioridad -- Listo 
         -Alta
         -Media
         -Baja
         -Preventiva
-    -Equipo
+
+        
+    -Equipo -- aqui me quede 
     -TipoEquipo
     -Pieza
     -Marca

@@ -37,7 +37,6 @@ ObtenerUbicacionesRouter.get("/obtenerUbicaciones", async (req, res) => {
     }
 });
 
-// Obtener Ubicacion por id
 ObtenerUbicacionRouter.get("/obtenerUbicacion/:id", async (req, res) => {
     const { id } = req.params;
 
