@@ -1,14 +1,21 @@
 import express from 'express';
 import { middleware } from "../middleware/middleware.js";
+
+//IMPORTACION RUTAS UBICACION
+import { CrearUbicacionRouter, EditarUbicacionRouter, EliminarUbicacionRouter, ObtenerUbicacionesRouter, ObtenerUbicacionRouter } from '../querys/ubicacion.js';
+
 const app = express();
 
 //Uso de middlewares
 app.use(middleware);
 
 
-//IMPORTACION RUTAS EDIFICIO
-import { CrearEdificioRouter } from '../querys/edificio.js';
-app.use("/api/", CrearEdificioRouter);
+
+app.use("/api/", CrearUbicacionRouter);
+app.use("/api/", ObtenerUbicacionesRouter);
+app.use("/api/", ObtenerUbicacionRouter);
+app.use("/api/", EditarUbicacionRouter);
+app.use("/api/", EliminarUbicacionRouter);
 
 
 
