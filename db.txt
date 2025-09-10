@@ -62,18 +62,18 @@ CREATE TABLE TipoPieza (
     nombre VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Equipo_Pieza (
-    equipo_id INT REFERENCES Equipo(id),
-    pieza_id INT REFERENCES Pieza(id),
-    PRIMARY KEY (equipo_id, pieza_id)
-);
-
 CREATE TABLE Pieza (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     fecha DATE,
     tipo_id INT REFERENCES TipoPieza(id),
     marca_id INT REFERENCES Marca(id)
+);
+
+CREATE TABLE Equipo_Pieza (
+    equipo_id INT REFERENCES Equipo(id),
+    pieza_id INT REFERENCES Pieza(id),
+    PRIMARY KEY (equipo_id, pieza_id)
 );
 
 CREATE TYPE estado_incidente AS ENUM ('NO INICIADO', 'EN PROCESO', 'TERMINADO', 'LIBERADO');
