@@ -1,11 +1,6 @@
 Rutas para registrar:
     -Ubicacion --Listo 
-    -Personas -- Listo 
-    -Especialidad -- No se hace (ya no hiciste esta tabla )
-        -Tecnico Software
-        -Tecnico Hardware
-        -Administrador
-        -Encargado Edificio
+    -Personas -- Listo
     -Rol. ------ Listo 
         -Administrador
         -Tecnico
@@ -17,38 +12,33 @@ Rutas para registrar:
         -Preventiva
 
         
-    -Equipo -- aqui me quede 
-    -TipoEquipo
-    -Pieza
-    -Marca
-    -TipoPieza
-    -Incidente
+    -Equipo -- Listo
+    -TipoEquipo --Listo
+    -Pieza --Listo
+    -Marca --Listo
+    -Incidente --Listo
 
 Ruta para editar
-    -Edificios
-    -Usuarios (Personas)
-    -Especialidad
-    -Rol
-    -Prioridad
-    -Equipo
-    -TipoEquipo
-    -Pieza
-    -Marca
-    -TipoPieza
-    -Incidente
+    -Edificios -- Listo
+    -Usuarios (Personas) -- Listo
+    -Rol -- Listo
+    -Prioridad -- Listo
+    -Equipo -- Listo
+    -TipoEquipo -- Listo
+    -Pieza -- Listo
+    -Marca -- Listo
+    -Incidente -- Listo
 
 Rutas para eliminar
-    -Edificios
-    -Usuarios (Personas)
-    -Especialidad
-    -Rol
-    -Prioridad
-    -Equipo
-    -TipoEquipo
-    -Pieza
-    -Marca
-    -TipoPieza
-    -Incidente
+    -Edificios -- Listo
+    -Usuarios (Personas) -- Listo
+    -Rol -- Listo
+    -Prioridad -- Listo
+    -Equipo -- Listo
+    -TipoEquipo -- Listo
+    -Pieza -- Listo
+    -Marca -- Listo
+    -Incidente -- Listo
 
 -Ruta para que el encargado de edificio pueda ver sus equipos.
 -Ruta para que el encargado de edificio pueda ver la incidencia de un equipo

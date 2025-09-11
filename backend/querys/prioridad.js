@@ -30,6 +30,11 @@ CrearPrioridadRouter.post("/crearPrioridad", async (req, res) => {
 
 
 ObtenerPrioridadesRouter.get("/obtenerPrioridades", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
     try {
         const result = await pool.query("SELECT * FROM prioridad");
         res.json({ success: true, result: result.rows });
@@ -40,6 +45,11 @@ ObtenerPrioridadesRouter.get("/obtenerPrioridades", async (req, res) => {
 
 
 ObtenerPrioridadRouter.get("/obtenerPrioridad/:id", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
     const { id } = req.params;
 
     try {

@@ -29,6 +29,11 @@ CrearUbicacionRouter.post("/crearUbicacion", async (req, res) => {
 });
 
 ObtenerUbicacionesRouter.get("/obtenerUbicaciones", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
     try {
         const result = await pool.query("SELECT * FROM Ubicacion");
         res.json({ success: true, result: result.rows });
@@ -38,6 +43,11 @@ ObtenerUbicacionesRouter.get("/obtenerUbicaciones", async (req, res) => {
 });
 
 ObtenerUbicacionRouter.get("/obtenerUbicacion/:id", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
     const { id } = req.params;
 
     try {

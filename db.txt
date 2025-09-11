@@ -31,11 +31,6 @@ CREATE TABLE Marca (
     nombre VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE TipoEquipo (
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL
-);
-
 CREATE TABLE Ubicacion (
     id SERIAL PRIMARY KEY,
     edificio VARCHAR(100) NOT NULL,
@@ -83,7 +78,7 @@ CREATE TABLE Incidente (
     prioridad_id INT REFERENCES Prioridad(id),
     servicio_id INT REFERENCES Servicio(id),
     finalizado BOOLEAN DEFAULT false,
-    calificacion INT,
+    calificacion INT DEFAULT '0',
     autorizada BOOLEAN DEFAULT false,
     estado estado_incidente DEFAULT 'NO INICIADO' NOT NULL
 );

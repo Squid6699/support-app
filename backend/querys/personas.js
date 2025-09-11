@@ -29,6 +29,12 @@ CrearPersonaRouter.post("/crearPersona", async (req, res) => {
 });
 
 ObtenerPersonasRouter.get("/obtenerPersonas", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+    
     try {
         const result = await pool.query("SELECT * FROM persona");
         res.json({ success: true, result: result.rows });
@@ -38,6 +44,13 @@ ObtenerPersonasRouter.get("/obtenerPersonas", async (req, res) => {
 });
 
 ObtenerPersonaRouter.get("/obtenerPersona/:id", async (req, res) => {
+
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
     const { id } = req.params;
 
     try {

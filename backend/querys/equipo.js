@@ -29,6 +29,12 @@ CrearEquipoRouter.post("/crearEquipo", async (req, res) => {
 
 
 ObtenerEquiposRouter.get("/obtenerEquipos", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
     try {
         const result = await pool.query("SELECT * FROM equipo");
         res.json({ success: true, result: result.rows });
@@ -38,6 +44,13 @@ ObtenerEquiposRouter.get("/obtenerEquipos", async (req, res) => {
 });
 
 ObtenerEquipoRouter.get("/obtenerEquipo/:id", async (req, res) => {
+
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
     const { id } = req.params;
 
     try {
