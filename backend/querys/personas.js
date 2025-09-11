@@ -13,14 +13,14 @@ CrearPersonaRouter.post("/crearPersona", async (req, res) => {
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { nombre, celular, correo, contraseña, rol_id, especialidad_id } = req.body;
+    const { nombre, celular, correo, contraseña, rol_id } = req.body;
     if (!nombre || !correo || !contraseña)
         return res.status(400).json({ success: false, msg: "Faltan datos " });
 
     try {
         const result = await pool.query(
-            "INSERT INTO persona (nombre, celular, correo, contraseña, rol_id, especialidad_id) VALUES ($1, $2, $3, $4, $5, $6)",
-            [nombre, celular, correo, contraseña, rol_id, especialidad_id]
+            "INSERT INTO persona (nombre, celular, correo, contraseña, rol_id) VALUES ($1, $2, $3, $4, $5)",
+            [nombre, celular, correo, contraseña, rol_id]
         );
         res.json({ success: true, msg: "Persona creada correctamente", result: result.rows[0] });
     } catch (err) {
@@ -59,12 +59,12 @@ EditarPersonaRouter.put("/editarPersona", async (req, res) => {
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { id, nombre, celular, correo, contraseña, rol_id, especialidad_id } = req.body;
+    const { id, nombre, celular, correo, contraseña, rol_id } = req.body;
 
     try {
         const result = await pool.query(
-            "UPDATE persona SET nombre=$1, celular=$2, correo=$3, contraseña=$4, rol_id=$5, especialidad_id=$6 WHERE id=$7 RETURNING *",
-            [nombre, celular, correo, contraseña, rol_id, especialidad_id, id]
+            "UPDATE persona SET nombre=$1, celular=$2, correo=$3, contraseña=$4, rol_id=$5 WHERE id=$6 RETURNING *",
+            [nombre, celular, correo, contraseña, rol_id, id]
         );
 
         if (result.rowCount === 0)
