@@ -3,10 +3,6 @@ CREATE TABLE Rol (
     nombre VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE Especialidad (
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL
-);
 
 CREATE TABLE Persona (
     id SERIAL PRIMARY KEY,
@@ -14,8 +10,7 @@ CREATE TABLE Persona (
     celular VARCHAR(20),
     correo VARCHAR(100) UNIQUE NOT NULL,
     contraseña VARCHAR(100) NOT NULL,
-    rol_id INT REFERENCES Rol(id),
-    especialidad_id INT REFERENCES Especialidad(id)
+    rol_id INT REFERENCES Rol(id)
 );
 
 CREATE TABLE Prioridad (
@@ -85,7 +80,6 @@ CREATE TABLE Incidente (
     usuario_id INT REFERENCES Persona(id),
     tecnico_id INT REFERENCES Persona(id),
     equipo_id INT REFERENCES Equipo(id),
-    tipo_incidente_id INT REFERENCES Especialidad(id),
     prioridad_id INT REFERENCES Prioridad(id),
     servicio_id INT REFERENCES Servicio(id),
     finalizado BOOLEAN DEFAULT false,
