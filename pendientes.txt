@@ -38,18 +38,22 @@ Rutas para eliminar
     -TipoEquipo -- Listo
     -Pieza -- Listo
     -Marca -- Listo
+    - Servicio -- Listo
     -Incidente -- Listo
 
--Ruta para que el encargado de edificio pueda ver sus equipos.
--Ruta para que el encargado de edificio pueda ver la incidencia de un equipo
--Ruta para que el encargado de edificio pueda ver sus incidencias.
--Ruta para que el encargado de edificio acepte o rechace una incidencia.
--Ruta para que el encargado asigne un tecnico.
--Ruta para que el tecnico pueda ver sus incidencias asignadas.
--Ruta para que el tecnico pueda ver detalles de la incidencia asignada (Nombre, ubicacion, marca, tipo, piezas, incidencias anteriores).
--Ruta para que el tecnico pueda dar detalle sobre el servicio.
--Ruta para que el tecnico pueda terminar una incidencia.
--Ruta para que el encargado pueda dar una calificacion a la incidencia.
--Ruta para que el encargado de edificio pueda liberar las incidencias en estado terminado.
--Ruta para que el encargado de edificio pueda filtrar entre las incidencias (AUTORIZADO, NO AUTORIZADO, NO INICIADO, EN PROCESO, TERMINADO, LIBERADO)
+-Ruta para que el encargado de edificio pueda ver sus equipos. // tabla Equipo
+- Ruta para que el encargado pueda ver detalles sobre los equipos  // tabla Equipo
+-Ruta para que el encargado de edificio pueda ver la incidencia de un equipo // tabla incidencia 
+-Ruta para que el encargado de edificio pueda ver sus incidencias. // tabla incidencia
+-Ruta para que el encargado de edificio acepte o rechace una incidencia. / tabla incidencia
+-Ruta para que el administrador asigne un tecnico. // tabla incidencia
+-Ruta para que el tecnico pueda ver sus incidencias asignadas. // tabla incidencia
+
+-Ruta para que el tecnico pueda ver detalles de la incidencia asignada (Nombre, ubicacion, marca, tipo, piezas, incidencias anteriores). // tabla incidencia
+-Ruta para que el tecnico pueda dar detalle sobre el servicio. // tabla servicio 
+-Ruta para que el tecnico pueda terminar una incidencia. // tabla incidencia
+-Ruta para que el encargado pueda dar una calificacion a la incidencia. // tabla incidencia
+-Ruta para que el encargado de edificio pueda liberar las incidencias en estado terminado. // tabla incidencia
+-Ruta para que el encargado de edificio pueda filtrar entre las incidencias (AUTORIZADO, NO AUTORIZADO, NO INICIADO, EN PROCESO, TERMINADO, LIBERADO) // tabla de incidencia 
+- Ruta para que el tecnico pueda cambiar el estado de la incidencia  // incidencia
 

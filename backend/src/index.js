@@ -10,6 +10,8 @@ import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
 import { CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter } from '../querys/incidente.js';
+import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquipoRouter, ObtenerEquiposRouter } from '../querys/equipo.js';
+
 
 const app = express();
 
@@ -69,6 +71,12 @@ app.use("/api/", ObtenerIncidenciasRouter);
 app.use("/api/", ObtenerIncidenciaRouter);
 app.use("/api/", EditarIncidenciaRouter);
 app.use("/api/", EliminarIncidenciaRouter);
+
+app.use("/api/", CrearEquipoRouter);
+app.use("/api/", ObtenerEquiposRouter);
+app.use("/api/", ObtenerEquipoRouter);
+app.use("/api/", EditarEquipoRouter);
+app.use("/api/", EditarEquipoRouter);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);

@@ -6,6 +6,7 @@ export const ObtenerEquiposRouter = express.Router();
 export const ObtenerEquipoRouter = express.Router();
 export const EditarEquipoRouter = express.Router();
 export const EliminarEquipoRouter = express.Router();
+export const verEquipoRouter = express.Router();
 
 CrearEquipoRouter.post("/crearEquipo", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -107,5 +108,30 @@ EliminarEquipoRouter.delete("/eliminarEquipo", async (req, res) => {
         res.json({ success: true, message: "Equipo eliminado correctamente" });
     } catch (err) {
         res.status(500).json({ success: false, error: "Error en DB" });
+    }
+});
+
+
+// Ruta para que el encargado de edificio pueda ver sus equipos
+// VerEquiposEncargado
+
+ObtenerEquiposRouter.get("/verEquipos", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const result = await pool.query(`
+            "SELECT  eq.nombre , ub.edificio , ub.aula 
+            FROM equipo eq
+            INNER  JOIN ubicacion ub  ON eq.ubicacion_id = ub.id 
+            INNER JOIN persona p ON ub.id  = p.id 
+            WHERE p.id = 1";
+        `);
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
     }
 });
