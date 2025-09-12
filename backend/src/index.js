@@ -5,12 +5,11 @@ import { CrearUbicacionRouter, EditarUbicacionRouter, EliminarUbicacionRouter, O
 import { CrearPersonaRouter, EditarPersonaRouter, EliminarPersonaRouter, ObtenerPersonasRouter, ObtenerPersonaRouter } from '../querys/personas.js';
 import { CrearRolRouter, EditarRolRouter, EliminarRolRouter, ObtenerRolesRouter, ObtenerRolRouter } from '../querys/rol.js';
 import { CrearPrioridadRouter, EditarPrioridadRouter, EliminarPrioridadRouter, ObtenerPrioridadesRouter, ObtenerPrioridadRouter } from '../querys/prioridad.js';
-import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquiposRouter, ObtenerEquipoRouter } from '../querys/equipo.js';
+import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquiposRouter, ObtenerEquipoRouter, ObtenerEquiposEncargadoRouter } from '../querys/equipo.js';
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
 import { CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter } from '../querys/incidente.js';
-import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquipoRouter, ObtenerEquiposRouter } from '../querys/equipo.js';
 
 
 const app = express();
@@ -77,6 +76,8 @@ app.use("/api/", ObtenerEquiposRouter);
 app.use("/api/", ObtenerEquipoRouter);
 app.use("/api/", EditarEquipoRouter);
 app.use("/api/", EditarEquipoRouter);
+
+app.use("/api/", ObtenerEquiposEncargadoRouter);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);

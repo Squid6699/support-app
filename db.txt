@@ -136,15 +136,21 @@ INSERT INTO Persona (nombre, celular, correo, contraseña, rol_id) VALUES
 INSERT INTO Ubicacion (edificio, aula, persona_id) VALUES
 ('Edificio A', 'Aula 101', 4),
 ('Edificio A', 'Aula 102', 4),
-('Edificio B', 'Lab 201', 4);
+('Edificio B', 'Lab 201', 4),
+('Edificio C', 'Aula 201', 1),
+('Edificio D', 'Aula 202', 1),
+('Edificio E', 'Aula 203', 1);
 
 
 INSERT INTO Equipo (nombre, fecha, ubicacion_id, marca_id, tipo_id) VALUES
 ('Laptop Docente 1', '2024-01-15', 1, 1, 1),
 ('Proyector Aula 102', '2023-05-20', 2, 2, 2),
 ('Impresora Lab 201', '2022-11-10', 3, 3, 3),
-('Servidor Principal', '2021-07-01', 3, 4, 4);
-
+('Servidor Principal', '2021-07-01', 3, 4, 4),
+('Laptop', '2024-01-15', 4, 1, 1),
+('Proyector', '2023-05-20', 4, 2, 2),
+('Impresora', '2022-11-10', 5, 3, 3),
+('Servidor', '2021-07-01', 6, 4, 4);
 
 INSERT INTO Pieza (nombre, fecha, marca_id) VALUES
 ('Disco Duro 1TB', '2024-03-01', 1),
