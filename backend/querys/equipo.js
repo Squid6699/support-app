@@ -7,6 +7,7 @@ export const ObtenerEquipoRouter = express.Router();
 export const EditarEquipoRouter = express.Router();
 export const EliminarEquipoRouter = express.Router();
 export const ObtenerEquiposEncargadoRouter = express.Router();
+export const ObtenerDetallesEquiposRouter = express.Router();
 
 CrearEquipoRouter.post("/crearEquipo", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -113,7 +114,6 @@ EliminarEquipoRouter.delete("/eliminarEquipo", async (req, res) => {
 
 
 // Ruta para que el encargado de edificio pueda ver sus equipos
-// VerEquiposEncargado
 
 ObtenerEquiposEncargadoRouter.get("/verEquiposEncargado/:id", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -128,12 +128,44 @@ ObtenerEquiposEncargadoRouter.get("/verEquiposEncargado/:id", async (req, res) =
         const result = await pool.query(`
             SELECT eq.nombre AS Nombre, ub.edificio AS Edificio, ub.aula AS Aula
             FROM equipo eq
-            INNER  JOIN ubicacion ub  ON eq.ubicacion_id = ub.id 
+            INNER  JOIN ubicacion ub ON eq.ubicacion_id = ub.id 
             INNER JOIN persona p ON ub.persona_id = p.id
             WHERE p.id = $1
         `, [id]);
         res.json({ success: true, result: result.rows });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+// Ruta para que el encargado pueda ver detalles sobre los equipos
+
+ObtenerDetallesEquiposRouter.get("/verDetallesEquipos/:id", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(`
+            SELECT  eq.id ,eq.nombre , eq.fecha ,ub.edificio ,ub.aula ,i.id ,i.fecha, i.descripcion ,i.estado ,i.prioridad_id 
+            FROM equipo eq
+            INNER JOIN ubicacion ub ON eq.ubicacion_id = ub.id
+            INNER JOIN persona p  ON ub.persona_id = p.id
+            LEFT  JOIN incidente i ON i.equipo_id = eq.id
+            WHERE p.id = $1
+        `, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, msg: "No se encontraron equipos para este encargado" });
+        }
+
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        console.error("Error en la DB:", err);
+        res.status(500).json({ success: false, msg: "Error en la base de datos" });
     }
 });

@@ -113,3 +113,35 @@ EliminarIncidenciaRouter.delete("/eliminarIncidencia", async (req, res) => {
         res.status(500).json({ success: false, msg: "Error en DB" });
     }
 });
+
+// Ruta para que el encargado de edificio pueda ver la incidencia de un equipo  
+
+ObtenerIncidenciaEquipoRouter.get("/verIncidencia/:equipoId", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { equipoId } = req.params;
+
+    try {
+        const result = await pool.query(`
+            SELECT  eq.id AS,eq.nombre,ub.edificio,ub.aula, p.id,p.nombre,i.id,i.fecha,i.descripcion,i.estado,i.prioridad_id
+            FROM equipo eq
+            INNER JOIN ubicacion ub ON eq.ubicacion_id = ub.id
+            INNER JOIN persona p ON ub.persona_id = p.id
+            LEFT JOIN incidente i ON i.equipo_id = eq.id
+            WHERE eq.id = $1
+        `, [equipoId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, msg: "No se encontraron incidencias para este equipo" });
+        }
+
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        console.error("Error en la DB:", err);
+        res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});

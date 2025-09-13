@@ -41,9 +41,10 @@ Rutas para eliminar
     - Servicio -- Listo
     -Incidente -- Listo
 
--Ruta para que el encargado de edificio pueda ver sus equipos. // tabla Equipo
-- Ruta para que el encargado pueda ver detalles sobre los equipos  // tabla Equipo
--Ruta para que el encargado de edificio pueda ver la incidencia de un equipo // tabla incidencia 
+-Ruta para que el encargado de edificio pueda ver sus equipos. // tabla Equipo - listo 
+-Ruta para que el encargado pueda ver detalles sobre los equipos  // tabla Equipo -- listo  (checar)
+-Ruta para que el encargado de edificio pueda ver la incidencia de un equipo // tabla incidencia  - listo (checar)
+
 -Ruta para que el encargado de edificio pueda ver sus incidencias. // tabla incidencia
 -Ruta para que el encargado de edificio acepte o rechace una incidencia. / tabla incidencia
 -Ruta para que el administrador asigne un tecnico. // tabla incidencia
