@@ -5,6 +5,7 @@ export const ObtenerIncidenciasRouter = exrpess.Router();
 export const ObtenerIncidenciaRouter = exrpess.Router();
 export const EditarIncidenciaRouter = exrpess.Router();
 export const EliminarIncidenciaRouter = exrpess.Router();
+export const ObtenerIncidenciaEquipoRouter = exrpess.Router();
 
 CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -145,3 +146,61 @@ ObtenerIncidenciaEquipoRouter.get("/verIncidencia/:equipoId", async (req, res) =
         res.status(500).json({ success: false, msg: "Error en la base de datos" });
     }
 });
+
+// Ruta para que el tecnico pueda ver detalles de la incidencia asignada (Nombre, ubicacion, marca, tipo, piezas, incidencias anteriores).
+// SELECT 
+//     i.fecha AS fechaIncidencia, 
+//     e.nombre AS nombreEquipo, 
+//     TE.nombre AS tipoEquipo,
+// 	M.nombre AS nombreMarca,
+//     STRING_AGG(PI.nombre, ', ') AS nombrePiezas,
+//     i.descripcion AS descripcionIncidencia,
+// 	UB.edificio AS Edificio,
+// 	UB.aula AS Aula,
+//     P.nombre AS nombreEncargado,
+// 	PR.nombre AS nombrePrioridad
+    
+// FROM incidente I
+// INNER JOIN persona P ON I.usuario_id = P.id
+// INNER JOIN equipo E ON I.equipo_id = E.id
+// INNER JOIN tipoequipo TE ON E.tipo_id = TE.id
+// INNER JOIN marca M ON E.marca_id = M.id
+// JOIN Equipo_Pieza EP ON e.id = EP.equipo_id
+// JOIN Pieza PI ON PI.id = EP.pieza_id
+// INNER JOIN prioridad PR ON I.prioridad_id = PR.id
+// INNER JOIN ubicacion UB ON E.ubicacion_id = UB.id
+// WHERE I.id = 1
+// GROUP BY 
+//     i.fecha, e.id, e.nombre, TE.nombre, 
+//     i.descripcion, P.nombre, M.nombre, PR.nombre,
+// 	UB.edificio, UB.aula
+// ORDER BY e.id;
+
+//CONSULTA PARA VER LAS INCIDENCIAS ANTERIORES DEL EQUIPO
+// SELECT 
+//     i.fecha AS fechaIncidencia, 
+//     e.nombre AS nombreEquipo, 
+//     TE.nombre AS tipoEquipo,
+// 	M.nombre AS nombreMarca,
+//     STRING_AGG(PI.nombre, ', ') AS nombrePiezas,
+//     i.descripcion AS descripcionIncidencia,
+// 	UB.edificio AS Edificio,
+// 	UB.aula AS Aula,
+//     P.nombre AS nombreEncargado,
+// 	PR.nombre AS nombrePrioridad
+    
+// FROM incidente I
+// INNER JOIN persona P ON I.usuario_id = P.id
+// INNER JOIN equipo E ON I.equipo_id = E.id
+// INNER JOIN tipoequipo TE ON E.tipo_id = TE.id
+// INNER JOIN marca M ON E.marca_id = M.id
+// JOIN Equipo_Pieza EP ON e.id = EP.equipo_id
+// JOIN Pieza PI ON PI.id = EP.pieza_id
+// INNER JOIN prioridad PR ON I.prioridad_id = PR.id
+// INNER JOIN ubicacion UB ON E.ubicacion_id = UB.id
+// WHERE E.id = 4
+// GROUP BY 
+//     i.fecha, e.id, e.nombre, TE.nombre, 
+//     i.descripcion, P.nombre, M.nombre, PR.nombre,
+// 	UB.edificio, UB.aula
+// ORDER BY e.id;
