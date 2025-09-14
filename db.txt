@@ -176,6 +176,15 @@ INSERT INTO Servicio (nombre, descripcion, tecnico_id, horas) VALUES
 
 INSERT INTO Incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizada, estado) VALUES
 ('2024-06-01', 'Laptop no enciende', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
+('2024-06-01', 'Laptop no enciende 2', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
+('2024-06-01', 'Laptop no enciende 3', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
+('2024-06-01', 'Laptop no enciende 4', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
+('2024-06-01', 'Laptop no enciende 5', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
 ('2024-06-05', 'Proyector sin señal', 1, 3, 2, 2, 2, false, 0, false, 'EN PROCESO'),
 ('2024-06-10', 'Impresora atascada', 1, 2, 3, 3, 1, true, 4, true, 'TERMINADO'),
 ('2024-06-15', 'Servidor requiere actualización', 1, 3, 4, 4, 3, false, 0, false, 'NO INICIADO');
+
+
+INSERT INTO Incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizada, estado) VALUES
+('2024-06-15', 'Servidor requiere actualización 2', 1, 3, 4, 4, null, false, 0, false, 'NO INICIADO');
+

@@ -6,29 +6,39 @@ export const ObtenerServiciosRouter = express.Router();
 export const ObtenerServicioRouter = express.Router();
 export const EditarServicioRouter = express.Router();
 export const EliminarServicioRouter = express.Router();
+export const ObtenerServiciosDeTecnicoRouter = express.Router();
 
-CrearEquipoRouter.post("/crearServicio", async (req, res) => {
+CrearServicioRouter.post("/crearServicio", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { nombre, descripcion, tecnico_id, horas} = req.body;
-    if (!nombre|| !descripcion || tecnico_id|| horas)
+    const { id_incidencia, nombre, descripcion, tecnico_id, horas} = req.body;
+
+    if (!nombre|| !descripcion || !tecnico_id|| !horas)
         return res.status(400).json({ success: false, msg: "Faltan datos" });
 
     try {
         const result = await pool.query(
-            "INSERT INTO servicio ( nombre, descripcion, tecnico_id, horas) VALUES ($1, $2, $3, $4)",
+            "INSERT INTO servicio ( nombre, descripcion, tecnico_id, horas) VALUES ($1, $2, $3, $4) RETURNING *",
             [nombre, descripcion, tecnico_id,horas]
         );
-        res.json({ success: true, msg: "Servicio creado correctamente", result: result.rows[0] });
+
+        const resultIncidencia = await pool.query(
+            "UPDATE Incidente SET servicio_id=$1 WHERE id=$2",
+            [result.rows[0].id, id_incidencia]
+        );
+
+
+        res.json({ success: true, msg: "Servicio creado correctamente" });
     } catch (err) {
+        console.log(err);
         res.status(500).json({ success: false, msg: "Error en DB" });
     }
 });
 
 
-ObtenerEquiposRouter.get("/obtenerServicios", async (req, res) => {
+ObtenerServiciosRouter.get("/obtenerServicios", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
 
     if (customHeader !== 'frontend') {
@@ -43,7 +53,7 @@ ObtenerEquiposRouter.get("/obtenerServicios", async (req, res) => {
     }
 });
 
-ObtenerEquipoRouter.get("/obtenerServicio/:id", async (req, res) => {
+ObtenerServicioRouter.get("/obtenerServicio/:id", async (req, res) => {
 
     const customHeader = req.headers['x-frontend-header'];
 
@@ -67,7 +77,7 @@ ObtenerEquipoRouter.get("/obtenerServicio/:id", async (req, res) => {
 });
 
 
-EditarEquipoRouter.put("/editarServicio", async (req, res) => {
+EditarServicioRouter.put("/editarServicio", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
@@ -92,7 +102,7 @@ EditarEquipoRouter.put("/editarServicio", async (req, res) => {
 });
 
 
-EliminarEquipoRouter.delete("/eliminarServicio", async (req, res) => {
+EliminarServicioRouter.delete("/eliminarServicio", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
@@ -110,3 +120,20 @@ EliminarEquipoRouter.delete("/eliminarServicio", async (req, res) => {
     }
 });
 
+//Ruta para que el tecnico pueda ver sus servicios dados.
+ObtenerServiciosDeTecnicoRouter.get("/obtenerServiciosDeTecnico/:id", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query("SELECT * FROM Servicio WHERE tecnico_id=$1", [id]);
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});

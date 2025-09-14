@@ -9,7 +9,8 @@ import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEqu
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
-import { CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter } from '../querys/incidente.js';
+import { CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, VerDetallesIncidenciaRouter } from '../querys/incidente.js';
+import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
 
 
 const app = express();
@@ -77,7 +78,23 @@ app.use("/api/", ObtenerEquipoRouter);
 app.use("/api/", EditarEquipoRouter);
 app.use("/api/", EditarEquipoRouter);
 
+app.use("/api/", CrearServicioRouter);
+app.use("/api/", ObtenerServiciosRouter);
+app.use("/api/", ObtenerServicioRouter);
+app.use("/api/", EditarServicioRouter);
+app.use("/api/", EliminarServicioRouter);
+
+
 app.use("/api/", ObtenerEquiposEncargadoRouter);
+
+
+//Ruta para que el tecnico pueda ver detalles de la incidencia asignada (Nombre, ubicacion, marca, tipo, piezas, incidencias anteriores). // tabla incidencia
+app.use("/api/", VerDetallesIncidenciaRouter);
+
+//Ruta para que el tecnico pueda ver sus servicios dados.
+app.use("/api/", ObtenerServiciosDeTecnicoRouter);
+
+
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);

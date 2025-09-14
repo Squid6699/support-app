@@ -1,15 +1,17 @@
-import exrpess from 'express';
+import express from 'express';
+import { pool } from '../database/db.js';
 
-export const CrearIncidenciaRouter = exrpess.Router();
-export const ObtenerIncidenciasRouter = exrpess.Router();
-export const ObtenerIncidenciaRouter = exrpess.Router();
-export const EditarIncidenciaRouter = exrpess.Router();
-export const EliminarIncidenciaRouter = exrpess.Router();
-export const ObtenerIncidenciaEquipoRouter = exrpess.Router();
+export const CrearIncidenciaRouter = express.Router();
+export const ObtenerIncidenciasRouter = express.Router();
+export const ObtenerIncidenciaRouter = express.Router();
+export const EditarIncidenciaRouter = express.Router();
+export const EliminarIncidenciaRouter = express.Router();
+export const ObtenerIncidenciaEquipoRouter = express.Router();
+export const VerDetallesIncidenciaRouter = express.Router();
 
 CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
-    if (customHeader !== 'frontend'){
+    if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
     }
 
@@ -148,59 +150,94 @@ ObtenerIncidenciaEquipoRouter.get("/verIncidencia/:equipoId", async (req, res) =
 });
 
 // Ruta para que el tecnico pueda ver detalles de la incidencia asignada (Nombre, ubicacion, marca, tipo, piezas, incidencias anteriores).
-// SELECT 
-//     i.fecha AS fechaIncidencia, 
-//     e.nombre AS nombreEquipo, 
-//     TE.nombre AS tipoEquipo,
-// 	M.nombre AS nombreMarca,
-//     STRING_AGG(PI.nombre, ', ') AS nombrePiezas,
-//     i.descripcion AS descripcionIncidencia,
-// 	UB.edificio AS Edificio,
-// 	UB.aula AS Aula,
-//     P.nombre AS nombreEncargado,
-// 	PR.nombre AS nombrePrioridad
-    
-// FROM incidente I
-// INNER JOIN persona P ON I.usuario_id = P.id
-// INNER JOIN equipo E ON I.equipo_id = E.id
-// INNER JOIN tipoequipo TE ON E.tipo_id = TE.id
-// INNER JOIN marca M ON E.marca_id = M.id
-// JOIN Equipo_Pieza EP ON e.id = EP.equipo_id
-// JOIN Pieza PI ON PI.id = EP.pieza_id
-// INNER JOIN prioridad PR ON I.prioridad_id = PR.id
-// INNER JOIN ubicacion UB ON E.ubicacion_id = UB.id
-// WHERE I.id = 1
-// GROUP BY 
-//     i.fecha, e.id, e.nombre, TE.nombre, 
-//     i.descripcion, P.nombre, M.nombre, PR.nombre,
-// 	UB.edificio, UB.aula
-// ORDER BY e.id;
+VerDetallesIncidenciaRouter.get("/verDetallesIncidencia/:incidenciaId", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
 
-//CONSULTA PARA VER LAS INCIDENCIAS ANTERIORES DEL EQUIPO
-// SELECT 
-//     i.fecha AS fechaIncidencia, 
-//     e.nombre AS nombreEquipo, 
-//     TE.nombre AS tipoEquipo,
-// 	M.nombre AS nombreMarca,
-//     STRING_AGG(PI.nombre, ', ') AS nombrePiezas,
-//     i.descripcion AS descripcionIncidencia,
-// 	UB.edificio AS Edificio,
-// 	UB.aula AS Aula,
-//     P.nombre AS nombreEncargado,
-// 	PR.nombre AS nombrePrioridad
+    const { incidenciaId } = req.params;
+
+    try {
+        const resultIncidencia = await pool.query(`
+            SELECT 
+                i.fecha AS fechaIncidencia,
+                e.id AS equipoId,
+                e.nombre AS nombreEquipo, 
+                TE.nombre AS tipoEquipo,
+                M.nombre AS nombreMarca,
+                STRING_AGG(PI.nombre, ', ') AS nombrePiezas,
+                i.descripcion AS descripcionIncidencia,
+                UB.edificio AS Edificio,
+                UB.aula AS Aula,
+                P.nombre AS nombreEncargado,
+                PR.nombre AS nombrePrioridad
     
-// FROM incidente I
-// INNER JOIN persona P ON I.usuario_id = P.id
-// INNER JOIN equipo E ON I.equipo_id = E.id
-// INNER JOIN tipoequipo TE ON E.tipo_id = TE.id
-// INNER JOIN marca M ON E.marca_id = M.id
-// JOIN Equipo_Pieza EP ON e.id = EP.equipo_id
-// JOIN Pieza PI ON PI.id = EP.pieza_id
-// INNER JOIN prioridad PR ON I.prioridad_id = PR.id
-// INNER JOIN ubicacion UB ON E.ubicacion_id = UB.id
-// WHERE E.id = 4
-// GROUP BY 
-//     i.fecha, e.id, e.nombre, TE.nombre, 
-//     i.descripcion, P.nombre, M.nombre, PR.nombre,
-// 	UB.edificio, UB.aula
-// ORDER BY e.id;
+            FROM incidente I
+            INNER JOIN persona P ON I.usuario_id = P.id
+            INNER JOIN equipo E ON I.equipo_id = E.id
+            INNER JOIN tipoequipo TE ON E.tipo_id = TE.id
+            INNER JOIN marca M ON E.marca_id = M.id
+            JOIN Equipo_Pieza EP ON e.id = EP.equipo_id
+            JOIN Pieza PI ON PI.id = EP.pieza_id
+            INNER JOIN prioridad PR ON I.prioridad_id = PR.id
+            INNER JOIN ubicacion UB ON E.ubicacion_id = UB.id
+            WHERE I.id = $1
+            GROUP BY 
+                i.fecha, e.id, e.nombre, TE.nombre, 
+                i.descripcion, P.nombre, M.nombre, PR.nombre,
+                UB.edificio, UB.aula
+            ORDER BY e.id;
+        `, [incidenciaId]);
+
+        if (resultIncidencia.rows.length === 0) {
+            return res.status(404).json({ success: false, msg: "No se encontraron detalles para esta incidencia" });
+        }
+
+        const equipoId = resultIncidencia.rows[0].equipoid;
+        
+        //CONSULTA PARA VER LAS INCIDENCIAS ANTERIORES DEL EQUIPO
+        const resultIncidenciasAnteriores = await pool.query(`
+            SELECT 
+                i.fecha AS fechaIncidencia, 
+                e.nombre AS nombreEquipo, 
+                TE.nombre AS tipoEquipo,
+                M.nombre AS nombreMarca,
+                STRING_AGG(PI.nombre, ', ') AS nombrePiezas,
+                i.descripcion AS descripcionIncidencia,
+                UB.edificio AS Edificio,
+                UB.aula AS Aula,
+                P.nombre AS nombreEncargado,
+                PR.nombre AS nombrePrioridad,
+                S.nombre AS nombreServicio,
+                S.descripcion AS descripcionServicio,
+                S.horas AS horasServicio
+                
+            FROM incidente I
+            INNER JOIN persona P ON I.usuario_id = P.id
+            INNER JOIN equipo E ON I.equipo_id = E.id
+            INNER JOIN tipoequipo TE ON E.tipo_id = TE.id
+            INNER JOIN marca M ON E.marca_id = M.id
+            JOIN Equipo_Pieza EP ON e.id = EP.equipo_id
+            JOIN Pieza PI ON PI.id = EP.pieza_id
+            INNER JOIN prioridad PR ON I.prioridad_id = PR.id
+            INNER JOIN ubicacion UB ON E.ubicacion_id = UB.id
+            INNER JOIN servicio S ON I.servicio_id = S.id
+            WHERE E.id = $1 AND I.id != $2
+            GROUP BY 
+                i.fecha, e.id, e.nombre, TE.nombre, 
+                i.descripcion, P.nombre, M.nombre, PR.nombre,
+                UB.edificio, UB.aula, S.nombre, S.descripcion, S.horas
+            ORDER BY e.id;
+        `, [equipoId, incidenciaId]);
+
+        res.json({ success: true, 
+            incidencia: resultIncidencia.rows[0], 
+            incidenciasAnteriores: resultIncidenciasAnteriores.rows 
+        });
+
+    } catch (err) {
+        return res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
