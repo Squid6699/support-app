@@ -53,10 +53,10 @@ Rutas para eliminar
 -Ruta para que el tecnico pueda ver detalles de la incidencia asignada (Nombre, ubicacion, marca, tipo, piezas, incidencias anteriores). // tabla incidencia --Listo
 -Ruta para que el tecnico pueda dar detalle sobre el servicio. // tabla servicio --Listo
 -Ruta para que el tecnico pueda ver sus servicios dados. // tabla servicio --Listo
--Ruta para que el tecnico pueda ver los detalles de los servicios dados. // Tabla servicio
--Ruta para que el tecnico pueda terminar una incidencia. // tabla incidencia
--Ruta para que el encargado pueda dar una calificacion a la incidencia. // tabla incidencia
--Ruta para que el encargado de edificio pueda liberar las incidencias en estado terminado. // tabla incidencia
+-Ruta para que el tecnico pueda ver los detalles de los servicios dados. // Tabla servicio --Listo
+-Ruta para que el tecnico pueda iniciar una incidencia. // tabla incidencia --Listo
+-Ruta para que el tecnico pueda terminar una incidencia. // tabla incidencia --Listo
+-Ruta para que el encargado pueda dar una calificacion a la incidencia. // tabla incidencia --Listo
+-Ruta para que el encargado de edificio pueda liberar las incidencias en estado terminado. // tabla incidencia --Listo
 -Ruta para que el encargado de edificio pueda filtrar entre las incidencias (AUTORIZADO, NO AUTORIZADO, NO INICIADO, EN PROCESO, TERMINADO, LIBERADO) // tabla de incidencia 
-- Ruta para que el tecnico pueda cambiar el estado de la incidencia  // incidencia
 

@@ -8,6 +8,10 @@ export const EditarIncidenciaRouter = express.Router();
 export const EliminarIncidenciaRouter = express.Router();
 export const ObtenerIncidenciaEquipoRouter = express.Router();
 export const VerDetallesIncidenciaRouter = express.Router();
+export const IniciarIncidenciaRouter = express.Router();
+export const TerminarIncidenciaRouter = express.Router();
+export const CalificarIncidenciaRouter = express.Router();
+export const LiberarIncidenciaRouter = express.Router();
 
 CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -241,3 +245,119 @@ VerDetallesIncidenciaRouter.get("/verDetallesIncidencia/:incidenciaId", async (r
     }
 });
 
+//Ruta para que el tecnico pueda iniciar una incidencia.
+IniciarIncidenciaRouter.put("/iniciarIncidencia", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE incidente SET estado = 'EN PROCESO' WHERE id = $1",
+            [id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, msg: "Incidencia no encontrada" });
+        }
+
+        res.json({ success: true, msg: "Incidencia iniciada correctamente" });
+    } catch (err) {
+        return res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+
+//Ruta para que el tecnico pueda terminar una incidencia.
+TerminarIncidenciaRouter.put("/terminarIncidencia", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE incidente SET estado = 'TERMINADO', fecha_fin = NOW() WHERE id = $1",
+            [id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, msg: "Incidencia no encontrada" });
+        }
+
+        res.json({ success: true, msg: "Incidencia terminada correctamente" });
+    } catch (err) {
+        return res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+//Ruta para que el encargado pueda dar una calificacion a la incidencia.
+CalificarIncidenciaRouter.put("/calificarIncidencia", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id, calificacion } = req.body;
+
+    if (!id || !calificacion) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE incidente SET calificacion = $1 WHERE id = $2",
+            [calificacion, id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, msg: "Incidencia no encontrada" });
+        }
+
+        res.json({ success: true, msg: "Incidencia calificada correctamente" });
+    } catch (err) {
+        return res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+//Ruta para que el encargado de edificio pueda liberar las incidencias en estado terminado.
+LiberarIncidenciaRouter.put("/liberarIncidencia", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE incidente SET estado = 'LIBERADO', finalizado = true WHERE id = $1",
+            [id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, msg: "Incidencia no encontrada" });
+        }
+
+        res.json({ success: true, msg: "Incidencia liberada correctamente" });
+    } catch (err) {
+        return res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});

@@ -7,6 +7,7 @@ export const ObtenerServicioRouter = express.Router();
 export const EditarServicioRouter = express.Router();
 export const EliminarServicioRouter = express.Router();
 export const ObtenerServiciosDeTecnicoRouter = express.Router();
+export const ObtenerDetallesServicioRouter = express.Router();
 
 CrearServicioRouter.post("/crearServicio", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -133,6 +134,44 @@ ObtenerServiciosDeTecnicoRouter.get("/obtenerServiciosDeTecnico/:id", async (req
     try {
         const result = await pool.query("SELECT * FROM Servicio WHERE tecnico_id=$1", [id]);
         res.json({ success: true, result: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+//Ruta para que el tecnico pueda ver los detalles de los servicios dados.
+ObtenerDetallesServicioRouter.get("/obtenerDetallesServicio/:id", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }  
+
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(
+            `SELECT S.nombre AS nombreServicio, 
+            S.descripcion AS descripcionServicio, 
+            S.horas AS horasServicio, 
+            I.fecha AS fechaIncidencia, 
+            I.descripcion descripcionIncidencia, 
+            E.nombre AS nombreEquipo, 
+            P.nombre AS Prioridad, 
+            I.finalizado AS finalizadoIncidencia, 
+            I.calificacion AS calificacionIncidencia, 
+            I.estado AS estadoIncidencia
+            FROM incidente I
+            INNER JOIN servicio S ON I.servicio_id = S.id
+            INNER JOIN equipo E ON I.equipo_id = E.id
+            INNER JOIN prioridad P ON I.prioridad_id = P.id
+            WHERE S.id = $1`, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, msg: "Servicio no encontrado" });
+        }
+
+        res.json({ success: true, result: result.rows[0] });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });
     }

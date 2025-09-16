@@ -9,8 +9,8 @@ import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEqu
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
-import { CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, VerDetallesIncidenciaRouter } from '../querys/incidente.js';
-import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
+import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter } from '../querys/incidente.js';
+import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
 
 
 const app = express();
@@ -93,6 +93,21 @@ app.use("/api/", VerDetallesIncidenciaRouter);
 
 //Ruta para que el tecnico pueda ver sus servicios dados.
 app.use("/api/", ObtenerServiciosDeTecnicoRouter);
+
+//Ruta para que el tecnico pueda ver los detalles de los servicios dados.
+app.use("/api/", ObtenerDetallesServicioRouter);
+
+//Ruta para que el tecnico pueda iniciar una incidencia.
+app.use("/api/", IniciarIncidenciaRouter);
+
+//Ruta para que el tecnico pueda terminar una incidencia.
+app.use("/api/", TerminarIncidenciaRouter);
+
+//Ruta para que el encargado pueda dar una calificacion a la incidencia.
+app.use("/api/", CalificarIncidenciaRouter);
+
+//Ruta para que el encargado de edificio pueda liberar las incidencias en estado terminado.
+app.use("/api/", LiberarIncidenciaRouter);
 
 
 
