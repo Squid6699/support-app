@@ -9,7 +9,7 @@ import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEqu
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
-import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter } from '../querys/incidente.js';
+import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter,obtenerIncidenciasEncargadoRouter,ActualizarEstadoIncidenciaRouter, AsignarTecnico , AsignarTecnico , IncidenciasTecnicoRouter } from '../querys/incidente.js';
 import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
 
 
@@ -109,6 +109,17 @@ app.use("/api/", CalificarIncidenciaRouter);
 //Ruta para que el encargado de edificio pueda liberar las incidencias en estado terminado.
 app.use("/api/", LiberarIncidenciaRouter);
 
+// Ruta para que el encargado de edificio pueda ver sus incidencias.
+app.use("/api/",obtenerIncidenciasEncargadoRouter);
+
+// Ruta para que el encargado de edificio acepte o rechace una incidencia.
+app.use("/api/",ActualizarEstadoIncidenciaRouter);
+
+// Ruta para que el administrador asigne un técnico a una incidencia
+app.use("/api/",AsignarTecnico);
+
+//-Ruta para que el tecnico pueda ver sus incidencias asignadas. 
+app.use("/api/",IncidenciasTecnicoRouter);
 
 
 app.listen(process.env.PORT, () => {

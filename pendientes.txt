@@ -44,11 +44,10 @@ Rutas para eliminar
 -Ruta para que el encargado de edificio pueda ver sus equipos. // tabla Equipo - listo 
 -Ruta para que el encargado pueda ver detalles sobre los equipos  // tabla Equipo -- listo  (checar)
 -Ruta para que el encargado de edificio pueda ver la incidencia de un equipo // tabla incidencia  - listo (checar)
-
--Ruta para que el encargado de edificio pueda ver sus incidencias. // tabla incidencia
--Ruta para que el encargado de edificio acepte o rechace una incidencia. / tabla incidencia
--Ruta para que el administrador asigne un tecnico. // tabla incidencia
--Ruta para que el tecnico pueda ver sus incidencias asignadas. // tabla incidencia
+-Ruta para que el encargado de edificio pueda ver sus incidencias. // tabla incidencia -- listo 
+-Ruta para que el encargado de edificio acepte o rechace una incidencia. / tabla incidencia-- listo
+-Ruta para que el administrador asigne un tecnico. // tabla incidencia -- Listo 
+-Ruta para que el tecnico pueda ver sus incidencias asignadas. // tabla incidencia -- listo
 
 -Ruta para que el tecnico pueda ver detalles de la incidencia asignada (Nombre, ubicacion, marca, tipo, piezas, incidencias anteriores). // tabla incidencia --Listo
 -Ruta para que el tecnico pueda dar detalle sobre el servicio. // tabla servicio --Listo

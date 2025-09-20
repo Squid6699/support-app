@@ -12,6 +12,12 @@ export const IniciarIncidenciaRouter = express.Router();
 export const TerminarIncidenciaRouter = express.Router();
 export const CalificarIncidenciaRouter = express.Router();
 export const LiberarIncidenciaRouter = express.Router();
+export const obtenerIncidenciasEncargadoRouter = express.Router();
+export const ActualizarEstadoIncidenciaRouter = express.Router();
+export const AsignarTecnico = express.Router();
+export const IncidenciasTecnicoRouter = express.Router();
+
+
 
 CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -361,3 +367,151 @@ LiberarIncidenciaRouter.put("/liberarIncidencia", async (req, res) => {
         return res.status(500).json({ success: false, msg: "Error en la base de datos" });
     }
 });
+
+// Ruta para que el encargado de edificio pueda ver sus incidencias.
+
+ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { personaId } = req.params;
+
+    try {
+        const result = await pool.query(`
+            SELECT 
+                i.id AS incidencia_id,
+                i.fecha,
+                i.descripcion,
+                i.estado,
+                i.prioridad_id,
+                eq.id AS equipo_id,
+                eq.nombre AS equipo_nombre,
+                ub.edificio,
+                ub.aula
+            FROM incidente i
+            INNER JOIN equipo eq ON i.equipo_id = eq.id
+            INNER JOIN ubicacion ub ON eq.ubicacion_id = ub.id
+            INNER JOIN persona p ON ub.persona_id = p.id
+            WHERE p.id = $1
+            ORDER BY i.fecha DESC
+        `, [personaId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, msg: "No se encontraron incidencias para este encargado" });
+        }
+
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        console.error("Error en la DB:", err);
+        res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+// Ruta para que el encargado de edificio acepte o rechace una incidencia.
+
+ActualizarEstadoIncidenciaRouter.put("/actualizarIncidencia/:incidenciaId", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { incidenciaId } = req.params;
+    const { estado } = req.body; 
+
+    if (!["aceptada", "rechazada"].includes(estado)) {
+        return res.status(400).json({ success: false, msg: "Estado inválido. Solo se permite 'aceptada' o 'rechazada'." });
+    }
+
+    try {
+        const result = await pool.query(
+            `UPDATE incidente 
+             SET estado = $1
+             WHERE id = $2
+             RETURNING id, estado`,
+            [estado, incidenciaId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, msg: "No se encontró la incidencia" });
+        }
+
+        res.json({ success: true, msg: "Incidencia actualizada", result: result.rows[0] });
+    } catch (err) {
+        console.error("Error en la DB:", err);
+        res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+// Ruta para que el administrador asigne un técnico a una incidencia
+
+AsignarTecnico.put("/asignarTecnico/:incidenciaId", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { incidenciaId } = req.params;
+    const { tecnicoId } = req.body;
+
+    if (!tecnicoId) {
+        return res.status(400).json({ success: false, msg: "Debes proporcionar el ID del técnico" });
+    }
+
+    try {
+        const result = await pool.query(
+            `UPDATE incidente
+             SET tecnico_id = $1
+             WHERE id = $2
+             RETURNING id, tecnico_id`,
+            [tecnicoId, incidenciaId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, msg: "No se encontró la incidencia" });
+        }
+
+        res.json({ success: true, msg: "Técnico asignado correctamente", result: result.rows[0] });
+    } catch (err) {
+        console.error("Error en la DB:", err);
+        res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+//-Ruta para que el tecnico pueda ver sus incidencias asignadas. 
+
+IncidenciasTecnicoRouter.get("/incidenciasTecnico/:tecnicoId", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { tecnicoId } = req.params;
+
+    try {
+        const result = await pool.query(
+            `SELECT 
+                i.id,i.fecha, i.hora,i.descripcion,i.estado,i.prioridad_id,
+                p.nombre AS prioridad,i.marca_id,m.nombre AS marca,i.tipoequipo_id,
+                t.nombre AS tipo_equipo,i.fecha_solucion,i.hora_solucion,i.solucion
+             FROM incidente i
+             LEFT JOIN prioridad p ON i.prioridad_id = p.id
+             LEFT JOIN marca m ON i.marca_id = m.id
+             LEFT JOIN tipoequipo t ON i.tipoequipo_id = t.id
+             WHERE i.tecnico_id = $1
+             ORDER BY i.fecha DESC, i.hora DESC`,
+            [tecnicoId]
+        );
+
+        res.json({ success: true, incidencias: result.rows });
+    } catch (err) {
+        console.error("Error al obtener incidencias del técnico:", err);
+        res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
