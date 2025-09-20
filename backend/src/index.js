@@ -1,5 +1,6 @@
 import express from 'express';
 import { middleware } from "../middleware/middleware.js";
+import jwt from "jsonwebtoken";
 
 import { CrearUbicacionRouter, EditarUbicacionRouter, EliminarUbicacionRouter, ObtenerUbicacionesRouter, ObtenerUbicacionRouter } from '../querys/ubicacion.js';
 import { CrearPersonaRouter, EditarPersonaRouter, EliminarPersonaRouter, ObtenerPersonasRouter, ObtenerPersonaRouter } from '../querys/personas.js';
@@ -11,6 +12,7 @@ import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaR
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
 import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter } from '../querys/incidente.js';
 import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
+import { userAuth } from '../querys/Auth.js';
 
 
 const app = express();
@@ -112,7 +114,7 @@ app.use("/api/", LiberarIncidenciaRouter);
 // Ruta para que el encargado de edificio pueda ver sus incidencias.
 app.use("/api/", ObtenerIncidenciasEncargadoRouter);
 
-// Ruta para que el encargado de edificio acepte o rechace una incidencia.
+// Ruta para que el encargado de edificio acepte o srechace una incidencia.
 app.use("/api/", ActualizarEstadoIncidenciaRouter);
 
 // Ruta para que el administrador asigne un técnico a una incidencia
@@ -122,9 +124,7 @@ app.use("/api/", AsignarTecnico);
 app.use("/api/", IncidenciasTecnicoRouter);
 
 
-
-
-
+app.use("/api/", userAuth);
 
 
 
@@ -137,16 +137,16 @@ app.use("/api/", IncidenciasTecnicoRouter);
 
 app.post("/api/", (req, res) => {
     const token = req.cookies.sesion;
+
     if (!token) {
         return res.json({ success: false, msg: "TOKEN INVALIDO." })
     }
 
     try {
         const verified = jwt.verify(token, process.env.SECRET_KEY);
-        return res.json({ success: true, nombre: verified.nombre, correo: verified.correo, autorization: verified.autorization });
+        res.json({ success: true, usuario: verified.usuario, correo: verified.correo, celular: verified.celular, rol: verified.rol });
 
     } catch (error) {
-        // console.log(error)
         return res.json({ success: false, msg: "TOKEN EXPIRADO." })
     }
 })

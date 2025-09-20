@@ -11,9 +11,10 @@ type SesionProviderProps = {
 export function SesionProvider({ children }: SesionProviderProps) {
   const HOST = import.meta.env.VITE_HOST;
   const navigate = useNavigate();
-  const [nombre, setNombre] = useState<string | null>(null);
+  const [usuario, setUsuario] = useState<string | null>(null);
   const [correo, setCorreo] = useState<string | null>(null);
-  const [autorization, setAutorization] = useState<string | null>(null);
+  const [celular, setCelular] = useState<string | null>(null);
+  const [rol, setRol] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,11 +28,11 @@ export function SesionProvider({ children }: SesionProviderProps) {
         });
 
         const data = await response.json();
-
         if (data.success) {
-          setNombre(data.nombre);
+          setUsuario(data.usuario);
           setCorreo(data.correo);
-          setAutorization(data.autorization);
+          setCelular(data.celular);
+          setRol(data.rol);
           navigate("/");
           document.title = "HOME";
         } else {
@@ -48,12 +49,14 @@ export function SesionProvider({ children }: SesionProviderProps) {
   return (
     <SesionContext.Provider
       value={{
-        nombre,
-        setNombre,
+        usuario,
+        setUsuario,
         correo,
         setCorreo,
-        autorization,
-        setAutorization,
+        celular,
+        setCelular,
+        rol,
+        setRol,
       }}
     >
       {children}

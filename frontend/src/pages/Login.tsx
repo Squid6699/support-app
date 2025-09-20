@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 
 function Login(){
     const HOST = import.meta.env.VITE_HOST
-    const {setNombre, setCorreo, setAutorization} = useSesion();
+    const {setUsuario, setCorreo, setRol, setCelular} = useSesion();
     const [correo, setCorreoLogin] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState({correo: false, password: false})
@@ -40,22 +40,24 @@ function Login(){
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
+                    'x-frontend-header': 'frontend',
                 },
                 body: JSON.stringify({ correo: correo, contrasena: password }),
                 credentials: "include"
             })
 
             const data = await response.json()
-            
+            console.log(data);
             if (data.success){
-                setNombre(data.usuario);
+                setUsuario(data.usuario);
                 setCorreo(data.correo);
-                setAutorization(data.autorization);
+                setCelular(data.celular);
+                setRol(data.rol);
                 setLoading(false);
-                window.location.href = "/"
+                window.location.href = "/";
             }else{
-                toast.error("CONTRASEÑA Y/O CORREO INCORRECTO");
-                setLoading(false)
+                toast.error(data.msg);
+                setLoading(false);
             }
 
         }catch(Exce){
