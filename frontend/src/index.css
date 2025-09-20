@@ -1,0 +1,83 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Oswald&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+    --main-color: #1b396a;
+    --text-color: #080206;
+}
+
+* {
+    /* font-family: 'Oswald', sans-serif !important; */
+    font-family: "Montserrat", sans-serif !important;
+    text-decoration: none !important;
+    list-style: none !important;
+    margin: 0;
+}
+
+.headerLogo{
+    width: 60px;
+    height: 60px;
+}
+
+.cardContenedor{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card{
+    display: flex;
+    border-radius: 0.28571429rem;
+    box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
+    padding: 15px;
+}
+
+.cardBody{
+    width: 90%;
+}
+
+.cardBodyRight{
+    width: 10%;
+    text-align: center;
+    align-content: center;
+}
+
+/* COLOR DEL BORDE AL HACERLE FOCUS */
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: var(--main-color) !important;
+}
+
+/* COLOR DEL LABEL DE INPUT FOCUS */
+.css-113d811-MuiFormLabel-root-MuiInputLabel-root.Mui-focused{
+    color: var(--main-color) !important;
+}
+
+/* MAXIMA LONGITUD DEL MODAL DIALOG */
+.css-10d30g3-MuiPaper-root-MuiDialog-paper{
+    max-width: 1000px !important;
+}
+
+/* TAMAÑO DEL GRID DE ASIGNAR PROYECTOS */
+.css-q7vl0f-MuiList-root{
+    width: 300px !important;
+}
+
+/* POSICION DEL CHIP EN ASIGNAR PROYECTOS */
+.css-niqf4j-MuiStack-root{
+    align-items: center !important;
+    flex-wrap: wrap !important;
+}
+
+.css-1mzerio{
+    align-items: center !important;
+    flex-wrap: wrap !important;
+}
+
+#btnLoading{
+    background-color: var(--main-color) !important;
+}
+
+#btnLoading:hover{
+    background-color: #1976d2 !important;
+}

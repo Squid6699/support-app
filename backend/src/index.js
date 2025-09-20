@@ -9,7 +9,7 @@ import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEqu
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
-import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter,obtenerIncidenciasEncargadoRouter,ActualizarEstadoIncidenciaRouter, AsignarTecnico , AsignarTecnico , IncidenciasTecnicoRouter } from '../querys/incidente.js';
+import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter } from '../querys/incidente.js';
 import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
 
 
@@ -110,16 +110,61 @@ app.use("/api/", CalificarIncidenciaRouter);
 app.use("/api/", LiberarIncidenciaRouter);
 
 // Ruta para que el encargado de edificio pueda ver sus incidencias.
-app.use("/api/",obtenerIncidenciasEncargadoRouter);
+app.use("/api/", ObtenerIncidenciasEncargadoRouter);
 
 // Ruta para que el encargado de edificio acepte o rechace una incidencia.
-app.use("/api/",ActualizarEstadoIncidenciaRouter);
+app.use("/api/", ActualizarEstadoIncidenciaRouter);
 
 // Ruta para que el administrador asigne un técnico a una incidencia
-app.use("/api/",AsignarTecnico);
+app.use("/api/", AsignarTecnico);
 
 //-Ruta para que el tecnico pueda ver sus incidencias asignadas. 
-app.use("/api/",IncidenciasTecnicoRouter);
+app.use("/api/", IncidenciasTecnicoRouter);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.post("/api/", (req, res) => {
+    const token = req.cookies.sesion;
+    if (!token) {
+        return res.json({ success: false, msg: "TOKEN INVALIDO." })
+    }
+
+    try {
+        const verified = jwt.verify(token, process.env.SECRET_KEY);
+        return res.json({ success: true, nombre: verified.nombre, correo: verified.correo, autorization: verified.autorization });
+
+    } catch (error) {
+        // console.log(error)
+        return res.json({ success: false, msg: "TOKEN EXPIRADO." })
+    }
+})
+
+app.get("/api/logout", async (req, res) => {
+    const customHeader = req.headers['x-custom-header'];
+
+    if (customHeader !== 'my-frontend-identifier') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        res.clearCookie('sesion', { path: '/' });
+        return res.json({ success: true });
+    } catch (err) {
+        return res.json({ error: "OCURRIO UN ERROR AL CERRAR SESION" })
+    }
+})
 
 
 app.listen(process.env.PORT, () => {

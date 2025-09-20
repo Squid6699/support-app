@@ -31,6 +31,21 @@ services:
     networks:
       - support-app-network
 
+
+  frontend:
+    build:
+      context: ./frontend   # Aquí va la carpeta donde está tu proyecto Vite
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    working_dir: /usr/src/app
+    command: npm run dev -- --host 0.0.0.0   # Para exponer el dev server
+    networks:
+      - support-app-network
+
 volumes:
   pgdata:
 
