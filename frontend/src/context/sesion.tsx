@@ -11,6 +11,7 @@ type SesionProviderProps = {
 export function SesionProvider({ children }: SesionProviderProps) {
   const HOST = import.meta.env.VITE_HOST;
   const navigate = useNavigate();
+  const [id, setId] = useState<number | null>(null);
   const [usuario, setUsuario] = useState<string | null>(null);
   const [correo, setCorreo] = useState<string | null>(null);
   const [celular, setCelular] = useState<string | null>(null);
@@ -29,6 +30,7 @@ export function SesionProvider({ children }: SesionProviderProps) {
 
         const data = await response.json();
         if (data.success) {
+          setId(data.id);
           setUsuario(data.usuario);
           setCorreo(data.correo);
           setCelular(data.celular);
@@ -55,6 +57,8 @@ export function SesionProvider({ children }: SesionProviderProps) {
         setCorreo,
         celular,
         setCelular,
+        id,
+        setId,
         rol,
         setRol,
       }}

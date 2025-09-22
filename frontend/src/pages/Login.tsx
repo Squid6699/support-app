@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 
 function Login(){
     const HOST = import.meta.env.VITE_HOST
-    const {setUsuario, setCorreo, setRol, setCelular} = useSesion();
+    const {setUsuario, setCorreo, setRol, setCelular, setId} = useSesion();
     const [correo, setCorreoLogin] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState({correo: false, password: false})
@@ -49,6 +49,7 @@ function Login(){
             const data = await response.json()
             console.log(data);
             if (data.success){
+                setId(data.id);
                 setUsuario(data.usuario);
                 setCorreo(data.correo);
                 setCelular(data.celular);

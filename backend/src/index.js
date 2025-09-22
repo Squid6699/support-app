@@ -149,7 +149,7 @@ app.post("/api/", (req, res) => {
 
     try {
         const verified = jwt.verify(token, process.env.SECRET_KEY);
-        res.json({ success: true, usuario: verified.usuario, correo: verified.correo, celular: verified.celular, rol: verified.rol });
+        res.json({ success: true, id: verified.id, usuario: verified.usuario, correo: verified.correo, celular: verified.celular, rol: verified.rol });
 
     } catch (error) {
         return res.json({ success: false, msg: "TOKEN EXPIRADO." })

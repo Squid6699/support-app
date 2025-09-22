@@ -23,6 +23,7 @@ import ExtensionIcon from '@mui/icons-material/Extension';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import LogoutIcon from '@mui/icons-material/Logout';
+import Incidencias from "../pages/Incidencias";
 
 const drawerWidth = 200;
 
@@ -256,7 +257,7 @@ function ResponsiveDrawer() {
 
                 {/* CONTEN MAIN */}
                 {selectedContent === "Incidencias Asignadas" && <div>Contenido de Incidencias Asignadas</div>}
-                {selectedContent === "Incidencias" && <div>Contenido de Incidencias</div>}
+                {selectedContent === "Incidencias" && <Incidencias />}
                 {selectedContent === "Servicios" && <div>Contenido de Servicios</div>}
                 {selectedContent === "Ubicaciones" && <div>Contenido de Ubicaciones</div>}
                 {selectedContent === "Usuarios" && <div>Contenido de Usuarios</div>}
