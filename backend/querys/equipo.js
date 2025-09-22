@@ -14,14 +14,14 @@ CrearEquipoRouter.post("/crearEquipo", async (req, res) => {
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { nombre, fecha, ubicacion_id, marca_id, tipo_id } = req.body;
-    if (!nombre || !fecha || !ubicacion_id || !marca_id || !tipo_id)
+    const { nombre, fecha, aula_id, marca_id, tipo_id } = req.body;
+    if (!nombre || !fecha || !aula_id || !marca_id || !tipo_id)
         return res.status(400).json({ success: false, msg: "Faltan datos" });
 
     try {
         const result = await pool.query(
-            "INSERT INTO equipo (nombre, fecha, ubicacion_id, marca_id, tipo_id) VALUES ($1, $2, $3, $4, $5)",
-            [nombre, fecha, ubicacion_id, marca_id, tipo_id]
+            "INSERT INTO equipo (nombre, fecha, aula_id, marca_id, tipo_id) VALUES ($1, $2, $3, $4, $5)",
+            [nombre, fecha, aula_id, marca_id, tipo_id]
         );
         res.json({ success: true, msg: "Equipo creado correctamente", result: result.rows[0] });
     } catch (err) {
@@ -74,14 +74,14 @@ EditarEquipoRouter.put("/editarEquipo", async (req, res) => {
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { id, nombre, fecha, ubicacion_id, marca_id, tipo_id } = req.body;
-    if (!nombre || !fecha || !ubicacion_id || !marca_id || !tipo_id)
+    const { id, nombre, fecha, aula_id, marca_id, tipo_id } = req.body;
+    if (!nombre || !fecha || !aula_id || !marca_id || !tipo_id)
         return res.status(400).json({ success: false, msg: "Faltan datos" });
 
     try {
         const result = await pool.query(
-            "UPDATE equipo SET nombre=$1, fecha=$2, ubicacion_id=$3, marca_id=$4, tipo_id=$5 WHERE id=$6",
-            [nombre, fecha, ubicacion_id, marca_id, tipo_id, id]
+            "UPDATE equipo SET nombre=$1, fecha=$2, aula_id=$3, marca_id=$4, tipo_id=$5 WHERE id=$6",
+            [nombre, fecha, aula_id, marca_id, tipo_id, id]
         );
 
         if (result.rowCount === 0)
@@ -126,11 +126,12 @@ ObtenerEquiposEncargadoRouter.get("/verEquiposEncargado/:id", async (req, res) =
 
     try {
         const result = await pool.query(`
-            SELECT eq.nombre AS Nombre, ub.edificio AS Edificio, ub.aula AS Aula
-            FROM equipo eq
-            INNER  JOIN ubicacion ub ON eq.ubicacion_id = ub.id 
-            INNER JOIN persona p ON ub.persona_id = p.id
-            WHERE p.id = $1
+            SELECT EQ.nombre AS nombreequipo, EQ.fecha AS fechaequipo, A.nombre AS nombreaula, E.nombre AS nombreedificio
+            FROM equipo EQ
+            INNER JOIN aula A ON EQ.aula_id = A.id
+            INNER JOIN Edificio E ON A.edificio_id = E.id
+            INNER JOIN Persona P ON E.encargado_id = P.id
+            WHERE P.id = $1
         `, [id]);
         res.json({ success: true, result: result.rows });
     } catch (err) {
@@ -151,12 +152,32 @@ ObtenerDetallesEquiposRouter.get("/verDetallesEquipos/:id", async (req, res) => 
 
     try {
         const result = await pool.query(`
-            SELECT  eq.id ,eq.nombre , eq.fecha ,ub.edificio ,ub.aula ,i.id ,i.fecha, i.descripcion ,i.estado ,i.prioridad_id 
-            FROM equipo eq
-            INNER JOIN ubicacion ub ON eq.ubicacion_id = ub.id
-            INNER JOIN persona p  ON ub.persona_id = p.id
-            LEFT  JOIN incidente i ON i.equipo_id = eq.id
-            WHERE p.id = $1
+            SELECT EQ.nombre AS nombreequipo, 
+            EQ.fecha AS fechaequipo, 
+            A.nombre AS nombreaula, 
+            E.nombre AS nombreedificio, 
+            I.id AS idincidente,
+            I.descripcion AS descripcionincidente,
+            Tec.nombre AS nombretecnico,
+            PR.nombre AS prioridad,
+            S.nombre AS nombreservicio,
+            S.descripcion AS descripcionservicio,
+            S.horas AS horasservicio,
+            I.finalizado AS incidenciafinalizada,
+            I.fecha_fin AS fechaterminoincidencia,
+            I.calificacion AS calificacionincidencia,
+            I.autorizada AS autorizadaincidencia,
+            I.estado AS estadoincidencia
+
+            FROM equipo EQ
+            INNER JOIN aula A ON EQ.aula_id = A.id
+            INNER JOIN Edificio E ON A.edificio_id = E.id
+            INNER JOIN Persona P ON E.encargado_id = P.id
+            LEFT JOIN Incidente I ON I.equipo_id = EQ.id
+            LEFT JOIN Persona Tec ON I.tecnico_id = Tec.id
+            LEFT JOIN Prioridad PR ON I.prioridad_id = PR.id
+            LEFT JOIN Servicio S ON I.servicio_id = S.id
+            WHERE EQ.id = $1
         `, [id]);
 
         if (result.rows.length === 0) {

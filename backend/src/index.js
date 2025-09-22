@@ -2,7 +2,6 @@ import express from 'express';
 import { middleware } from "../middleware/middleware.js";
 import jwt from "jsonwebtoken";
 
-import { CrearUbicacionRouter, EditarUbicacionRouter, EliminarUbicacionRouter, ObtenerUbicacionesRouter, ObtenerUbicacionRouter } from '../querys/ubicacion.js';
 import { CrearPersonaRouter, EditarPersonaRouter, EliminarPersonaRouter, ObtenerPersonasRouter, ObtenerPersonaRouter } from '../querys/personas.js';
 import { CrearRolRouter, EditarRolRouter, EliminarRolRouter, ObtenerRolesRouter, ObtenerRolRouter } from '../querys/rol.js';
 import { CrearPrioridadRouter, EditarPrioridadRouter, EliminarPrioridadRouter, ObtenerPrioridadesRouter, ObtenerPrioridadRouter } from '../querys/prioridad.js';
@@ -13,6 +12,7 @@ import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaR
 import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter } from '../querys/incidente.js';
 import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
 import { userAuth } from '../querys/Auth.js';
+import { CrearAulaRouter, CrearEdificioRouter, EditarAulaRouter, EditarEdificioRouter, EliminarAulaRouter, EliminarEdificioRouter, ObtenerAulasPorEdificioRouter, ObtenerAulasRouter, ObtenerEdificiosRouter } from '../querys/ubicacion.js';
 
 
 const app = express();
@@ -20,11 +20,16 @@ const app = express();
 //Uso de middlewares
 app.use(middleware);
 
-app.use("/api/", CrearUbicacionRouter);
-app.use("/api/", ObtenerUbicacionesRouter);
-app.use("/api/", ObtenerUbicacionRouter);
-app.use("/api/", EditarUbicacionRouter);
-app.use("/api/", EliminarUbicacionRouter);
+app.use("/api/", CrearEdificioRouter);
+app.use("/api/", CrearAulaRouter);
+app.use("/api/", ObtenerEdificiosRouter);
+app.use("/api/", ObtenerAulasRouter);
+app.use("/api/", EditarEdificioRouter);
+app.use("/api/", EditarAulaRouter);
+app.use("/api/", EliminarEdificioRouter);
+app.use("/api/", EliminarAulaRouter);
+app.use("/api/", ObtenerAulasPorEdificioRouter);
+
 
 app.use("/api/", CrearPersonaRouter);
 app.use("/api/", ObtenerPersonasRouter);

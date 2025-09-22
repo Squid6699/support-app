@@ -1,108 +1,200 @@
 import express from 'express';
 import { pool } from '../database/db.js';
 
-export const CrearUbicacionRouter = express.Router();
-export const ObtenerUbicacionesRouter = express.Router();
-export const ObtenerUbicacionRouter = express.Router();
-export const EditarUbicacionRouter = express.Router();
-export const EliminarUbicacionRouter = express.Router();
+export const CrearEdificioRouter = express.Router();
+export const CrearAulaRouter = express.Router();
+export const ObtenerEdificiosRouter = express.Router();
+export const ObtenerAulasRouter = express.Router();
+export const EditarEdificioRouter = express.Router();
+export const EditarAulaRouter = express.Router();
+export const EliminarEdificioRouter = express.Router();
+export const EliminarAulaRouter = express.Router();
+export const ObtenerAulasPorEdificioRouter = express.Router();
 
-CrearUbicacionRouter.post("/crearUbicacion", async (req, res) => {
+CrearEdificioRouter.post('/crearEdificio', async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
 
-    if (customHeader !== 'frontend')
+    if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
+    }
 
-    const { edificio, aula, persona_id } = req.body;
-    if (!edificio || !aula || !persona_id)
+    const { nombre, encargado_id } = req.body;
+
+    if (!nombre || !encargado_id) {
         return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
 
     try {
         const result = await pool.query(
-            "INSERT INTO Ubicacion (edificio, aula, persona_id) VALUES ($1, $2, $3)",
-            [edificio, aula, persona_id]
+            "INSERT INTO Edificio (nombre, encargado_id) VALUES ($1, $2)",
+            [nombre, encargado_id]
         );
-        res.json({ success: true, msg: "Ubicacion creada correctamente", result: result.rows[0] });
+        res.json({ success: true, msg: "Edificio creado correctamente", result: result.rows[0] });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });
     }
 });
 
-ObtenerUbicacionesRouter.get("/obtenerUbicaciones", async (req, res) => {
+CrearAulaRouter.post('/crearAula', async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
-
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
     }
-    try {
-        const result = await pool.query("SELECT * FROM Ubicacion");
-        res.json({ success: true, result: result.rows });
-    } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+
+    const { nombre, edificio_id } = req.body;
+
+    if (!nombre || !edificio_id) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
     }
-});
-
-ObtenerUbicacionRouter.get("/obtenerUbicacion/:id", async (req, res) => {
-    const customHeader = req.headers['x-frontend-header'];
-
-    if (customHeader !== 'frontend') {
-        return res.status(401).send('Unauthorized');
-    }
-    const { id } = req.params;
-
-    try {
-        const result = await pool.query("SELECT * FROM Ubicacion WHERE id=$1", [id]);
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, msg: "Ubicacion no encontrada" });
-        }
-
-        res.json({ success: true, result: result.rows[0] });
-    } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
-    }
-});
-
-
-EditarUbicacionRouter.put("/editarUbicacion", async (req, res) => {
-    const customHeader = req.headers['x-frontend-header'];
-    if (customHeader !== 'frontend')
-        return res.status(401).send('Unauthorized');
-
-    const { id, edificio, aula, persona_id } = req.body;
 
     try {
         const result = await pool.query(
-            "UPDATE Ubicacion SET edificio=$1, aula=$2, persona_id=$3 WHERE id=$4 ",
-            [edificio, aula, persona_id, id]
+            "INSERT INTO Aula (nombre, edificio_id) VALUES ($1, $2)",
+            [nombre, edificio_id]
         );
-
-        if (result.rowCount === 0) {
-            return res.status(404).json({ success: false, message: "Ubicacion no encontrada" });
-        }
-
-        res.json({ success: true, message: "Ubicacion actualizada correctamente", result: result.rows[0] });
+        res.json({ success: true, msg: "Aula creada correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, msg: "Error en DB" });
     }
 });
 
-EliminarUbicacionRouter.delete("/eliminarUbicacion", async (req, res) => {
+ObtenerEdificiosRouter.get('/obtenerEdificios', async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
-    if (customHeader !== 'frontend')
+    if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const result = await pool.query("SELECT * FROM Edificio");
+        res.json({ success: true, data: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+ObtenerAulasRouter.get('/obtenerAulas', async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const result = await pool.query("SELECT * FROM Aula");
+        res.json({ success: true, data: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+EditarEdificioRouter.put('/editarEdificio', async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id, nombre, encargado_id } = req.body;
+
+    if (!id || !nombre || !encargado_id) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE Edificio SET nombre = $1, encargado_id = $2 WHERE id = $3",
+            [nombre, encargado_id, id]
+        );
+        res.json({ success: true, msg: "Edificio editado correctamente", result: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+EditarAulaRouter.put('/editarAula', async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+    const { id, nombre, edificio_id } = req.body;
+
+    if (!id || !nombre || !edificio_id) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE Aula SET nombre = $1, edificio_id = $2 WHERE id = $3",
+            [nombre, edificio_id, id]
+        );
+        res.json({ success: true, msg: "Aula editada correctamente", result: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }   
+});
+
+EliminarEdificioRouter.delete('/eliminarEdificio', async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
 
     const { id } = req.body;
 
+    if (!id) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
     try {
-        const result = await pool.query("DELETE FROM Ubicacion WHERE id=$1", [id]);
-
-        if (result.rowCount === 0) {
-            return res.status(404).json({ success: false, message: "Ubicacion no encontrada" });
-        }
-
-        res.json({ success: true, message: "Ubicacion eliminada correctamente" });
+        const result = await pool.query(
+            "DELETE FROM Edificio WHERE id = $1",
+            [id]
+        );
+        res.json({ success: true, msg: "Edificio eliminado correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+EliminarAulaRouter.delete('/eliminarAula', async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
+    try {
+        const result = await pool.query(
+            "DELETE FROM Aula WHERE id = $1",
+            [id]
+        );
+        res.json({ success: true, msg: "Aula eliminada correctamente", result: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+ObtenerAulasPorEdificioRouter.get('/obtenerAulasPorEdificio/:edificioId', async (req, res) => {
+    const customHeader = req.headers['x-frontend-header']; 
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+    const { edificioId } = req.params;
+
+    if (!edificioId) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
+    try {
+        const result = await pool.query(
+            "SELECT * FROM Aula WHERE edificio_id = $1",
+            [edificioId]
+        );
+        res.json({ success: true, data: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
     }
 });

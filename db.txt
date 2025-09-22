@@ -32,12 +32,18 @@ CREATE TABLE TipoEquipo (
     nombre VARCHAR(100) NOT NULL
 );
 
--- Tabla de ubicación
-CREATE TABLE Ubicacion (
+--Tabla de Edificio
+CREATE TABLE Edificio (
     id SERIAL PRIMARY KEY,
-    edificio VARCHAR(100) NOT NULL,
-    aula VARCHAR(100) NOT NULL,
-    persona_id INT REFERENCES Persona(id)
+    nombre VARCHAR(100) NOT NULL,
+    encargado_id INT REFERENCES Persona(id)
+);
+
+-- Tabla de Aulas
+CREATE TABLE Aula (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    edificio_id INT REFERENCES Edificio(id)
 );
 
 -- Tabla de equipos
@@ -45,7 +51,7 @@ CREATE TABLE Equipo (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     fecha DATE,
-    ubicacion_id INT REFERENCES Ubicacion(id),
+    aula_id INT REFERENCES Aula(id),
     marca_id INT REFERENCES Marca(id),
     tipo_id INT REFERENCES TipoEquipo(id)
 );
@@ -134,24 +140,33 @@ INSERT INTO Persona (nombre, celular, correo, contraseña, rol_id) VALUES
 ('Marta López', '5556543210', 'marta.lopez@uni.edu', 'pass123', 4); -- Encargada
 
 
-INSERT INTO Ubicacion (edificio, aula, persona_id) VALUES
-('Edificio A', 'Aula 101', 4),
-('Edificio A', 'Aula 102', 4),
-('Edificio B', 'Lab 201', 4),
-('Edificio C', 'Aula 201', 1),
-('Edificio D', 'Aula 202', 1),
-('Edificio E', 'Aula 203', 1);
+-- Insertar edificios
+INSERT INTO Edificio (nombre, encargado_id) VALUES
+('Edificio A', 4),
+('Edificio B', 4),
+('Edificio C', 4),
+('Edificio D', 4),
+('Edificio E', 4);
 
+-- Insertar aulas (ligadas a los edificios)
+INSERT INTO Aula (nombre, edificio_id) VALUES
+('Aula 101', 1), -- Edificio A
+('Aula 102', 1), -- Edificio A
+('Lab 201', 2),  -- Edificio B
+('Aula 201', 3), -- Edificio C
+('Aula 202', 4), -- Edificio D
+('Aula 203', 5); -- Edificio E
 
-INSERT INTO Equipo (nombre, fecha, ubicacion_id, marca_id, tipo_id) VALUES
-('Laptop Docente 1', '2024-01-15', 1, 1, 1),
-('Proyector Aula 102', '2023-05-20', 2, 2, 2),
-('Impresora Lab 201', '2022-11-10', 3, 3, 3),
-('Servidor Principal', '2021-07-01', 3, 4, 4),
-('Laptop', '2024-01-15', 4, 1, 1),
-('Proyector', '2023-05-20', 4, 2, 2),
-('Impresora', '2022-11-10', 5, 3, 3),
-('Servidor', '2021-07-01', 6, 4, 4);
+-- Insertar equipos (ajustado a aula_id en vez de ubicacion_id)
+INSERT INTO Equipo (nombre, fecha, aula_id, marca_id, tipo_id) VALUES
+('Laptop Docente 1', '2024-01-15', 1, 1, 1), -- Aula 101
+('Proyector Aula 102', '2023-05-20', 2, 2, 2), -- Aula 102
+('Impresora Lab 201', '2022-11-10', 3, 3, 3), -- Lab 201
+('Servidor Principal', '2021-07-01', 3, 4, 4), -- Lab 201
+('Laptop', '2024-01-15', 4, 1, 1), -- Aula 201
+('Proyector', '2023-05-20', 4, 2, 2), -- Aula 201
+('Impresora', '2022-11-10', 5, 3, 3), -- Aula 202
+('Servidor', '2021-07-01', 6, 4, 4); -- Aula 203
 
 INSERT INTO Pieza (nombre, fecha, marca_id) VALUES
 ('Disco Duro 1TB', '2024-03-01', 1),

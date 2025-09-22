@@ -140,12 +140,32 @@ ObtenerIncidenciaEquipoRouter.get("/verIncidencia/:equipoId", async (req, res) =
 
     try {
         const result = await pool.query(`
-            SELECT  eq.id AS,eq.nombre,ub.edificio,ub.aula, p.id,p.nombre,i.id,i.fecha,i.descripcion,i.estado,i.prioridad_id
-            FROM equipo eq
-            INNER JOIN ubicacion ub ON eq.ubicacion_id = ub.id
-            INNER JOIN persona p ON ub.persona_id = p.id
-            LEFT JOIN incidente i ON i.equipo_id = eq.id
-            WHERE eq.id = $1
+            SELECT EQ.nombre AS nombreequipo, 
+            EQ.fecha AS fechaequipo, 
+            A.nombre AS nombreaula, 
+            E.nombre AS nombreedificio, 
+            I.id AS idincidente,
+            I.descripcion AS descripcionincidente,
+            Tec.nombre AS nombretecnico,
+            PR.nombre AS prioridad,
+            S.nombre AS nombreservicio,
+            S.descripcion AS descripcionservicio,
+            S.horas AS horasservicio,
+            I.finalizado AS incidenciafinalizada,
+            I.fecha_fin AS fechaterminoincidencia,
+            I.calificacion AS calificacionincidencia,
+            I.autorizada AS autorizadaincidencia,
+            I.estado AS estadoincidencia
+
+            FROM equipo EQ
+            INNER JOIN aula A ON EQ.aula_id = A.id
+            INNER JOIN Edificio E ON A.edificio_id = E.id
+            INNER JOIN Persona P ON E.encargado_id = P.id
+            LEFT JOIN Incidente I ON I.equipo_id = EQ.id
+            LEFT JOIN Persona Tec ON I.tecnico_id = Tec.id
+            LEFT JOIN Prioridad PR ON I.prioridad_id = PR.id
+            LEFT JOIN Servicio S ON I.servicio_id = S.id
+            WHERE EQ.id = $1
         `, [equipoId]);
 
         if (result.rows.length === 0) {
@@ -178,8 +198,8 @@ VerDetallesIncidenciaRouter.get("/verDetallesIncidencia/:incidenciaId", async (r
                 M.nombre AS nombreMarca,
                 STRING_AGG(PI.nombre, ', ') AS nombrePiezas,
                 i.descripcion AS descripcionIncidencia,
-                UB.edificio AS Edificio,
-                UB.aula AS Aula,
+                ED.nombre AS Edificio,
+                A.nombre AS Aula,
                 P.nombre AS nombreEncargado,
                 PR.nombre AS nombrePrioridad
     
@@ -191,12 +211,13 @@ VerDetallesIncidenciaRouter.get("/verDetallesIncidencia/:incidenciaId", async (r
             JOIN Equipo_Pieza EP ON e.id = EP.equipo_id
             JOIN Pieza PI ON PI.id = EP.pieza_id
             INNER JOIN prioridad PR ON I.prioridad_id = PR.id
-            INNER JOIN ubicacion UB ON E.ubicacion_id = UB.id
+            INNER JOIN aula A ON E.aula_id = A.id
+            INNER JOIN Edificio ED ON A.edificio_id = ED.id
             WHERE I.id = $1
             GROUP BY 
                 i.fecha, e.id, e.nombre, TE.nombre, 
                 i.descripcion, P.nombre, M.nombre, PR.nombre,
-                UB.edificio, UB.aula
+                ED.nombre, A.nombre
             ORDER BY e.id;
         `, [incidenciaId]);
 
@@ -215,8 +236,8 @@ VerDetallesIncidenciaRouter.get("/verDetallesIncidencia/:incidenciaId", async (r
                 M.nombre AS nombreMarca,
                 STRING_AGG(PI.nombre, ', ') AS nombrePiezas,
                 i.descripcion AS descripcionIncidencia,
-                UB.edificio AS Edificio,
-                UB.aula AS Aula,
+                ED.nombre AS Edificio,
+                A.nombre AS Aula,
                 P.nombre AS nombreEncargado,
                 PR.nombre AS nombrePrioridad,
                 S.nombre AS nombreServicio,
@@ -231,13 +252,14 @@ VerDetallesIncidenciaRouter.get("/verDetallesIncidencia/:incidenciaId", async (r
             JOIN Equipo_Pieza EP ON e.id = EP.equipo_id
             JOIN Pieza PI ON PI.id = EP.pieza_id
             INNER JOIN prioridad PR ON I.prioridad_id = PR.id
-            INNER JOIN ubicacion UB ON E.ubicacion_id = UB.id
+            INNER JOIN aula A ON E.aula_id = A.id
+            INNER JOIN Edificio ED ON A.edificio_id = ED.id
             INNER JOIN servicio S ON I.servicio_id = S.id
             WHERE E.id = $1 AND I.id != $2
             GROUP BY 
                 i.fecha, e.id, e.nombre, TE.nombre, 
                 i.descripcion, P.nombre, M.nombre, PR.nombre,
-                UB.edificio, UB.aula, S.nombre, S.descripcion, S.horas
+                ED.nombre, A.nombre, S.nombre, S.descripcion, S.horas
             ORDER BY e.id;
         `, [equipoId, incidenciaId]);
 
@@ -383,18 +405,20 @@ ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", asy
         const result = await pool.query(`
             SELECT 
                 i.id AS incidencia_id,
-                i.fecha,
-                i.descripcion,
-                i.estado,
-                i.prioridad_id,
+                i.fecha as fechaincidencia,
+                i.descripcion as descripcion_incidencia,
+                i.estado AS estado_incidencia,
+                pr.nombre AS prioridad,
                 eq.id AS equipo_id,
                 eq.nombre AS equipo_nombre,
-                ub.edificio,
-                ub.aula
+                ED.nombre AS edificio,
+                A.nombre AS aula
             FROM incidente i
             INNER JOIN equipo eq ON i.equipo_id = eq.id
-            INNER JOIN ubicacion ub ON eq.ubicacion_id = ub.id
-            INNER JOIN persona p ON ub.persona_id = p.id
+            INNER JOIN aula A ON E.aula_id = A.id
+            INNER JOIN Edificio ED ON A.edificio_id = ED.id
+            INNER JOIN persona p ON ed.encargado_id = p.id
+            INNER JOIN prioridad pr ON i.prioridad_id = pr.id
             WHERE p.id = $1
             ORDER BY i.fecha DESC
         `, [personaId]);
