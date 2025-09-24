@@ -1,7 +1,7 @@
 import express from "express";
 import { pool } from '../database/db.js';
 import jwt from "jsonwebtoken";
-
+import 'dotenv/config';
 export const userAuth = express.Router();
 
 userAuth.post("/auth/login", async (req, res) => {
@@ -37,6 +37,7 @@ userAuth.post("/auth/login", async (req, res) => {
         res.json({ success: true, id: user.id, usuario: user.nombreusuario, correo: user.correousuario, celular: user.celularusuario, rol: user.nombrerol });
 
     } catch (error) {
+        console.error(error);
         return res.status(500).json({ success: false, msg: "Error en el servidor" });
     }
 });

@@ -6,6 +6,7 @@ export const ObtenerPersonasRouter = express.Router();
 export const ObtenerPersonaRouter = express.Router();
 export const EditarPersonaRouter = express.Router();
 export const EliminarPersonaRouter = express.Router();
+export const ObtenerTecnicosRouter = express.Router();
 
 
 CrearPersonaRouter.post("/crearPersona", async (req, res) => {
@@ -34,7 +35,7 @@ ObtenerPersonasRouter.get("/obtenerPersonas", async (req, res) => {
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
     }
-    
+
     try {
         const result = await pool.query("SELECT * FROM persona");
         res.json({ success: true, result: result.rows });
@@ -105,5 +106,24 @@ EliminarPersonaRouter.delete("/eliminarPersona", async (req, res) => {
         res.json({ success: true, message: "Persona eliminada correctamente" });
     } catch (err) {
         res.status(500).json({ success: false, error: "Error en DB" });
+    }
+});
+
+ObtenerTecnicosRouter.get("/obtenerTecnicos", async (req, res) => {
+
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const result = await pool.query(`SELECT P.id AS id, P.nombre AS nombre, P.celular AS celular, P.correo AS correo, R.nombre AS rol 
+            FROM persona P
+            INNER JOIN rol R ON P.rol_id = R.id
+            WHERE rol_id = 2 OR rol_id = 3`
+        );
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
     }
 });

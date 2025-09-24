@@ -47,7 +47,6 @@ function Login(){
             })
 
             const data = await response.json()
-            console.log(data);
             if (data.success){
                 setId(data.id);
                 setUsuario(data.usuario);

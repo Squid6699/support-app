@@ -36,7 +36,7 @@ ObtenerPrioridadesRouter.get("/obtenerPrioridades", async (req, res) => {
         return res.status(401).send('Unauthorized');
     }
     try {
-        const result = await pool.query("SELECT * FROM prioridad");
+        const result = await pool.query("SELECT id, nombre FROM prioridad");
         res.json({ success: true, result: result.rows });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });

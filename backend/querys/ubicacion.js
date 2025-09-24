@@ -10,6 +10,7 @@ export const EditarAulaRouter = express.Router();
 export const EliminarEdificioRouter = express.Router();
 export const EliminarAulaRouter = express.Router();
 export const ObtenerAulasPorEdificioRouter = express.Router();
+export const ObtenerEdificiosPorEncargadoRouter = express.Router();
 
 CrearEdificioRouter.post('/crearEdificio', async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -192,6 +193,28 @@ ObtenerAulasPorEdificioRouter.get('/obtenerAulasPorEdificio/:edificioId', async 
         const result = await pool.query(
             "SELECT * FROM Aula WHERE edificio_id = $1",
             [edificioId]
+        );
+        res.json({ success: true, data: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+ObtenerEdificiosPorEncargadoRouter.get('/obtenerEdificiosPorEncargado/:encargadoId', async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }  
+    const { encargadoId } = req.params;
+
+    if (!encargadoId) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
+
+    try {
+        const result = await pool.query(
+            "SELECT * FROM Edificio WHERE encargado_id = $1",
+            [encargadoId]
         );
         res.json({ success: true, data: result.rows });
     } catch (err) {

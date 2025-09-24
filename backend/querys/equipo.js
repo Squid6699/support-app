@@ -8,6 +8,7 @@ export const EditarEquipoRouter = express.Router();
 export const EliminarEquipoRouter = express.Router();
 export const ObtenerEquiposEncargadoRouter = express.Router();
 export const ObtenerDetallesEquiposRouter = express.Router();
+export const ObtenerEquiposPorAulaRouter = express.Router();
 
 CrearEquipoRouter.post("/crearEquipo", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -126,7 +127,7 @@ ObtenerEquiposEncargadoRouter.get("/verEquiposEncargado/:id", async (req, res) =
 
     try {
         const result = await pool.query(`
-            SELECT EQ.nombre AS nombreequipo, EQ.fecha AS fechaequipo, A.nombre AS nombreaula, E.nombre AS nombreedificio
+            SELECT EQ.id AS id, EQ.nombre AS nombreequipo, EQ.fecha AS fechaequipo, A.nombre AS nombreaula, E.nombre AS nombreedificio
             FROM equipo EQ
             INNER JOIN aula A ON EQ.aula_id = A.id
             INNER JOIN Edificio E ON A.edificio_id = E.id
@@ -188,5 +189,27 @@ ObtenerDetallesEquiposRouter.get("/verDetallesEquipos/:id", async (req, res) => 
     } catch (err) {
         console.error("Error en la DB:", err);
         res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+// Ruta para obtener equipos por aula
+ObtenerEquiposPorAulaRouter.get("/obtenerEquiposPorAula/:id", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(`
+            SELECT id, nombre, aula_id
+            FROM equipo
+            WHERE id = $1
+        `, [id]);
+        res.json({ success: true, data: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "Error en DB" });
     }
 });

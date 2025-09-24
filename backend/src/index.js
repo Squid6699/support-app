@@ -2,18 +2,18 @@ import express from 'express';
 import { middleware } from "../middleware/middleware.js";
 import jwt from "jsonwebtoken";
 
-import { CrearPersonaRouter, EditarPersonaRouter, EliminarPersonaRouter, ObtenerPersonasRouter, ObtenerPersonaRouter } from '../querys/personas.js';
+import { CrearPersonaRouter, EditarPersonaRouter, EliminarPersonaRouter, ObtenerPersonasRouter, ObtenerPersonaRouter, ObtenerTecnicosRouter } from '../querys/personas.js';
 import { CrearRolRouter, EditarRolRouter, EliminarRolRouter, ObtenerRolesRouter, ObtenerRolRouter } from '../querys/rol.js';
 import { CrearPrioridadRouter, EditarPrioridadRouter, EliminarPrioridadRouter, ObtenerPrioridadesRouter, ObtenerPrioridadRouter } from '../querys/prioridad.js';
-import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquiposRouter, ObtenerEquipoRouter, ObtenerEquiposEncargadoRouter } from '../querys/equipo.js';
+import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquiposRouter, ObtenerEquipoRouter, ObtenerEquiposEncargadoRouter, ObtenerEquiposPorAulaRouter } from '../querys/equipo.js';
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
 import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter } from '../querys/incidente.js';
 import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
 import { userAuth } from '../querys/Auth.js';
-import { CrearAulaRouter, CrearEdificioRouter, EditarAulaRouter, EditarEdificioRouter, EliminarAulaRouter, EliminarEdificioRouter, ObtenerAulasPorEdificioRouter, ObtenerAulasRouter, ObtenerEdificiosRouter } from '../querys/ubicacion.js';
-
+import { CrearAulaRouter, CrearEdificioRouter, EditarAulaRouter, EditarEdificioRouter, EliminarAulaRouter, EliminarEdificioRouter, ObtenerAulasPorEdificioRouter, ObtenerAulasRouter, ObtenerEdificiosPorEncargadoRouter, ObtenerEdificiosRouter } from '../querys/ubicacion.js';
+import 'dotenv/config';
 
 const app = express();
 
@@ -125,12 +125,20 @@ app.use("/api/", ActualizarEstadoIncidenciaRouter);
 // Ruta para que el administrador asigne un técnico a una incidencia
 app.use("/api/", AsignarTecnico);
 
-//-Ruta para que el tecnico pueda ver sus incidencias asignadas. 
+//Ruta para que el tecnico pueda ver sus incidencias asignadas. 
 app.use("/api/", IncidenciasTecnicoRouter);
 
 
 app.use("/api/", userAuth);
 
+//Ruta para obtener a los tecnicos
+app.use("/api/", ObtenerTecnicosRouter);
+
+//Ruta para obtener los edificios del encargado
+app.use("/api/", ObtenerEdificiosPorEncargadoRouter);
+
+//Ruta para obtener equipos por aula
+app.use("/api/", ObtenerEquiposPorAulaRouter);
 
 
 

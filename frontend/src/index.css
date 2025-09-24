@@ -18,6 +18,10 @@ button .boton{
     background-color: var(--main-color) !important;
 }
 
+.boton {
+    background-color: var(--main-color) !important;
+}
+
 .headerLogo{
     width: 60px;
     height: 60px;

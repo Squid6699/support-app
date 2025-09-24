@@ -1,8 +1,46 @@
 export interface Incidencia {
-    fecha: string;
+    fecha: null;
     descripcion: string;
     usuario_id: number;
     tecnico_id: number;
     equipo_id: number;
     prioridad_id: number;
+}
+
+export interface Usuario {
+    id: number;
+    nombre: string;
+    celular: string;
+    correo: string;
+    rol: string;
+}
+
+export interface EquiposPorEncargado {
+    id: number;
+    nombreequipo: string;
+    fechaequipo: string;
+    nombreaula: string;
+    nombreedificio: string;
+}
+
+export interface Edificio {
+    id: number;
+    nombre: string;
+}
+
+export interface Aula {
+    id: number;
+    nombre: string;
+    edificio_id: number;
+}
+
+export interface EquipoAula {
+    id: number;
+    nombre: string;
+    aula_id: number;
+}
+
+export interface Prioridad {
+    id: number;
+    nombre: string;
 }
