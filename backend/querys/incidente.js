@@ -27,18 +27,19 @@ CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
 
     const { fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizado, estado } = req.body;
 
-    if (!fecha || !descripcion || !usuario_id || !tecnico_id || !equipo_id || !prioridad_id || !servicio_id) {
+    if (!fecha || !descripcion || !usuario_id || !tecnico_id || !equipo_id || !prioridad_id) {
         return res.status(400).json({ success: false, msg: "Faltan datos" });
     }
 
     try {
         const result = await pool.query(
-            "INSERT INTO incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizada, estado) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
-            [fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizado, estado]
+            "INSERT INTO incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id) VALUES ($1, $2, $3, $4, $5, $6)",
+            [fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id]
         );
 
         res.json({ success: true, msg: "Incidente creado correctamente", result: result.rows[0] });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ success: false, msg: "Error en DB" });
     }
 });

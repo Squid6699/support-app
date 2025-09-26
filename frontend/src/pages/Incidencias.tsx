@@ -17,6 +17,7 @@ import FormControl from "@mui/material/FormControl";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import toast from "react-hot-toast";
 
 function Incidencias() {
     const { id, usuario } = useSesion();
@@ -206,7 +207,7 @@ function Incidencias() {
         }
     }
 
-    function submitIncidencia(e: React.FormEvent<HTMLFormElement>) {
+    async function submitIncidencia(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         handleValueErroresIncidencia({
             descripcion: "",
@@ -240,6 +241,38 @@ function Incidencias() {
             handleValueErroresIncidencia({ prioridad_id: "Seleccione una prioridad" });
             return;
         }
+
+        try {
+            const response = await fetch(HOST + "api/crearIncidencia", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-frontend-header': 'frontend',
+                },
+                body: JSON.stringify({"fecha": incidenciaValue.fecha, "descripcion": incidenciaValue.descripcion, "usuario_id": incidenciaValue.usuario_id, "tecnico_id": incidenciaValue.tecnico_id, "equipo_id": incidenciaValue.equipo_id, "prioridad_id": incidenciaValue.prioridad_id}),
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                toast.success(data.msg);
+                handleCloseModalIncidencia();
+                setIncidenciaValue({
+                    fecha: null,
+                    descripcion: '',
+                    usuario_id: id,
+                    tecnico_id: 0,
+                    equipo_id: 0,
+                    prioridad_id: 0
+                });
+                setSelectedEdificio(0);
+                setSelectedAula(0);
+            } else {
+                toast.error(data.msg);
+            }
+
+        } catch (error) {
+            toast.error("OCURRIO UN ERROR");
+        }
     }
 
     return (
@@ -250,6 +283,14 @@ function Incidencias() {
                     CREAR
                 </Button>
             </header>
+
+            <main>
+                
+            </main>
+
+
+
+
             <Modal
                 open={openModalIncidencia}
                 onClose={handleCloseModalIncidencia}
@@ -262,11 +303,10 @@ function Incidencias() {
                     </Typography>
                     <Box id="modal-modal-description" sx={{ mt: 2 }}>
 
-                        <Box
-                            sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}
-                        >
+                        <Box sx={{ m: 2, width: '100%' }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DatePicker
+                                    disablePast
                                     label="Fecha"
                                     value={incidenciaValue.fecha}
                                     onChange={(newValue) => handleValueChangeIncidencia({ fecha: newValue })}
@@ -282,7 +322,7 @@ function Incidencias() {
                         </Box>
 
                         <Box
-                            sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}
+                            sx={{ m: 2, width: '100%' }}
                         >
                             <TextField
                                 id="outlined-multiline-static"
@@ -293,21 +333,22 @@ function Incidencias() {
                                 onChange={(e) => handleValueChangeIncidencia({ descripcion: e.target.value })}
                                 error={incidenciaError.descripcion !== ""}
                                 helperText={incidenciaError.descripcion}
+                                fullWidth
                             />
                         </Box>
 
                         <Box
-                            sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}
+                            sx={{ m: 2, width: '100%' }}
                         >
-                            <TextField id="outlined-basic" label="Encargado" variant="outlined" defaultValue={usuario} disabled />
+                            <TextField id="outlined-basic" label="Encargado" variant="outlined" defaultValue={usuario} disabled fullWidth />
                         </Box>
 
 
 
                         <Box
-                            sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}
+                            sx={{ m: 2, width: '100%' }}
                         >
-                            <FormControl sx={{ m: 1, width: '100%' }}>
+                            <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-autowidth-label">Tecnico</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-autowidth-label"
@@ -327,17 +368,16 @@ function Incidencias() {
                         </Box>
 
                         <Box
-                            sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}
+                            sx={{ m: 2, display: 'flex', gap: 2, flexDirection: 'row', flexWrap: 'nowrap' }}
                         >
 
-                            <FormControl sx={{ m: 1, width: '30%' }}>
+                            <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-autowidth-label">Edificio</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-autowidth-label"
                                     id="demo-simple-select-autowidth"
                                     value={selectedEdificio}
                                     onChange={(e) => setSelectedEdificio(e.target.value)}
-                                    autoWidth
                                     label="Edificio"
                                 >
                                     {isLoadingEdificios ? <MenuItem value={0}>Cargando...</MenuItem> : null}
@@ -348,14 +388,13 @@ function Incidencias() {
                                 </Select>
                             </FormControl>
 
-                            <FormControl sx={{ m: 1, width: '30%' }}>
+                            <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-autowidth-label">Aula</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-autowidth-label"
                                     id="demo-simple-select-autowidth"
                                     value={selectedAula}
                                     onChange={(e) => setSelectedAula(e.target.value)}
-                                    autoWidth
                                     label="Aula"
                                 >
                                     {isLoadingAulas ? <MenuItem value={0}>Cargando...</MenuItem> : null}
@@ -366,14 +405,13 @@ function Incidencias() {
                                 </Select>
                             </FormControl>
 
-                            <FormControl sx={{ m: 1, width: '30%' }}>
+                            <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-autowidth-label">Equipo</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-autowidth-label"
                                     id="demo-simple-select-autowidth"
                                     value={incidenciaValue.equipo_id}
                                     onChange={(e) => handleValueChangeIncidencia({ equipo_id: e.target.value })}
-                                    autoWidth
                                     label="Equipo"
                                 >
                                     {isLoadingEquipos ? <MenuItem value={0}>Cargando...</MenuItem> : null}
@@ -386,16 +424,15 @@ function Incidencias() {
                         </Box>
 
                         <Box
-                            sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}
+                            sx={{ m: 2, width: '100%' }}
                         >
-                            <FormControl sx={{ m: 1, width: '100%' }}>
+                            <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-autowidth-label">Prioridad</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-autowidth-label"
                                     id="demo-simple-select-autowidth"
                                     value={incidenciaValue.prioridad_id}
                                     onChange={(e) => handleValueChangeIncidencia({ prioridad_id: e.target.value })}
-                                    autoWidth
                                     label="Prioridad"
                                 >
                                     {isLoadingPrioridades ? <MenuItem value={0}>Cargando...</MenuItem> : null}
@@ -407,10 +444,8 @@ function Incidencias() {
                             </FormControl>
                         </Box>
 
-                        <Box
-                            sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}
-                        >
-                            <Button type="submit" variant="contained" className="boton" fullWidth >
+                        <Box sx={{ m: 2, width: '100%' }}>
+                            <Button type="submit" variant="contained" className="boton" fullWidth>
                                 Crear Incidencia
                             </Button>
                         </Box>
