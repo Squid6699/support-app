@@ -2,9 +2,22 @@ export interface Incidencia {
     fecha: null;
     descripcion: string;
     usuario_id: number;
-    tecnico_id: number;
     equipo_id: number;
     prioridad_id: number;
+}
+
+export interface Incidencias{
+    incidencia_id: number;
+    fechaincidencia: Date;
+    descripcion_incidencia: string;
+    estado_incidencia: string;
+    prioridad: string;
+    equipo_id: number;
+    equipo_nombre: string;
+    edificio: string;
+    aula: string;
+    autorizada: boolean;
+    tecnico_nombre: string | null;
 }
 
 export interface Usuario {

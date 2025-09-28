@@ -25,16 +25,16 @@ CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
         return res.status(401).send('Unauthorized');
     }
 
-    const { fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizado, estado } = req.body;
+    const { fecha, descripcion, usuario_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizado, estado } = req.body;
 
-    if (!fecha || !descripcion || !usuario_id || !tecnico_id || !equipo_id || !prioridad_id) {
+    if (!fecha || !descripcion || !usuario_id || !equipo_id || !prioridad_id) {
         return res.status(400).json({ success: false, msg: "Faltan datos" });
     }
 
     try {
         const result = await pool.query(
-            "INSERT INTO incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id) VALUES ($1, $2, $3, $4, $5, $6)",
-            [fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id]
+            "INSERT INTO incidente (fecha, descripcion, usuario_id, equipo_id, prioridad_id) VALUES ($1, $2, $3, $4, $5)",
+            [fecha, descripcion, usuario_id, equipo_id, prioridad_id]
         );
 
         res.json({ success: true, msg: "Incidente creado correctamente", result: result.rows[0] });
@@ -175,7 +175,6 @@ ObtenerIncidenciaEquipoRouter.get("/verIncidencia/:equipoId", async (req, res) =
 
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        console.error("Error en la DB:", err);
         res.status(500).json({ success: false, msg: "Error en la base de datos" });
     }
 });
@@ -413,19 +412,22 @@ ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", asy
                 eq.id AS equipo_id,
                 eq.nombre AS equipo_nombre,
                 ED.nombre AS edificio,
-                A.nombre AS aula
+                A.nombre AS aula,
+                i.autorizada AS autorizada,
+                t.nombre AS tecnico_nombre
             FROM incidente i
             INNER JOIN equipo eq ON i.equipo_id = eq.id
-            INNER JOIN aula A ON E.aula_id = A.id
+            INNER JOIN aula A ON eq.aula_id = A.id
             INNER JOIN Edificio ED ON A.edificio_id = ED.id
             INNER JOIN persona p ON ed.encargado_id = p.id
             INNER JOIN prioridad pr ON i.prioridad_id = pr.id
-            WHERE p.id = $1
+            LEFT JOIN persona t ON i.tecnico_id = t.id
+            WHERE p.id = $1 AND i.estado != 'LIBERADO'
             ORDER BY i.fecha DESC
         `, [personaId]);
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, msg: "No se encontraron incidencias para este encargado" });
+            return res.json({ success: false, msg: "No se encontraron incidencias para este encargado" });
         }
 
         res.json({ success: true, result: result.rows });

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import type { Aula, Edificio, EquipoAula, Incidencia, Prioridad, Usuario } from "../../types";
+import type { Aula, Edificio, EquipoAula, Incidencia, Incidencias, Prioridad } from "../../types";
 import TextField from "@mui/material/TextField";
 import { useSesion } from "../hook/useSesion";
 import { style } from "../css/componentsStyle";
@@ -18,6 +18,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import toast from "react-hot-toast";
+import Accordion from '@mui/material/Accordion';
+import AccordionActions from '@mui/material/AccordionActions';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import dayjs from "dayjs";
 
 function Incidencias() {
     const { id, usuario } = useSesion();
@@ -44,9 +50,9 @@ function Incidencias() {
         queryFn: obtenerPrioridades,
     });
 
-    const { data: tecnicos, isLoading: isLoadingTecnicos } = useQuery<Usuario[]>({
-        queryKey: ["Tecnicos"],
-        queryFn: obtenerTecnicos,
+    const { data: incidencias, isLoading: isLoadingIncidencias, refetch: refetchIncidencias } = useQuery<Incidencias[]>({
+        queryKey: ["Incidencias"],
+        queryFn: obtenerIncidencias,
     });
 
 
@@ -65,7 +71,6 @@ function Incidencias() {
         fecha: null,
         descripcion: '',
         usuario_id: id,
-        tecnico_id: 0,
         equipo_id: 0,
         prioridad_id: 0
     });
@@ -75,7 +80,6 @@ function Incidencias() {
     const [incidenciaError, setIncidenciaError] = useState({
         fecha: "",
         descripcion: "",
-        tecnico_id: "",
         equipo_id: "",
         prioridad_id: ""
     });
@@ -101,11 +105,10 @@ function Incidencias() {
         handleValueChangeIncidencia({ equipo_id: 0 });
     }, [selectedAula]);
 
-
-    // SACAR TODOS LOS TECNICOS
-    async function obtenerTecnicos() {
+    //SACAR INCIDENCIAS DEL ENCARGADO
+    async function obtenerIncidencias() {
         try {
-            const response = await fetch(HOST + "api/obtenerTecnicos", {
+            const response = await fetch(HOST + "api/verIncidenciasEncargado/" + id, {
                 method: 'GET',
                 headers: {
                     'x-frontend-header': 'frontend',
@@ -211,7 +214,6 @@ function Incidencias() {
         e.preventDefault();
         handleValueErroresIncidencia({
             descripcion: "",
-            tecnico_id: "",
             fecha: "",
             equipo_id: "",
             prioridad_id: "",
@@ -224,11 +226,6 @@ function Incidencias() {
 
         if (incidenciaValue.descripcion === '') {
             handleValueErroresIncidencia({ descripcion: "La descripcion es requerida" });
-            return;
-        }
-
-        if (incidenciaValue.tecnico_id === 0) {
-            handleValueErroresIncidencia({ tecnico_id: "Seleccione un tecnico" });
             return;
         }
 
@@ -249,9 +246,9 @@ function Incidencias() {
                     'Content-Type': 'application/json',
                     'x-frontend-header': 'frontend',
                 },
-                body: JSON.stringify({"fecha": incidenciaValue.fecha, "descripcion": incidenciaValue.descripcion, "usuario_id": incidenciaValue.usuario_id, "tecnico_id": incidenciaValue.tecnico_id, "equipo_id": incidenciaValue.equipo_id, "prioridad_id": incidenciaValue.prioridad_id}),
+                body: JSON.stringify({ "fecha": incidenciaValue.fecha, "descripcion": incidenciaValue.descripcion, "usuario_id": incidenciaValue.usuario_id, "equipo_id": incidenciaValue.equipo_id, "prioridad_id": incidenciaValue.prioridad_id }),
             });
-            
+
             const data = await response.json();
             if (data.success) {
                 toast.success(data.msg);
@@ -260,12 +257,12 @@ function Incidencias() {
                     fecha: null,
                     descripcion: '',
                     usuario_id: id,
-                    tecnico_id: 0,
                     equipo_id: 0,
                     prioridad_id: 0
                 });
                 setSelectedEdificio(0);
                 setSelectedAula(0);
+                refetchIncidencias();
             } else {
                 toast.error(data.msg);
             }
@@ -285,12 +282,85 @@ function Incidencias() {
             </header>
 
             <main>
-                
-            </main>
+                {isLoadingIncidencias ? <p>Cargando...</p> : 
 
+                incidencias && incidencias.length > 0 ? (
+                    incidencias.map((incidencia) => {
+                        let colorCirculo = "";
+                        switch (incidencia.prioridad.toLowerCase()) {
+                            case "alta":
+                                colorCirculo = "red";
+                                break;
+                            case "media":
+                                colorCirculo = "orange";
+                                break;
+                            case "baja":
+                                colorCirculo = "green";
+                                break;
+                            default:
+                                colorCirculo = "";
+                        }
 
+                        return (
+                            <Accordion key={incidencia.incidencia_id}>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header"
+                                >
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            flexWrap: "nowrap",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            width: "100%",
+                                        }}
+                                    >
+                                        <Typography style={{ maxWidth: "80%" }} component="span">
+                                            {dayjs(incidencia.fechaincidencia).format("DD/MM/YYYY") +
+                                                " - " +
+                                                incidencia.descripcion_incidencia}
+                                        </Typography>
 
+                                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                            {colorCirculo && (
+                                                <span
+                                                    style={{
+                                                        width: "12px",
+                                                        height: "12px",
+                                                        borderRadius: "50%",
+                                                        backgroundColor: colorCirculo,
+                                                        display: "inline-block",
+                                                    }}
+                                                ></span>
+                                            )}
+                                            <Typography component="span">{incidencia.prioridad}</Typography>
+                                        </div>
+                                    </div>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <Typography component="span">AUTORIZADO: {incidencia.autorizada ? "SI" : "NO"} <br /></Typography>
+                                    <Typography component="span">ESTADO: {incidencia.estado_incidencia} <br /></Typography>
+                                    <Typography component="span">EDIFICIO: {incidencia.edificio.toUpperCase()} <br /></Typography>
+                                    <Typography component="span">AULA: {incidencia.aula.toUpperCase()} <br /></Typography>
+                                    <Typography component="span">EQUIPO: {incidencia.equipo_nombre.toUpperCase()} <br /></Typography>
+                                    <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
 
+                                </AccordionDetails>
+                                <AccordionActions>
+                                    <Button>EDITAR</Button>
+                                    <Button>LIBERAR</Button>
+                                    <Button>ELIMINAR</Button>
+                                </AccordionActions>
+                            </Accordion>
+                        );
+                    })
+                ) : "No hay incidencias asignadas a tu cargo"}
+        </main >
+
+            {/* MODAL CREAR INCIDENCIA */}
             <Modal
                 open={openModalIncidencia}
                 onClose={handleCloseModalIncidencia}
@@ -341,30 +411,6 @@ function Incidencias() {
                             sx={{ m: 2, width: '100%' }}
                         >
                             <TextField id="outlined-basic" label="Encargado" variant="outlined" defaultValue={usuario} disabled fullWidth />
-                        </Box>
-
-
-
-                        <Box
-                            sx={{ m: 2, width: '100%' }}
-                        >
-                            <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-autowidth-label">Tecnico</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-autowidth-label"
-                                    id="demo-simple-select-autowidth"
-                                    value={incidenciaValue.tecnico_id}
-                                    onChange={(e) => handleValueChangeIncidencia({ tecnico_id: e.target.value })}
-                                    autoWidth
-                                    label="Tecnico"
-                                >
-                                    {isLoadingTecnicos ? <MenuItem value={0}>Cargando...</MenuItem> : null}
-                                    <MenuItem value={0} selected disabled>Seleccione un tecnico</MenuItem>
-                                    {tecnicos ? tecnicos.map((tecnico) => (
-                                        <MenuItem key={tecnico.id} value={tecnico.id}>{tecnico.nombre} - {tecnico.rol}</MenuItem>
-                                    )) : <MenuItem key={0} value={0}>No hay técnicos disponibles</MenuItem>}
-                                </Select>
-                            </FormControl>
                         </Box>
 
                         <Box
@@ -453,6 +499,12 @@ function Incidencias() {
                     </Box>
                 </Box >
             </Modal >
+
+            {/* MODAL EDITAR INCIDENCIA */}
+
+            {/* MODAL ELIMINAR INCIDENCIA */}
+
+            {/* MODAL LIBERAR INCIDENCIA */}
 
         </>
 
