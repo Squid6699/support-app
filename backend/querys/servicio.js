@@ -159,7 +159,7 @@ ObtenerDetallesServicioRouter.get("/obtenerDetallesServicio/:id", async (req, re
             E.nombre AS nombreEquipo, 
             P.nombre AS Prioridad, 
             I.finalizado AS finalizadoIncidencia, 
-            I.calificacion AS calificacionIncidencia, 
+            S.calificacion AS calificacionServicio, 
             I.estado AS estadoIncidencia
             FROM incidente I
             INNER JOIN servicio S ON I.servicio_id = S.id

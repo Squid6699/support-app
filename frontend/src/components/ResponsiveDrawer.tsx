@@ -83,6 +83,7 @@ function ResponsiveDrawer() {
                     <List>
                         {[
                             "Incidencias",
+                            "Incidencias Liberadas",
                             "Servicios",
                             "Ubicaciones",
                             "Usuarios",
@@ -95,13 +96,14 @@ function ResponsiveDrawer() {
                                 <ListItemButton onClick={() => handleContentChange(text)}>
                                     <ListItemIcon>
                                         {index === 0 && <SummarizeIcon />}
-                                        {index === 1 && <ElectricalServicesIcon />}
-                                        {index === 2 && <RoomPreferencesIcon />}
-                                        {index === 3 && <AccountCircleIcon />}
-                                        {index === 4 && <DevicesIcon />}
-                                        {index === 5 && <ExtensionIcon />}
-                                        {index === 6 && <BookmarkIcon />}
-                                        {index === 7 && <PriorityHighIcon />}
+                                        {index === 1 && <SummarizeIcon />}
+                                        {index === 2 && <ElectricalServicesIcon />}
+                                        {index === 3 && <RoomPreferencesIcon />}
+                                        {index === 4 && <AccountCircleIcon />}
+                                        {index === 5 && <DevicesIcon />}
+                                        {index === 6 && <ExtensionIcon />}
+                                        {index === 7 && <BookmarkIcon />}
+                                        {index === 8 && <PriorityHighIcon />}
 
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
@@ -143,13 +145,15 @@ function ResponsiveDrawer() {
                     <List>
                         {[
                             "Incidencias",
+                            "Incidencias Liberadas",
                             "Servicios",
                         ].map((text, index) => (
                             <ListItem key={text} disablePadding>
                                 <ListItemButton onClick={() => handleContentChange(text)}>
                                     <ListItemIcon>
                                         {index === 0 && <SummarizeIcon />}
-                                        {index === 1 && <ElectricalServicesIcon />}
+                                        {index === 1 && <SummarizeIcon />}
+                                        {index === 2 && <ElectricalServicesIcon />}
 
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
@@ -258,6 +262,7 @@ function ResponsiveDrawer() {
                 {/* CONTEN MAIN */}
                 {selectedContent === "Incidencias Asignadas" && <div>Contenido de Incidencias Asignadas</div>}
                 {selectedContent === "Incidencias" && <Incidencias />}
+                {selectedContent === "Incidencias Liberadas"&& <div>Contenido de Incidencias Liberadas</div>}
                 {selectedContent === "Servicios" && <div>Contenido de Servicios</div>}
                 {selectedContent === "Ubicaciones" && <div>Contenido de Ubicaciones</div>}
                 {selectedContent === "Usuarios" && <div>Contenido de Usuarios</div>}

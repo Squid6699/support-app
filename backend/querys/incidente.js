@@ -25,7 +25,7 @@ CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
         return res.status(401).send('Unauthorized');
     }
 
-    const { fecha, descripcion, usuario_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizado, estado } = req.body;
+    const { fecha, descripcion, usuario_id, equipo_id, prioridad_id } = req.body;
 
     if (!fecha || !descripcion || !usuario_id || !equipo_id || !prioridad_id) {
         return res.status(400).json({ success: false, msg: "Faltan datos" });
@@ -84,16 +84,16 @@ EditarIncidenciaRouter.put("/editarIncidencia", async (req, res) => {
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
     }
-    const { id, fecha, descripcion, usuario_id, tecnico_id, equipo_id, tipo_incidente_id, prioridad_id, servicio_id, finalizado, calificacion, autorizado, estado } = req.body;
+    const { fecha, descripcion, usuario_id, equipo_id, prioridad_id } = req.body;
 
-    if (!id || !fecha || !descripcion || !usuario_id || !tecnico_id || !equipo_id || !tipo_incidente_id || !prioridad_id || !servicio_id) {
+    if (!fecha || !descripcion || !usuario_id || !equipo_id || !prioridad_id) {
         return res.status(400).json({ success: false, msg: "Faltan datos" });
     }
 
     try {
         const result = await pool.query(
-            "UPDATE incidente SET fecha = $1, descripcion = $2, usuario_id = $3, tecnico_id = $4, equipo_id = $5, tipo_incidente_id = $6, prioridad_id = $7, servicio_id = $8, finalizado = $9, calificacion = $10, autorizada = $11, estado = $12 WHERE id = $13",
-            [fecha, descripcion, usuario_id, tecnico_id, equipo_id, tipo_incidente_id, prioridad_id, servicio_id, finalizado, calificacion, autorizado, estado, id]
+            "UPDATE incidente SET fecha = $1, descripcion = $2, usuario_id = $3, equipo_id = $4, prioridad_id = $5 WHERE id = $6",
+            [fecha, descripcion, usuario_id, equipo_id, prioridad_id, id]
         );
 
         if (result.rowCount === 0) {
@@ -154,7 +154,7 @@ ObtenerIncidenciaEquipoRouter.get("/verIncidencia/:equipoId", async (req, res) =
             S.horas AS horasservicio,
             I.finalizado AS incidenciafinalizada,
             I.fecha_fin AS fechaterminoincidencia,
-            I.calificacion AS calificacionincidencia,
+            S.calificacion AS calificacionservicio,
             I.autorizada AS autorizadaincidencia,
             I.estado AS estadoincidencia
 
@@ -226,7 +226,7 @@ VerDetallesIncidenciaRouter.get("/verDetallesIncidencia/:incidenciaId", async (r
         }
 
         const equipoId = resultIncidencia.rows[0].equipoid;
-        
+
         //CONSULTA PARA VER LAS INCIDENCIAS ANTERIORES DEL EQUIPO
         const resultIncidenciasAnteriores = await pool.query(`
             SELECT 
@@ -263,9 +263,10 @@ VerDetallesIncidenciaRouter.get("/verDetallesIncidencia/:incidenciaId", async (r
             ORDER BY e.id;
         `, [equipoId, incidenciaId]);
 
-        res.json({ success: true, 
-            incidencia: resultIncidencia.rows[0], 
-            incidenciasAnteriores: resultIncidenciasAnteriores.rows 
+        res.json({
+            success: true,
+            incidencia: resultIncidencia.rows[0],
+            incidenciasAnteriores: resultIncidenciasAnteriores.rows
         });
 
     } catch (err) {
@@ -332,7 +333,7 @@ TerminarIncidenciaRouter.put("/terminarIncidencia", async (req, res) => {
     }
 });
 
-//Ruta para que el encargado pueda dar una calificacion a la incidencia.
+//Ruta para que el encargado pueda dar una calificacion a la incidencia en servicio.
 CalificarIncidenciaRouter.put("/calificarIncidencia", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
     if (customHeader !== 'frontend') {
@@ -347,15 +348,15 @@ CalificarIncidenciaRouter.put("/calificarIncidencia", async (req, res) => {
 
     try {
         const result = await pool.query(
-            "UPDATE incidente SET calificacion = $1 WHERE id = $2",
+            "UPDATE Servicio SET calificacion = $1 WHERE id = $2",
             [calificacion, id]
         );
 
         if (result.rowCount === 0) {
-            return res.status(404).json({ success: false, msg: "Incidencia no encontrada" });
+            return res.status(404).json({ success: false, msg: "Servicio no encontrado" });
         }
 
-        res.json({ success: true, msg: "Incidencia calificada correctamente" });
+        res.json({ success: true, msg: "Servicio calificado correctamente" });
     } catch (err) {
         return res.status(500).json({ success: false, msg: "Error en la base de datos" });
     }
@@ -408,10 +409,13 @@ ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", asy
                 i.fecha as fechaincidencia,
                 i.descripcion as descripcion_incidencia,
                 i.estado AS estado_incidencia,
+                pr.id AS prioridad_id,
                 pr.nombre AS prioridad,
                 eq.id AS equipo_id,
                 eq.nombre AS equipo_nombre,
+                ED.id AS edificio_id,
                 ED.nombre AS edificio,
+                A.id AS aula_id,
                 A.nombre AS aula,
                 i.autorizada AS autorizada,
                 t.nombre AS tecnico_nombre
@@ -437,7 +441,7 @@ ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", asy
     }
 });
 
-// Ruta para que el encargado de edificio acepte o rechace una incidencia.
+// Ruta para que el administrador acepte o rechace una incidencia.
 
 ActualizarEstadoIncidenciaRouter.put("/actualizarIncidencia/:incidenciaId", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -447,7 +451,7 @@ ActualizarEstadoIncidenciaRouter.put("/actualizarIncidencia/:incidenciaId", asyn
     }
 
     const { incidenciaId } = req.params;
-    const { estado } = req.body; 
+    const { estado } = req.body;
 
     if (!["aceptada", "rechazada"].includes(estado)) {
         return res.status(400).json({ success: false, msg: "Estado inválido. Solo se permite 'aceptada' o 'rechazada'." });
@@ -468,7 +472,6 @@ ActualizarEstadoIncidenciaRouter.put("/actualizarIncidencia/:incidenciaId", asyn
 
         res.json({ success: true, msg: "Incidencia actualizada", result: result.rows[0] });
     } catch (err) {
-        console.error("Error en la DB:", err);
         res.status(500).json({ success: false, msg: "Error en la base de datos" });
     }
 });

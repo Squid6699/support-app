@@ -77,7 +77,8 @@ CREATE TABLE Servicio (
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT NOT NULL,
     tecnico_id INT REFERENCES Persona(id),
-    horas INT
+    horas INT,
+    calificacion INT DEFAULT 0
 );
 
 -- ENUM para estado de incidentes
@@ -95,7 +96,6 @@ CREATE TABLE Incidente (
     servicio_id INT REFERENCES Servicio(id),
     finalizado BOOLEAN DEFAULT false,
     fecha_fin DATE,
-    calificacion INT DEFAULT 0,
     autorizada BOOLEAN DEFAULT false,
     estado estado_incidente DEFAULT 'NO INICIADO' NOT NULL
 );
@@ -190,17 +190,17 @@ INSERT INTO Servicio (nombre, descripcion, tecnico_id, horas) VALUES
 ('Revisión Preventiva', 'Chequeo general de equipos', 2, 2);
 
 
-INSERT INTO Incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizada, estado) VALUES
-('2024-06-01', 'Laptop no enciende', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
-('2024-06-01', 'Laptop no enciende 2', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
-('2024-06-01', 'Laptop no enciende 3', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
-('2024-06-01', 'Laptop no enciende 4', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
-('2024-06-01', 'Laptop no enciende 5', 1, 2, 1, 1, 1, false, 0, false, 'NO INICIADO'),
-('2024-06-05', 'Proyector sin señal', 1, 3, 2, 2, 2, false, 0, false, 'EN PROCESO'),
-('2024-06-10', 'Impresora atascada', 1, 2, 3, 3, 1, true, 4, true, 'TERMINADO'),
-('2024-06-15', 'Servidor requiere actualización', 1, 3, 4, 4, 3, false, 0, false, 'NO INICIADO');
+INSERT INTO Incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, autorizada, estado) VALUES
+('2024-06-01', 'Laptop no enciende', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
+('2024-06-01', 'Laptop no enciende 2', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
+('2024-06-01', 'Laptop no enciende 3', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
+('2024-06-01', 'Laptop no enciende 4', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
+('2024-06-01', 'Laptop no enciende 5', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
+('2024-06-05', 'Proyector sin señal', 1, 3, 2, 2, 2, false, false, 'EN PROCESO'),
+('2024-06-10', 'Impresora atascada', 1, 2, 3, 3, 1, true, true, 'TERMINADO'),
+('2024-06-15', 'Servidor requiere actualización', 1, 3, 4, 4, 3, false, false, 'NO INICIADO');
 
 
-INSERT INTO Incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, calificacion, autorizada, estado) VALUES
-('2024-06-15', 'Servidor requiere actualización 2', 1, 3, 4, 4, null, false, 0, false, 'NO INICIADO');
+INSERT INTO Incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, autorizada, estado) VALUES
+('2024-06-15', 'Servidor requiere actualización 2', 1, 3, 4, 4, null, false, false, 'NO INICIADO');
 

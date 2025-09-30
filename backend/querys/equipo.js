@@ -166,7 +166,7 @@ ObtenerDetallesEquiposRouter.get("/verDetallesEquipos/:id", async (req, res) => 
             S.horas AS horasservicio,
             I.finalizado AS incidenciafinalizada,
             I.fecha_fin AS fechaterminoincidencia,
-            I.calificacion AS calificacionincidencia,
+            S.calificacion AS calificacionservicio,
             I.autorizada AS autorizadaincidencia,
             I.estado AS estadoincidencia
 

@@ -24,6 +24,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import dayjs from "dayjs";
+import FormHelperText from "@mui/material/FormHelperText";
 
 function Incidencias() {
     const { id, usuario } = useSesion();
@@ -81,7 +82,9 @@ function Incidencias() {
         fecha: "",
         descripcion: "",
         equipo_id: "",
-        prioridad_id: ""
+        prioridad_id: "",
+        edificio_id: "",
+        aula_id: ""
     });
 
     const handleValueErroresIncidencia = (newValue: any) => {
@@ -92,18 +95,72 @@ function Incidencias() {
         setIncidenciaValue({ ...incidenciaValue, ...newValue });
     }
 
+    // EDITAR INCIDENCIA
+    const [incidenciaSelectedEdit, setIncidenciaSelectedEdit] = useState<Incidencias | null>(null);
+    const [openModalIncidenciaEdit, setOpenModalIncidenciaEdit] = useState(false);
+
+    const handleOpenModalIncidenciaEdit = (incidencia: Incidencias) => {
+        console.log(incidencia);
+        setIncidenciaSelectedEdit(incidencia);
+        setSelectedEdificioEdit(incidencia.edificio_id);
+        setSelectedAulaEdit(incidencia.aula_id);
+        setOpenModalIncidenciaEdit(true);
+        setIncidenciaValueEdit({
+            fecha: incidencia.fechaincidencia ? dayjs(incidencia.fechaincidencia) : null,
+            descripcion: incidencia.descripcion_incidencia,
+            usuario_id: id,
+            equipo_id: incidencia.equipo_id,
+            prioridad_id: incidencia.id_prioridad
+        });
+    }
+
+    const handleCloseModalIncidenciaEdit = () => {
+        setOpenModalIncidenciaEdit(false);
+        setIncidenciaSelectedEdit(null);
+    }
+
+    const [incidenciaValueEdit, setIncidenciaValueEdit] = useState<Incidencia>({
+        fecha: null,
+        descripcion: '',
+        usuario_id: id,
+        equipo_id: 0,
+        prioridad_id: 0
+    });
+    const [selectedEdificioEdit, setSelectedEdificioEdit] = useState<number>(0);
+    const [selectedAulaEdit, setSelectedAulaEdit] = useState<number>(0);
+
+    const [incidenciaErrorEdit, setIncidenciaErrorEdit] = useState({
+        fecha: "",
+        descripcion: "",
+        equipo_id: "",
+        prioridad_id: "",
+        edificio_id: "",
+        aula_id: ""
+    });
+
+    const handleValueErroresIncidenciaEdit = (newValue: any) => {
+        setIncidenciaErrorEdit({ ...incidenciaErrorEdit, ...newValue });
+    }
+
+    const handleValueChangeIncidenciaEdit = (newValue: any) => {
+        setIncidenciaValueEdit({ ...incidenciaValueEdit, ...newValue });
+    }
+
 
     useEffect(() => {
         refetchAulas();
         setSelectedAula(0);
         handleValueChangeIncidencia({ equipo_id: 0 });
 
-    }, [selectedEdificio]);
+        setSelectedAulaEdit(0);
+        handleValueChangeIncidenciaEdit({ equipo_id: 0 });
+    }, [selectedEdificio, selectedEdificioEdit]);
 
     useEffect(() => {
         refetchEquipos();
         handleValueChangeIncidencia({ equipo_id: 0 });
-    }, [selectedAula]);
+        handleValueChangeIncidenciaEdit({ equipo_id: 0 });
+    }, [selectedAula, selectedAulaEdit]);
 
     //SACAR INCIDENCIAS DEL ENCARGADO
     async function obtenerIncidencias() {
@@ -217,15 +274,27 @@ function Incidencias() {
             fecha: "",
             equipo_id: "",
             prioridad_id: "",
+            edificio_id: "",
+            aula_id: ""
         });
 
-        if (incidenciaValue.fecha === "") {
+        if (incidenciaValue.fecha === null) {
             handleValueErroresIncidencia({ fecha: "La fecha es requerida" });
             return;
         }
 
         if (incidenciaValue.descripcion === '') {
             handleValueErroresIncidencia({ descripcion: "La descripcion es requerida" });
+            return;
+        }
+
+        if (selectedEdificio === 0) {
+            handleValueErroresIncidencia({ edificio_id: "Seleccione un edificio" });
+            return;
+        }
+
+        if (selectedAula === 0) {
+            handleValueErroresIncidencia({ aula_id: "Seleccione una aula" });
             return;
         }
 
@@ -258,10 +327,84 @@ function Incidencias() {
                     descripcion: '',
                     usuario_id: id,
                     equipo_id: 0,
-                    prioridad_id: 0
+                    prioridad_id: 0,
                 });
                 setSelectedEdificio(0);
                 setSelectedAula(0);
+                refetchIncidencias();
+            } else {
+                toast.error(data.msg);
+            }
+
+        } catch (error) {
+            toast.error("OCURRIO UN ERROR");
+        }
+    }
+
+    async function submitIncidenciaEdit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        handleValueErroresIncidenciaEdit({
+            descripcion: "",
+            fecha: "",
+            equipo_id: "",
+            prioridad_id: "",
+            edificio_id: "",
+            aula_id: ""
+        });
+
+        if (incidenciaValueEdit.fecha === null) {
+            handleValueErroresIncidenciaEdit({ fecha: "La fecha es requerida" });
+            return;
+        }
+
+        if (incidenciaValueEdit.descripcion === '') {
+            handleValueErroresIncidenciaEdit({ descripcion: "La descripcion es requerida" });
+            return;
+        }
+
+        if (selectedEdificioEdit === 0) {
+            handleValueErroresIncidenciaEdit({ edificio_id: "Seleccione un edificio" });
+            return;
+        }
+
+        if (selectedAulaEdit === 0) {
+            handleValueErroresIncidenciaEdit({ aula_id: "Seleccione una aula" });
+            return;
+        }
+
+        if (incidenciaValueEdit.equipo_id === 0) {
+            handleValueErroresIncidenciaEdit({ equipo_id: "Seleccione un equipo" });
+            return;
+        }
+
+        if (incidenciaValueEdit.prioridad_id === 0) {
+            handleValueErroresIncidenciaEdit({ prioridad_id: "Seleccione una prioridad" });
+            return;
+        }
+
+        try {
+            const response = await fetch(HOST + "api/editarIncidencia", {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-frontend-header': 'frontend',
+                },
+                body: JSON.stringify({ "fecha": incidenciaValueEdit.fecha, "descripcion": incidenciaValueEdit.descripcion, "usuario_id": incidenciaValueEdit.usuario_id, "equipo_id": incidenciaValueEdit.equipo_id, "prioridad_id": incidenciaValueEdit.prioridad_id }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                toast.success(data.msg);
+                handleCloseModalIncidenciaEdit();
+                setIncidenciaValueEdit({
+                    fecha: null,
+                    descripcion: '',
+                    usuario_id: id,
+                    equipo_id: 0,
+                    prioridad_id: 0,
+                });
+                setSelectedEdificioEdit(0);
+                setSelectedAulaEdit(0);
                 refetchIncidencias();
             } else {
                 toast.error(data.msg);
@@ -282,83 +425,83 @@ function Incidencias() {
             </header>
 
             <main>
-                {isLoadingIncidencias ? <p>Cargando...</p> : 
+                {isLoadingIncidencias ? <p>Cargando...</p> :
 
-                incidencias && incidencias.length > 0 ? (
-                    incidencias.map((incidencia) => {
-                        let colorCirculo = "";
-                        switch (incidencia.prioridad.toLowerCase()) {
-                            case "alta":
-                                colorCirculo = "red";
-                                break;
-                            case "media":
-                                colorCirculo = "orange";
-                                break;
-                            case "baja":
-                                colorCirculo = "green";
-                                break;
-                            default:
-                                colorCirculo = "";
-                        }
+                    incidencias && incidencias.length > 0 ? (
+                        incidencias.map((incidencia) => {
+                            let colorCirculo = "";
+                            switch (incidencia.prioridad.toLowerCase()) {
+                                case "alta":
+                                    colorCirculo = "red";
+                                    break;
+                                case "media":
+                                    colorCirculo = "orange";
+                                    break;
+                                case "baja":
+                                    colorCirculo = "green";
+                                    break;
+                                default:
+                                    colorCirculo = "";
+                            }
 
-                        return (
-                            <Accordion key={incidencia.incidencia_id}>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header"
-                                >
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            flexDirection: "row",
-                                            flexWrap: "nowrap",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                            width: "100%",
-                                        }}
+                            return (
+                                <Accordion key={incidencia.incidencia_id}>
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="panel1a-content"
+                                        id="panel1a-header"
                                     >
-                                        <Typography style={{ maxWidth: "80%" }} component="span">
-                                            {dayjs(incidencia.fechaincidencia).format("DD/MM/YYYY") +
-                                                " - " +
-                                                incidencia.descripcion_incidencia}
-                                        </Typography>
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                flexWrap: "nowrap",
+                                                justifyContent: "space-between",
+                                                alignItems: "center",
+                                                width: "100%",
+                                            }}
+                                        >
+                                            <Typography style={{ maxWidth: "80%" }} component="span">
+                                                {dayjs(incidencia.fechaincidencia).format("DD/MM/YYYY") +
+                                                    " - " +
+                                                    incidencia.descripcion_incidencia}
+                                            </Typography>
 
-                                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                            {colorCirculo && (
-                                                <span
-                                                    style={{
-                                                        width: "12px",
-                                                        height: "12px",
-                                                        borderRadius: "50%",
-                                                        backgroundColor: colorCirculo,
-                                                        display: "inline-block",
-                                                    }}
-                                                ></span>
-                                            )}
-                                            <Typography component="span">{incidencia.prioridad}</Typography>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                                {colorCirculo && (
+                                                    <span
+                                                        style={{
+                                                            width: "12px",
+                                                            height: "12px",
+                                                            borderRadius: "50%",
+                                                            backgroundColor: colorCirculo,
+                                                            display: "inline-block",
+                                                        }}
+                                                    ></span>
+                                                )}
+                                                <Typography component="span">{incidencia.prioridad}</Typography>
+                                            </div>
                                         </div>
-                                    </div>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Typography component="span">AUTORIZADO: {incidencia.autorizada ? "SI" : "NO"} <br /></Typography>
-                                    <Typography component="span">ESTADO: {incidencia.estado_incidencia} <br /></Typography>
-                                    <Typography component="span">EDIFICIO: {incidencia.edificio.toUpperCase()} <br /></Typography>
-                                    <Typography component="span">AULA: {incidencia.aula.toUpperCase()} <br /></Typography>
-                                    <Typography component="span">EQUIPO: {incidencia.equipo_nombre.toUpperCase()} <br /></Typography>
-                                    <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Typography component="span">AUTORIZADO: {incidencia.autorizada ? "SI" : "NO"} <br /></Typography>
+                                        <Typography component="span">ESTADO: {incidencia.estado_incidencia} <br /></Typography>
+                                        <Typography component="span">EDIFICIO: {incidencia.edificio.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">AULA: {incidencia.aula.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">EQUIPO: {incidencia.equipo_nombre.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
 
-                                </AccordionDetails>
-                                <AccordionActions>
-                                    <Button>EDITAR</Button>
-                                    <Button>LIBERAR</Button>
-                                    <Button>ELIMINAR</Button>
-                                </AccordionActions>
-                            </Accordion>
-                        );
-                    })
-                ) : "No hay incidencias asignadas a tu cargo"}
-        </main >
+                                    </AccordionDetails>
+                                    <AccordionActions>
+                                        <Button disabled={incidencia.autorizada} onClick={() => { handleOpenModalIncidenciaEdit(incidencia); }}>EDITAR</Button>
+                                        {incidencia.estado_incidencia.toLowerCase() !== "terminado" ? null : <Button>LIBERAR</Button>}
+                                        <Button disabled={incidencia.autorizada}>ELIMINAR</Button>
+                                    </AccordionActions>
+                                </Accordion>
+                            );
+                        })
+                    ) : "No hay incidencias asignadas a tu cargo"}
+            </main >
 
             {/* MODAL CREAR INCIDENCIA */}
             <Modal
@@ -369,7 +512,7 @@ function Incidencias() {
             >
                 <Box sx={style} component={"form"} onSubmit={submitIncidencia}>
                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                        Nueva incidencia
+                        NUEVA INCIDENCIA
                     </Typography>
                     <Box id="modal-modal-description" sx={{ mt: 2 }}>
 
@@ -425,6 +568,7 @@ function Incidencias() {
                                     value={selectedEdificio}
                                     onChange={(e) => setSelectedEdificio(e.target.value)}
                                     label="Edificio"
+
                                 >
                                     {isLoadingEdificios ? <MenuItem value={0}>Cargando...</MenuItem> : null}
                                     <MenuItem value={0} selected disabled>Seleccione un edificio</MenuItem>
@@ -432,6 +576,7 @@ function Incidencias() {
                                         <MenuItem key={edificio.id} value={edificio.id}>{edificio.nombre}</MenuItem>
                                     )) : <MenuItem key={0} value={0}>No hay edificios disponibles</MenuItem>}
                                 </Select>
+                                <FormHelperText error>{incidenciaError.edificio_id}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth>
@@ -449,6 +594,7 @@ function Incidencias() {
                                         <MenuItem key={aula.id} value={aula.id}>{aula.nombre}</MenuItem>
                                     )) : <MenuItem key={0} value={0}>No hay aulas disponibles</MenuItem>}
                                 </Select>
+                                <FormHelperText error>{incidenciaError.aula_id}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth>
@@ -466,6 +612,7 @@ function Incidencias() {
                                         <MenuItem key={equipo.id} value={equipo.id}>{equipo.nombre}</MenuItem>
                                     )) : <MenuItem key={0} value={0}>No hay equipos disponibles</MenuItem>}
                                 </Select>
+                                <FormHelperText error>{incidenciaError.equipo_id}</FormHelperText>
                             </FormControl>
                         </Box>
 
@@ -487,6 +634,7 @@ function Incidencias() {
                                         <MenuItem key={prioridad.id} value={prioridad.id}>{prioridad.nombre}</MenuItem>
                                     )) : <MenuItem key={0} value={0}>No hay prioridades disponibles</MenuItem>}
                                 </Select>
+                                <FormHelperText error>{incidenciaError.prioridad_id}</FormHelperText>
                             </FormControl>
                         </Box>
 
@@ -501,6 +649,149 @@ function Incidencias() {
             </Modal >
 
             {/* MODAL EDITAR INCIDENCIA */}
+            <Modal
+                open={openModalIncidenciaEdit}
+                onClose={handleCloseModalIncidenciaEdit}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style} component={"form"} onSubmit={submitIncidenciaEdit}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        EDITAR INCIDENCIA
+                    </Typography>
+                    <Box id="modal-modal-description" sx={{ mt: 2 }}>
+
+                        <Box sx={{ m: 2, width: '100%' }}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    disablePast
+                                    label="Fecha"
+                                    value={incidenciaValueEdit.fecha}
+                                    onChange={(newValue) => handleValueChangeIncidenciaEdit({ fecha: newValue })}
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                            error: incidenciaErrorEdit.fecha !== "",
+                                            helperText: incidenciaErrorEdit.fecha,
+                                        },
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        </Box>
+
+                        <Box
+                            sx={{ m: 2, width: '100%' }}
+                        >
+                            <TextField
+                                id="outlined-multiline-static"
+                                label="Descripcion"
+                                multiline
+                                rows={4}
+                                defaultValue={incidenciaValueEdit.descripcion}
+                                onChange={(e) => handleValueChangeIncidenciaEdit({ descripcion: e.target.value })}
+                                error={incidenciaErrorEdit.descripcion !== ""}
+                                helperText={incidenciaErrorEdit.descripcion}
+                                fullWidth
+                            />
+                        </Box>
+
+                        <Box
+                            sx={{ m: 2, width: '100%' }}
+                        >
+                            <TextField id="outlined-basic" label="Encargado" variant="outlined" defaultValue={usuario} disabled fullWidth />
+                        </Box>
+
+                        <Box
+                            sx={{ m: 2, display: 'flex', gap: 2, flexDirection: 'row', flexWrap: 'nowrap' }}
+                        >
+
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-autowidth-label">Edificio</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-autowidth-label"
+                                    id="demo-simple-select-autowidth"
+                                    value={selectedEdificioEdit}
+                                    onChange={(e) => setSelectedEdificioEdit(e.target.value)}
+                                    label="Edificio"
+
+                                >
+                                    {isLoadingEdificios ? <MenuItem value={0}>Cargando...</MenuItem> : null}
+                                    <MenuItem value={0} selected disabled>Seleccione un edificio</MenuItem>
+                                    {edificios ? edificios.map((edificio) => (
+                                        <MenuItem key={edificio.id} value={edificio.id}>{edificio.nombre}</MenuItem>
+                                    )) : <MenuItem key={0} value={0}>No hay edificios disponibles</MenuItem>}
+                                </Select>
+                                <FormHelperText error>{incidenciaErrorEdit.edificio_id}</FormHelperText>
+                            </FormControl>
+
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-autowidth-label">Aula</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-autowidth-label"
+                                    id="demo-simple-select-autowidth"
+                                    value={selectedAulaEdit}
+                                    onChange={(e) => setSelectedAulaEdit(e.target.value)}
+                                    label="Aula"
+                                >
+                                    {isLoadingAulas ? <MenuItem value={0}>Cargando...</MenuItem> : null}
+                                    <MenuItem value={0} selected disabled>Seleccione un aula</MenuItem>
+                                    {aulas ? aulas.map((aula) => (
+                                        <MenuItem key={aula.id} value={aula.id}>{aula.nombre}</MenuItem>
+                                    )) : <MenuItem key={0} value={0}>No hay aulas disponibles</MenuItem>}
+                                </Select>
+                                <FormHelperText error>{incidenciaErrorEdit.aula_id}</FormHelperText>
+                            </FormControl>
+
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-autowidth-label">Equipo</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-autowidth-label"
+                                    id="demo-simple-select-autowidth"
+                                    value={incidenciaValueEdit.equipo_id}
+                                    onChange={(e) => handleValueChangeIncidenciaEdit({ equipo_id: e.target.value })}
+                                    label="Equipo"
+                                >
+                                    {isLoadingEquipos ? <MenuItem value={0}>Cargando...</MenuItem> : null}
+                                    <MenuItem value={0} selected disabled>Seleccione un equipo</MenuItem>
+                                    {equipos ? equipos.map((equipo) => (
+                                        <MenuItem key={equipo.id} value={equipo.id}>{equipo.nombre}</MenuItem>
+                                    )) : <MenuItem key={0} value={0}>No hay equipos disponibles</MenuItem>}
+                                </Select>
+                                <FormHelperText error>{incidenciaErrorEdit.equipo_id}</FormHelperText>
+                            </FormControl>
+                        </Box>
+
+                        <Box
+                            sx={{ m: 2, width: '100%' }}
+                        >
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-autowidth-label">Prioridad</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-autowidth-label"
+                                    id="demo-simple-select-autowidth"
+                                    value={incidenciaValueEdit.prioridad_id}
+                                    onChange={(e) => handleValueChangeIncidenciaEdit({ prioridad_id: e.target.value })}
+                                    label="Prioridad"
+                                >
+                                    {isLoadingPrioridades ? <MenuItem value={0}>Cargando...</MenuItem> : null}
+                                    <MenuItem value={0} selected disabled>Seleccione una prioridad</MenuItem>
+                                    {prioridades ? prioridades.map((prioridad) => (
+                                        <MenuItem key={prioridad.id} value={prioridad.id}>{prioridad.nombre}</MenuItem>
+                                    )) : <MenuItem key={0} value={0}>No hay prioridades disponibles</MenuItem>}
+                                </Select>
+                                <FormHelperText error>{incidenciaErrorEdit.prioridad_id}</FormHelperText>
+                            </FormControl>
+                        </Box>
+
+                        <Box sx={{ m: 2, width: '100%' }}>
+                            <Button type="submit" variant="contained" className="boton" fullWidth>
+                                Editar Incidencia
+                            </Button>
+                        </Box>
+
+                    </Box>
+                </Box >
+            </Modal >
 
             {/* MODAL ELIMINAR INCIDENCIA */}
 

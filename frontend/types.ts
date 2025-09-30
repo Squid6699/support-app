@@ -1,5 +1,7 @@
+import type { Dayjs } from "dayjs";
+
 export interface Incidencia {
-    fecha: null;
+    fecha: Dayjs | null;
     descripcion: string;
     usuario_id: number;
     equipo_id: number;
@@ -11,10 +13,13 @@ export interface Incidencias{
     fechaincidencia: Date;
     descripcion_incidencia: string;
     estado_incidencia: string;
+    id_prioridad: number;
     prioridad: string;
     equipo_id: number;
     equipo_nombre: string;
+    edificio_id: number;
     edificio: string;
+    aula_id: number;
     aula: string;
     autorizada: boolean;
     tecnico_nombre: string | null;
