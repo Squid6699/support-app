@@ -16,6 +16,7 @@ export const ObtenerIncidenciasEncargadoRouter = express.Router();
 export const ActualizarEstadoIncidenciaRouter = express.Router();
 export const AsignarTecnico = express.Router();
 export const IncidenciasTecnicoRouter = express.Router();
+export const ObtenerIncidenciasLiberadasRouter = express.Router();
 
 
 
@@ -392,8 +393,94 @@ LiberarIncidenciaRouter.put("/liberarIncidencia", async (req, res) => {
 });
 
 // Ruta para que el encargado de edificio pueda ver sus incidencias.
-
 ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { personaId } = req.params;
+    const { estado } = req.query; // <-- filtros desde el frontend
+
+    let query = `
+        SELECT 
+            i.id AS incidencia_id,
+            i.fecha as fechaincidencia,
+            i.descripcion as descripcion_incidencia,
+            i.estado AS estado_incidencia,
+            pr.id AS prioridad_id,
+            pr.nombre AS prioridad,
+            eq.id AS equipo_id,
+            eq.nombre AS equipo_nombre,
+            ED.id AS edificio_id,
+            ED.nombre AS edificio,
+            A.id AS aula_id,
+            A.nombre AS aula,
+            i.autorizada AS autorizada,
+            t.nombre AS tecnico_nombre
+        FROM incidente i
+        INNER JOIN equipo eq ON i.equipo_id = eq.id
+        INNER JOIN aula A ON eq.aula_id = A.id
+        INNER JOIN Edificio ED ON A.edificio_id = ED.id
+        INNER JOIN persona p ON ed.encargado_id = p.id
+        INNER JOIN prioridad pr ON i.prioridad_id = pr.id
+        LEFT JOIN persona t ON i.tecnico_id = t.id
+        WHERE p.id = $1
+    `;
+
+    const params = [personaId];
+
+    if (estado === "AUTORIZADO") {
+        query += ` AND i.autorizada = true`;
+    }
+
+    if (estado === "NO AUTORIZADO") {
+        query += ` AND i.autorizada = false`;
+    }
+
+    if (estado === "SINTÉCNICO") {
+        query += ` AND i.tecnico_id IS NULL`;
+    }
+
+    if (estado === "TECNICOASIGNADO") {
+        query += ` AND i.tecnico_id IS NOT NULL`;
+    }
+
+    if (estado === "NO INICIADO"){
+        query += ` AND i.estado = 'NO INICIADO'`;
+    }
+
+    if (estado === "EN PROCESO"){
+        query += ` AND i.estado = 'EN PROCESO'`;
+    }
+
+    if (estado === "TERMINADO"){
+        query += ` AND i.estado = 'TERMINADO'`;
+    }
+
+    if (estado === "LIBERADO"){
+        query += ` AND i.estado = 'LIBERADO'`;
+    }
+
+    query += ` ORDER BY i.fecha DESC`;
+
+    try {
+        const result = await pool.query(query, params);
+
+        if (result.rows.length === 0) {
+            return res.json({ success: false, msg: "No se encontraron incidencias" });
+        }
+
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        console.error("Error en la DB:", err);
+        res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+
+// Ruta para que el encargado de edificio pueda ver sus incidencias liberadas.
+ObtenerIncidenciasLiberadasRouter.get("/verIncidenciasLiberadas/:personaId", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
 
     if (customHeader !== 'frontend') {
@@ -426,7 +513,7 @@ ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", asy
             INNER JOIN persona p ON ed.encargado_id = p.id
             INNER JOIN prioridad pr ON i.prioridad_id = pr.id
             LEFT JOIN persona t ON i.tecnico_id = t.id
-            WHERE p.id = $1 AND i.estado != 'LIBERADO'
+            WHERE p.id = $1 AND i.estado = 'LIBERADO'
             ORDER BY i.fecha DESC
         `, [personaId]);
 

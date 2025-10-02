@@ -24,6 +24,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Incidencias from "../pages/Incidencias";
+import IncidenciasLiberadasEncargado from "../pages/IncidenciasLiberadasEncargado";
 
 const drawerWidth = 200;
 
@@ -146,6 +147,7 @@ function ResponsiveDrawer() {
                         {[
                             "Incidencias",
                             "Incidencias Liberadas",
+                            "Equipos",
                             "Servicios",
                         ].map((text, index) => (
                             <ListItem key={text} disablePadding>
@@ -153,7 +155,8 @@ function ResponsiveDrawer() {
                                     <ListItemIcon>
                                         {index === 0 && <SummarizeIcon />}
                                         {index === 1 && <SummarizeIcon />}
-                                        {index === 2 && <ElectricalServicesIcon />}
+                                        {index === 2 && <DevicesIcon />}
+                                        {index === 3 && <ElectricalServicesIcon />}
 
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
@@ -262,7 +265,7 @@ function ResponsiveDrawer() {
                 {/* CONTEN MAIN */}
                 {selectedContent === "Incidencias Asignadas" && <div>Contenido de Incidencias Asignadas</div>}
                 {selectedContent === "Incidencias" && <Incidencias />}
-                {selectedContent === "Incidencias Liberadas"&& <div>Contenido de Incidencias Liberadas</div>}
+                {selectedContent === "Incidencias Liberadas"&& <IncidenciasLiberadasEncargado />}
                 {selectedContent === "Servicios" && <div>Contenido de Servicios</div>}
                 {selectedContent === "Ubicaciones" && <div>Contenido de Ubicaciones</div>}
                 {selectedContent === "Usuarios" && <div>Contenido de Usuarios</div>}

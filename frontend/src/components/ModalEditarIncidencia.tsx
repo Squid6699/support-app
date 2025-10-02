@@ -12,16 +12,188 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import FormHelperText from "@mui/material/FormHelperText";
 import Typography from "@mui/material/Typography";
 import { useSesion } from "../hook/useSesion";
+import type { Aula, Edificio, EquipoAula, Incidencia, Incidencias, Prioridad } from "../../types";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import Button from "@mui/material/Button";
+import toast from "react-hot-toast";
+import dayjs from "dayjs";
 
 
+interface ModalEditarIncidenciaProps {
+    open: boolean;
+    setOpenModalIncidencia: (value: boolean) => void;
+    refetchIncidencias: () => void;
+    incidencia: Incidencias | null;
+}
 
-
-function ModalCrearIncidencia({ open }) {
+function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencias, incidencia }: ModalEditarIncidenciaProps) {
     const { id, usuario } = useSesion();
+    const HOST = import.meta.env.VITE_HOST
 
-    async function submitIncidenciaEdit(e: React.FormEvent<HTMLFormElement>) {
+    // console.log(incidencia);
+
+    const [incidenciaValue, setIncidenciaValue] = useState<Incidencia>({
+        fecha: incidencia?.fechaincidencia ? dayjs(incidencia.fechaincidencia) : null,
+        descripcion: incidencia?.descripcion_incidencia || '',
+        usuario_id: id,
+        equipo_id: incidencia?.equipo_id || 0,
+        prioridad_id: incidencia?.id_prioridad || 0,
+    });
+    const [selectedEdificio, setSelectedEdificio] = useState<number>(incidencia?.edificio_id || 0);
+    const [selectedAula, setSelectedAula] = useState<number>(incidencia?.aula_id || 0);
+
+    const handleCloseModalIncidencia = () => {
+        setOpenModalIncidencia(false);
+        setIncidenciaValue({
+            fecha: null,
+            descripcion: '',
+            usuario_id: id,
+            equipo_id: 0,
+            prioridad_id: 0,
+        });
+        setSelectedEdificio(0);
+        setSelectedAula(0);
+    }
+
+    const [incidenciaError, setIncidenciaError] = useState({
+        fecha: "",
+        descripcion: "",
+        equipo_id: "",
+        prioridad_id: "",
+        edificio_id: "",
+        aula_id: ""
+    });
+
+    const handleValueErroresIncidencia = (newValue: any) => {
+        setIncidenciaError({ ...incidenciaError, ...newValue });
+    }
+
+    const handleValueChangeIncidencia = (newValue: any) => {
+        setIncidenciaValue({ ...incidenciaValue, ...newValue });
+    }
+
+    const { data: edificios, isLoading: isLoadingEdificios } = useQuery<Edificio[]>({
+        queryKey: ["Edificios"],
+        queryFn: obtenerEdificiosPorEncargado,
+    });
+
+    const { data: aulas, isLoading: isLoadingAulas, refetch: refetchAulas } = useQuery<Aula[]>({
+        queryKey: ["Aulas"],
+        queryFn: obtenerAulasPorEdificio,
+    });
+
+    const { data: equipos, isLoading: isLoadingEquipos, refetch: refetchEquipos } = useQuery<EquipoAula[]>({
+        queryKey: ["Equipos"],
+        queryFn: obtenerEquiposPorAula,
+    });
+
+    const { data: prioridades, isLoading: isLoadingPrioridades } = useQuery<Prioridad[]>({
+        queryKey: ["Prioridades"],
+        queryFn: obtenerPrioridades,
+    });
+
+    //SACAR EDIFICIOS DEL ENCARGADO
+    async function obtenerEdificiosPorEncargado() {
+        try {
+            const response = await fetch(HOST + "api/obtenerEdificiosPorEncargado/" + id, {
+                method: 'GET',
+                headers: {
+                    'x-frontend-header': 'frontend',
+                },
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                return (data.data);
+            } else {
+                return [];
+            }
+        } catch {
+            throw new Error("OCURRIO UN ERROR");
+        }
+    }
+
+    //SACAR AULAS DEL EDIFICIO
+    async function obtenerAulasPorEdificio() {
+        try {
+            const response = await fetch(HOST + "api/obtenerAulasPorEdificio/" + selectedEdificio, {
+                method: 'GET',
+                headers: {
+                    'x-frontend-header': 'frontend',
+                },
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                return (data.data);
+            } else {
+                return [];
+            }
+        } catch {
+            throw new Error("OCURRIO UN ERROR");
+        }
+    }
+
+    //SACAR EQUIPOS DEL AULA
+    async function obtenerEquiposPorAula() {
+        try {
+            const response = await fetch(HOST + "api/obtenerEquiposPorAula/" + selectedAula, {
+                method: 'GET',
+                headers: {
+                    'x-frontend-header': 'frontend',
+                },
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                return (data.data);
+            } else {
+                return [];
+            }
+        } catch {
+            throw new Error("OCURRIO UN ERROR");
+        }
+    }
+
+    //SACAR PRIORIDADES
+    async function obtenerPrioridades() {
+        try {
+            const response = await fetch(HOST + "api/obtenerPrioridades", {
+                method: 'GET',
+                headers: {
+                    'x-frontend-header': 'frontend',
+                },
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                return (data.result);
+            } else {
+                return [];
+            }
+        } catch {
+            throw new Error("OCURRIO UN ERROR");
+        }
+    }
+
+
+    useEffect(() => {
+        refetchAulas();
+        setSelectedAula(0);
+        handleValueChangeIncidencia({ equipo_id: 0 });
+
+    }, [selectedEdificio]);
+
+    useEffect(() => {
+        refetchEquipos();
+        handleValueChangeIncidencia({ equipo_id: 0 });
+
+    }, [selectedAula]);
+
+    async function submitIncidencia(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        handleValueErroresIncidenciaEdit({
+        handleValueErroresIncidencia({
             descripcion: "",
             fecha: "",
             equipo_id: "",
@@ -30,51 +202,51 @@ function ModalCrearIncidencia({ open }) {
             aula_id: ""
         });
 
-        if (incidenciaValueEdit.fecha === null) {
-            handleValueErroresIncidenciaEdit({ fecha: "La fecha es requerida" });
+        if (incidenciaValue.fecha === null) {
+            handleValueErroresIncidencia({ fecha: "La fecha es requerida" });
             return;
         }
 
-        if (incidenciaValueEdit.descripcion === '') {
-            handleValueErroresIncidenciaEdit({ descripcion: "La descripcion es requerida" });
+        if (incidenciaValue.descripcion === '') {
+            handleValueErroresIncidencia({ descripcion: "La descripcion es requerida" });
             return;
         }
 
         if (selectedEdificio === 0) {
-            handleValueErroresIncidenciaEdit({ edificio_id: "Seleccione un edificio" });
+            handleValueErroresIncidencia({ edificio_id: "Seleccione un edificio" });
             return;
         }
 
         if (selectedAula === 0) {
-            handleValueErroresIncidenciaEdit({ aula_id: "Seleccione una aula" });
+            handleValueErroresIncidencia({ aula_id: "Seleccione una aula" });
             return;
         }
 
-        if (incidenciaValueEdit.equipo_id === 0) {
-            handleValueErroresIncidenciaEdit({ equipo_id: "Seleccione un equipo" });
+        if (incidenciaValue.equipo_id === 0) {
+            handleValueErroresIncidencia({ equipo_id: "Seleccione un equipo" });
             return;
         }
 
-        if (incidenciaValueEdit.prioridad_id === 0) {
-            handleValueErroresIncidenciaEdit({ prioridad_id: "Seleccione una prioridad" });
+        if (incidenciaValue.prioridad_id === 0) {
+            handleValueErroresIncidencia({ prioridad_id: "Seleccione una prioridad" });
             return;
         }
 
         try {
-            const response = await fetch(HOST + "api/editarIncidencia", {
-                method: 'PUT',
+            const response = await fetch(HOST + "api/crearIncidencia", {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'x-frontend-header': 'frontend',
                 },
-                body: JSON.stringify({ "fecha": incidenciaValueEdit.fecha, "descripcion": incidenciaValueEdit.descripcion, "usuario_id": incidenciaValueEdit.usuario_id, "equipo_id": incidenciaValueEdit.equipo_id, "prioridad_id": incidenciaValueEdit.prioridad_id }),
+                body: JSON.stringify({ "fecha": incidenciaValue.fecha, "descripcion": incidenciaValue.descripcion, "usuario_id": incidenciaValue.usuario_id, "equipo_id": incidenciaValue.equipo_id, "prioridad_id": incidenciaValue.prioridad_id }),
             });
 
             const data = await response.json();
             if (data.success) {
                 toast.success(data.msg);
-                handleCloseModalIncidenciaEdit();
-                setIncidenciaValueEdit({
+                handleCloseModalIncidencia();
+                setIncidenciaValue({
                     fecha: null,
                     descripcion: '',
                     usuario_id: id,
@@ -92,19 +264,18 @@ function ModalCrearIncidencia({ open }) {
             toast.error("OCURRIO UN ERROR");
         }
     }
-
-
     return (
         <>
+
             <Modal
-                open={openModalIncidenciaEdit}
-                onClose={handleCloseModalIncidenciaEdit}
+                open={open}
+                onClose={handleCloseModalIncidencia}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={style} component={"form"} onSubmit={submitIncidenciaEdit}>
+                <Box sx={style} component={"form"} onSubmit={submitIncidencia}>
                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                        EDITAR INCIDENCIA
+                        NUEVA INCIDENCIA
                     </Typography>
                     <Box id="modal-modal-description" sx={{ mt: 2 }}>
 
@@ -113,13 +284,13 @@ function ModalCrearIncidencia({ open }) {
                                 <DatePicker
                                     disablePast
                                     label="Fecha"
-                                    value={incidenciaValueEdit.fecha}
-                                    onChange={(newValue) => handleValueChangeIncidenciaEdit({ fecha: newValue })}
+                                    value={incidencia?.fechaincidencia ? dayjs(incidencia.fechaincidencia) : incidenciaValue.fecha}
+                                    onChange={(newValue) => handleValueChangeIncidencia({ fecha: newValue })}
                                     slotProps={{
                                         textField: {
                                             fullWidth: true,
-                                            error: incidenciaErrorEdit.fecha !== "",
-                                            helperText: incidenciaErrorEdit.fecha,
+                                            error: incidenciaError.fecha !== "",
+                                            helperText: incidenciaError.fecha,
                                         },
                                     }}
                                 />
@@ -134,10 +305,10 @@ function ModalCrearIncidencia({ open }) {
                                 label="Descripcion"
                                 multiline
                                 rows={4}
-                                defaultValue={incidenciaValueEdit.descripcion}
-                                onChange={(e) => handleValueChangeIncidenciaEdit({ descripcion: e.target.value })}
-                                error={incidenciaErrorEdit.descripcion !== ""}
-                                helperText={incidenciaErrorEdit.descripcion}
+                                value={incidencia?.descripcion_incidencia}
+                                onChange={(e) => handleValueChangeIncidencia({ descripcion: e.target.value })}
+                                error={incidenciaError.descripcion !== ""}
+                                helperText={incidenciaError.descripcion}
                                 fullWidth
                             />
                         </Box>
@@ -157,7 +328,7 @@ function ModalCrearIncidencia({ open }) {
                                 <Select
                                     labelId="demo-simple-select-autowidth-label"
                                     id="demo-simple-select-autowidth"
-                                    value={selectedEdificio}
+                                    value={incidencia?.edificio_id}
                                     onChange={(e) => setSelectedEdificio(e.target.value)}
                                     label="Edificio"
 
@@ -168,7 +339,7 @@ function ModalCrearIncidencia({ open }) {
                                         <MenuItem key={edificio.id} value={edificio.id}>{edificio.nombre}</MenuItem>
                                     )) : <MenuItem key={0} value={0}>No hay edificios disponibles</MenuItem>}
                                 </Select>
-                                <FormHelperText error>{incidenciaErrorEdit.edificio_id}</FormHelperText>
+                                <FormHelperText error>{incidenciaError.edificio_id}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth>
@@ -176,17 +347,17 @@ function ModalCrearIncidencia({ open }) {
                                 <Select
                                     labelId="demo-simple-select-autowidth-label"
                                     id="demo-simple-select-autowidth"
-                                    value={selectedAula}
+                                    value={incidencia?.aula_id}
                                     onChange={(e) => setSelectedAula(e.target.value)}
                                     label="Aula"
                                 >
-                                    {isLoadingAulasEdit ? <MenuItem value={0}>Cargando...</MenuItem> : null}
+                                    {isLoadingAulas ? <MenuItem value={0}>Cargando...</MenuItem> : null}
                                     <MenuItem value={0} selected disabled>Seleccione un aula</MenuItem>
-                                    {aulasEdit ? aulasEdit.map((aula) => (
+                                    {aulas ? aulas.map((aula) => (
                                         <MenuItem key={aula.id} value={aula.id}>{aula.nombre}</MenuItem>
                                     )) : <MenuItem key={0} value={0}>No hay aulas disponibles</MenuItem>}
                                 </Select>
-                                <FormHelperText error>{incidenciaErrorEdit.aula_id}</FormHelperText>
+                                <FormHelperText error>{incidenciaError.aula_id}</FormHelperText>
                             </FormControl>
 
                             <FormControl fullWidth>
@@ -194,17 +365,17 @@ function ModalCrearIncidencia({ open }) {
                                 <Select
                                     labelId="demo-simple-select-autowidth-label"
                                     id="demo-simple-select-autowidth"
-                                    value={incidenciaValueEdit.equipo_id}
-                                    onChange={(e) => handleValueChangeIncidenciaEdit({ equipo_id: e.target.value })}
+                                    value={incidencia?.equipo_id}
+                                    onChange={(e) => handleValueChangeIncidencia({ equipo_id: e.target.value })}
                                     label="Equipo"
                                 >
-                                    {isLoadingEquiposEdit ? <MenuItem value={0}>Cargando...</MenuItem> : null}
+                                    {isLoadingEquipos ? <MenuItem value={0}>Cargando...</MenuItem> : null}
                                     <MenuItem value={0} selected disabled>Seleccione un equipo</MenuItem>
-                                    {equiposEdit ? equiposEdit.map((equipo) => (
+                                    {equipos ? equipos.map((equipo) => (
                                         <MenuItem key={equipo.id} value={equipo.id}>{equipo.nombre}</MenuItem>
                                     )) : <MenuItem key={0} value={0}>No hay equipos disponibles</MenuItem>}
                                 </Select>
-                                <FormHelperText error>{incidenciaErrorEdit.equipo_id}</FormHelperText>
+                                <FormHelperText error>{incidenciaError.equipo_id}</FormHelperText>
                             </FormControl>
                         </Box>
 
@@ -216,8 +387,8 @@ function ModalCrearIncidencia({ open }) {
                                 <Select
                                     labelId="demo-simple-select-autowidth-label"
                                     id="demo-simple-select-autowidth"
-                                    value={incidenciaValueEdit.prioridad_id}
-                                    onChange={(e) => handleValueChangeIncidenciaEdit({ prioridad_id: e.target.value })}
+                                    value={incidencia?.id_prioridad}
+                                    onChange={(e) => handleValueChangeIncidencia({ prioridad_id: e.target.value })}
                                     label="Prioridad"
                                 >
                                     {isLoadingPrioridades ? <MenuItem value={0}>Cargando...</MenuItem> : null}
@@ -226,7 +397,7 @@ function ModalCrearIncidencia({ open }) {
                                         <MenuItem key={prioridad.id} value={prioridad.id}>{prioridad.nombre}</MenuItem>
                                     )) : <MenuItem key={0} value={0}>No hay prioridades disponibles</MenuItem>}
                                 </Select>
-                                <FormHelperText error>{incidenciaErrorEdit.prioridad_id}</FormHelperText>
+                                <FormHelperText error>{incidenciaError.prioridad_id}</FormHelperText>
                             </FormControl>
                         </Box>
 
@@ -242,5 +413,4 @@ function ModalCrearIncidencia({ open }) {
         </>
     );
 }
-
-export default ModalCrearIncidencia;
+export default ModalEditarIncidencia;
