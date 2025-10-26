@@ -25,6 +25,7 @@ import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Incidencias from "../pages/Incidencias";
 import IncidenciasLiberadasEncargado from "../pages/IncidenciasLiberadasEncargado";
+import EquiposEncargado from "../pages/EquiposEncargado";
 
 const drawerWidth = 200;
 
@@ -269,7 +270,7 @@ function ResponsiveDrawer() {
                 {selectedContent === "Servicios" && <div>Contenido de Servicios</div>}
                 {selectedContent === "Ubicaciones" && <div>Contenido de Ubicaciones</div>}
                 {selectedContent === "Usuarios" && <div>Contenido de Usuarios</div>}
-                {selectedContent === "Equipos" && <div>Contenido de Equipos</div>}
+                {selectedContent === "Equipos" && <EquiposEncargado />}
                 {selectedContent === "Piezas" && <div>Contenido de Piezas</div>}
                 {selectedContent === "Marcas" && <div>Contenido de Marcas</div>}
                 {selectedContent === "Prioridades" && <div>Contenido de Prioridades</div>}

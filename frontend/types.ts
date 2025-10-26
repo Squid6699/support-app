@@ -62,3 +62,11 @@ export interface Prioridad {
     id: number;
     nombre: string;
 }
+
+export interface EquiposPorEncargado {
+    id: number;
+    nombreequipo: string;
+    fechaequipo: string;
+    nombreaula: string;
+    nombreedificio: string;
+}
