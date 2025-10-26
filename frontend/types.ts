@@ -8,7 +8,7 @@ export interface Incidencia {
     prioridad_id: number;
 }
 
-export interface Incidencias{
+export interface Incidencias {
     incidencia_id: number;
     fechaincidencia: Date;
     descripcion_incidencia: string;
@@ -69,4 +69,18 @@ export interface EquiposPorEncargado {
     fechaequipo: string;
     nombreaula: string;
     nombreedificio: string;
+}
+
+export interface EquipoDetalles {
+    id: number;
+    fechaequipo: string;
+    idincidente: number;
+    descripcionincidente: string;
+    nombretecnico: string | null;
+    prioridad: string;
+    estadoincidencia: string;
+    nombreservicio: string | null;
+    descripcionservicio: string | null;
+    horasservicio: number | null;
+    calificacionservicio: number | null;
 }

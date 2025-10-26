@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { CrearPersonaRouter, EditarPersonaRouter, EliminarPersonaRouter, ObtenerPersonasRouter, ObtenerPersonaRouter, ObtenerTecnicosRouter } from '../querys/personas.js';
 import { CrearRolRouter, EditarRolRouter, EliminarRolRouter, ObtenerRolesRouter, ObtenerRolRouter } from '../querys/rol.js';
 import { CrearPrioridadRouter, EditarPrioridadRouter, EliminarPrioridadRouter, ObtenerPrioridadesRouter, ObtenerPrioridadRouter } from '../querys/prioridad.js';
-import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquiposRouter, ObtenerEquipoRouter, ObtenerEquiposEncargadoRouter, ObtenerEquiposPorAulaRouter } from '../querys/equipo.js';
+import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquiposRouter, ObtenerEquipoRouter, ObtenerEquiposEncargadoRouter, ObtenerEquiposPorAulaRouter, ObtenerDetallesEquiposRouter } from '../querys/equipo.js';
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
@@ -80,12 +80,6 @@ app.use("/api/", EditarIncidenciaRouter);
 app.use("/api/", EliminarIncidenciaRouter);
 app.use("/api/", ObtenerIncidenciasLiberadasRouter);
 
-app.use("/api/", CrearEquipoRouter);
-app.use("/api/", ObtenerEquiposRouter);
-app.use("/api/", ObtenerEquipoRouter);
-app.use("/api/", EditarEquipoRouter);
-app.use("/api/", EditarEquipoRouter);
-
 app.use("/api/", CrearServicioRouter);
 app.use("/api/", ObtenerServiciosRouter);
 app.use("/api/", ObtenerServicioRouter);
@@ -94,6 +88,8 @@ app.use("/api/", EliminarServicioRouter);
 
 
 app.use("/api/", ObtenerEquiposEncargadoRouter);
+app.use("/api/", ObtenerDetallesEquiposRouter);
+
 
 
 //Ruta para que el tecnico pueda ver detalles de la incidencia asignada (Nombre, ubicacion, marca, tipo, piezas, incidencias anteriores). // tabla incidencia

@@ -153,7 +153,8 @@ ObtenerDetallesEquiposRouter.get("/verDetallesEquipos/:id", async (req, res) => 
 
     try {
         const result = await pool.query(`
-            SELECT EQ.nombre AS nombreequipo, 
+            SELECT EQ.id AS id, 
+            EQ.nombre AS nombreequipo, 
             EQ.fecha AS fechaequipo, 
             A.nombre AS nombreaula, 
             E.nombre AS nombreedificio, 
