@@ -104,9 +104,9 @@ function ModalDetalleEquipo({ open, handleClose, equipoId }: ModalCrearIncidenci
                                             <Typography variant="body2">
                                                 HORAS DE SERVICIO: {detalle.horasservicio !== null ? detalle.horasservicio : "SIN HORAS"} <br />
                                             </Typography>
-                                            <Typography variant="body2">
+                                            {/* <Typography variant="body2">
                                                 CALIFICACIÓN DEL SERVICIO: {detalle.calificacionservicio !== 0 ? detalle.calificacionservicio : "SIN CALIFICACIÓN"} <br />
-                                            </Typography>
+                                            </Typography> */}
                                             <hr />
                                         </>
 

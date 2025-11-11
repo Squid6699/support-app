@@ -8,21 +8,22 @@ export const EditarServicioRouter = express.Router();
 export const EliminarServicioRouter = express.Router();
 export const ObtenerServiciosDeTecnicoRouter = express.Router();
 export const ObtenerDetallesServicioRouter = express.Router();
+export const ObtenerServiciosDeEquiposRouter = express.Router();
 
 CrearServicioRouter.post("/crearServicio", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { id_incidencia, nombre, descripcion, tecnico_id, horas} = req.body;
+    const { id_incidencia, nombre, descripcion, tecnico_id, horas } = req.body;
 
-    if (!nombre|| !descripcion || !tecnico_id|| !horas)
+    if (!nombre || !descripcion || !tecnico_id || !horas)
         return res.status(400).json({ success: false, msg: "Faltan datos" });
 
     try {
         const result = await pool.query(
             "INSERT INTO servicio ( nombre, descripcion, tecnico_id, horas) VALUES ($1, $2, $3, $4) RETURNING *",
-            [nombre, descripcion, tecnico_id,horas]
+            [nombre, descripcion, tecnico_id, horas]
         );
 
         const resultIncidencia = await pool.query(
@@ -84,7 +85,7 @@ EditarServicioRouter.put("/editarServicio", async (req, res) => {
         return res.status(401).send('Unauthorized');
 
     const { id, nombre, descripcion, tecnico_id, horas } = req.body;
-    if (!nombre || !descripcion || !tecnico_id|| !horas || !tipo_id)
+    if (!nombre || !descripcion || !tecnico_id || !horas || !tipo_id)
         return res.status(400).json({ success: false, msg: "Faltan datos" });
 
     try {
@@ -145,7 +146,7 @@ ObtenerDetallesServicioRouter.get("/obtenerDetallesServicio/:id", async (req, re
 
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
-    }  
+    }
 
     const { id } = req.params;
 
@@ -174,5 +175,60 @@ ObtenerDetallesServicioRouter.get("/obtenerDetallesServicio/:id", async (req, re
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+// Ruta para que el encargado pueda ver los servicios de sus equipos
+ObtenerServiciosDeEquiposRouter.get("/obtenerServiciosDeEquipos/:id", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(`
+            SELECT 
+                EQ.id AS id_equipo,
+                EQ.nombre AS nombre_equipo,
+                EQ.fecha AS fecha_equipo,
+                A.nombre AS nombre_aula,
+                E.nombre AS nombre_edificio,
+                json_agg(
+                    json_build_object(
+                        'id_incidencia', I.id,
+                        'descripcion_incidencia', I.descripcion,
+                        'nombre_tecnico', Tec.nombre,
+                        'prioridad', PR.nombre,
+                        'nombre_servicio', S.nombre,
+                        'descripcion_servicio', S.descripcion,
+                        'horas_servicio', S.horas,
+                        'incidencia_finalizada', I.finalizado,
+                        'fecha_termino_incidencia', I.fecha_fin,
+                        'calificacion_servicio', S.calificacion,
+                        'autorizada_incidencia', I.autorizada,
+                        'estado_incidencia', I.estado
+                    )
+                ) FILTER (WHERE I.id IS NOT NULL) AS servicios
+            FROM equipo EQ
+            INNER JOIN aula A ON EQ.aula_id = A.id
+            INNER JOIN edificio E ON A.edificio_id = E.id
+            INNER JOIN persona P ON E.encargado_id = P.id
+            LEFT JOIN incidente I ON I.equipo_id = EQ.id
+            LEFT JOIN persona Tec ON I.tecnico_id = Tec.id
+            LEFT JOIN prioridad PR ON I.prioridad_id = PR.id
+            LEFT JOIN servicio S ON I.servicio_id = S.id
+            WHERE P.id = $1
+            GROUP BY EQ.id, EQ.nombre, EQ.fecha, A.nombre, E.nombre
+            ORDER BY EQ.nombre;
+        `, [id]);
+
+        res.json({ success: true, result: result.rows });
+
+    } catch (error) {
+        console.error('Error al obtener los servicios de equipos:', error);
+        res.status(500).send('Error interno del servidor');
     }
 });

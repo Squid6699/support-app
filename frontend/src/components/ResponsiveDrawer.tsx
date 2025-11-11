@@ -26,6 +26,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Incidencias from "../pages/Incidencias";
 import IncidenciasLiberadasEncargado from "../pages/IncidenciasLiberadasEncargado";
 import EquiposEncargado from "../pages/EquiposEncargado";
+import ServiciosEquipoEncargado from "../pages/ServiciosEquipoEncargado";
 
 const drawerWidth = 200;
 
@@ -122,7 +123,7 @@ function ResponsiveDrawer() {
                     <List>
                         {[
                             "Incidencias Asignadas",
-                            "Servicios",
+                            "Servicios realizados",
                             "Ubicaciones",
                         ].map((text, index) => (
                             <ListItem key={text} disablePadding>
@@ -149,7 +150,7 @@ function ResponsiveDrawer() {
                             "Incidencias",
                             "Incidencias Liberadas",
                             "Equipos",
-                            "Servicios",
+                            "Servicios de mis equipos",
                         ].map((text, index) => (
                             <ListItem key={text} disablePadding>
                                 <ListItemButton onClick={() => handleContentChange(text)}>
@@ -267,7 +268,10 @@ function ResponsiveDrawer() {
                 {selectedContent === "Incidencias Asignadas" && <div>Contenido de Incidencias Asignadas</div>}
                 {selectedContent === "Incidencias" && <Incidencias />}
                 {selectedContent === "Incidencias Liberadas"&& <IncidenciasLiberadasEncargado />}
-                {selectedContent === "Servicios" && <div>Contenido de Servicios</div>}
+                {selectedContent === "Servicios de mis equipos" && <ServiciosEquipoEncargado />}
+
+
+
                 {selectedContent === "Ubicaciones" && <div>Contenido de Ubicaciones</div>}
                 {selectedContent === "Usuarios" && <div>Contenido de Usuarios</div>}
                 {selectedContent === "Equipos" && <EquiposEncargado />}

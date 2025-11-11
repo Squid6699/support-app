@@ -19,7 +19,7 @@ function EquiposEncargado() {
     const { id } = useSesion();
     const HOST = import.meta.env.VITE_HOST
 
-    const { data: equipos, isLoading: isLoadingEquipos, refetch: refetchEquipos } = useQuery<EquiposPorEncargado[]>({
+    const { data: equipos, isLoading: isLoadingEquipos } = useQuery<EquiposPorEncargado[]>({
         queryKey: ["Equipos"],
         queryFn: obtenerEquipos,
     });
@@ -95,8 +95,8 @@ function EquiposEncargado() {
 
                                     </AccordionDetails>
                                     <AccordionActions>
-                                        <Button>EDITAR</Button>
-                                        <Button>ELIMINAR</Button>
+                                        {/* <Button>EDITAR</Button> */}
+                                        {/* <Button>ELIMINAR</Button> */}
                                         <Button onClick={() => handleOpenModal(equipo.id)}>DETALLES</Button>
                                     </AccordionActions>
                                 </Accordion>

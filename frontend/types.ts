@@ -84,3 +84,27 @@ export interface EquipoDetalles {
     horasservicio: number | null;
     calificacionservicio: number | null;
 }
+
+export interface ServicioDeEquipo {
+  id_incidencia: number | null;
+  descripcion_incidencia: string | null;
+  nombre_tecnico: string | null;
+  prioridad: string | null;
+  nombre_servicio: string | null;
+  descripcion_servicio: string | null;
+  horas_servicio: number | null;
+  incidencia_finalizada: boolean | null;
+  fecha_termino_incidencia: string | null;
+  calificacion_servicio: number | null;
+  autorizada_incidencia: boolean | null;
+  estado_incidencia: string | null;
+}
+
+export interface EquipoConServicios {
+  id_equipo: number;
+  nombre_equipo: string;
+  fecha_equipo: string;
+  nombre_aula: string;
+  nombre_edificio: string;
+  servicios: ServicioDeEquipo[]; // ← array de servicios del equipo
+}
