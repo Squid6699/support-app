@@ -17,33 +17,34 @@ export const ActualizarEstadoIncidenciaRouter = express.Router();
 export const AsignarTecnico = express.Router();
 export const IncidenciasTecnicoRouter = express.Router();
 export const ObtenerIncidenciasLiberadasRouter = express.Router();
+export const ObtenerIncidenciasAdminRouter = express.Router();
 
 
 
-CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
-    const customHeader = req.headers['x-frontend-header'];
-    if (customHeader !== 'frontend') {
-        return res.status(401).send('Unauthorized');
-    }
+// CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
+//     const customHeader = req.headers['x-frontend-header'];
+//     if (customHeader !== 'frontend') {
+//         return res.status(401).send('Unauthorized');
+//     }
 
-    const { fecha, descripcion, usuario_id, equipo_id, prioridad_id } = req.body;
+//     const { fecha, descripcion, usuario_id, equipo_id, prioridad_id } = req.body;
 
-    if (!fecha || !descripcion || !usuario_id || !equipo_id || !prioridad_id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
-    }
+//     if (!fecha || !descripcion || !usuario_id || !equipo_id || !prioridad_id) {
+//         return res.status(400).json({ success: false, msg: "Faltan datos" });
+//     }
 
-    try {
-        const result = await pool.query(
-            "INSERT INTO incidente (fecha, descripcion, usuario_id, equipo_id, prioridad_id) VALUES ($1, $2, $3, $4, $5)",
-            [fecha, descripcion, usuario_id, equipo_id, prioridad_id]
-        );
+//     try {
+//         const result = await pool.query(
+//             "INSERT INTO incidente (fecha, descripcion, usuario_id, equipo_id, prioridad_id) VALUES ($1, $2, $3, $4, $5)",
+//             [fecha, descripcion, usuario_id, equipo_id, prioridad_id]
+//         );
 
-        res.json({ success: true, msg: "Incidente creado correctamente", result: result.rows[0] });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, msg: "Error en DB" });
-    }
-});
+//         res.json({ success: true, msg: "Incidente creado correctamente", result: result.rows[0] });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ success: false, msg: "Error en DB" });
+//     }
+// });
 
 ObtenerIncidenciasRouter.get("/obtenerIncidencias", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -446,19 +447,19 @@ ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", asy
         query += ` AND i.tecnico_id IS NOT NULL`;
     }
 
-    if (estado === "NO INICIADO"){
+    if (estado === "NO INICIADO") {
         query += ` AND i.estado = 'NO INICIADO'`;
     }
 
-    if (estado === "EN PROCESO"){
+    if (estado === "EN PROCESO") {
         query += ` AND i.estado = 'EN PROCESO'`;
     }
 
-    if (estado === "TERMINADO"){
+    if (estado === "TERMINADO") {
         query += ` AND i.estado = 'TERMINADO'`;
     }
 
-    if (estado === "LIBERADO"){
+    if (estado === "LIBERADO") {
         query += ` AND i.estado = 'LIBERADO'`;
     }
 
@@ -609,26 +610,161 @@ IncidenciasTecnicoRouter.get("/incidenciasTecnico/:tecnicoId", async (req, res) 
     }
 
     const { tecnicoId } = req.params;
+    const { estado } = req.query; // <-- filtros desde el frontend
+
+    let query = `
+        SELECT 
+            i.id AS incidencia_id,
+            i.fecha as fechaincidencia,
+            i.descripcion as descripcion_incidencia,
+            i.estado AS estado_incidencia,
+            pr.id AS prioridad_id,
+            pr.nombre AS prioridad,
+            eq.id AS equipo_id,
+            eq.nombre AS equipo_nombre,
+            ED.id AS edificio_id,
+            ED.nombre AS edificio,
+            A.id AS aula_id,
+            A.nombre AS aula,
+            i.autorizada AS autorizada,
+            t.nombre AS tecnico_nombre
+        FROM incidente i
+        INNER JOIN equipo eq ON i.equipo_id = eq.id
+        INNER JOIN aula A ON eq.aula_id = A.id
+        INNER JOIN Edificio ED ON A.edificio_id = ED.id
+        INNER JOIN persona p ON ed.encargado_id = p.id
+        INNER JOIN prioridad pr ON i.prioridad_id = pr.id
+        INNER JOIN persona t ON i.tecnico_id = t.id
+        WHERE t.id = $1
+    `;
+
+
+    const params = [tecnicoId];
+
+    if (estado === "AUTORIZADO") {
+        query += ` AND i.autorizada = true`;
+    }
+
+    if (estado === "NO AUTORIZADO") {
+        query += ` AND i.autorizada = false`;
+    }
+
+    if (estado === "SIN TECNICO") {
+        query += ` AND i.tecnico_id IS NULL`;
+    }
+
+    if (estado === "TECNICO ASIGNADO") {
+        query += ` AND i.tecnico_id IS NOT NULL`;
+    }
+
+    if (estado === "NO INICIADO") {
+        query += ` AND i.estado = 'NO INICIADO'`;
+    }
+
+    if (estado === "EN PROCESO") {
+        query += ` AND i.estado = 'EN PROCESO'`;
+    }
+
+    if (estado === "TERMINADO") {
+        query += ` AND i.estado = 'TERMINADO'`;
+    }
+
+    if (estado === "LIBERADO") {
+        query += ` AND i.estado = 'LIBERADO'`;
+    }
+
+    query += ` ORDER BY i.fecha DESC`;
+
 
     try {
-        const result = await pool.query(
-            `SELECT 
-                i.id,i.fecha, i.hora,i.descripcion,i.estado,i.prioridad_id,
-                p.nombre AS prioridad,i.marca_id,m.nombre AS marca,i.tipoequipo_id,
-                t.nombre AS tipo_equipo,i.fecha_solucion,i.hora_solucion,i.solucion
-             FROM incidente i
-             LEFT JOIN prioridad p ON i.prioridad_id = p.id
-             LEFT JOIN marca m ON i.marca_id = m.id
-             LEFT JOIN tipoequipo t ON i.tipoequipo_id = t.id
-             WHERE i.tecnico_id = $1
-             ORDER BY i.fecha DESC, i.hora DESC`,
-            [tecnicoId]
-        );
+        const result = await pool.query(query, params);
 
         res.json({ success: true, incidencias: result.rows });
     } catch (err) {
-        console.error("Error al obtener incidencias del técnico:", err);
+        console.log(err);
         res.status(500).json({ success: false, msg: "Error en la base de datos" });
     }
 });
 
+// RUTA PARA QUE EL ADMINISTRADOR VEA TODAS LAS INCIDENCIAS
+ObtenerIncidenciasAdminRouter.get("/incidenciasAdmin", async (req, res) => {
+    console.log("Llegó a la ruta de incidenciasAdmin");
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { estado } = req.query; // <-- filtros desde el frontend
+
+    let query = `
+        SELECT 
+            i.id AS incidencia_id,
+            i.fecha as fechaincidencia,
+            i.descripcion as descripcion_incidencia,
+            i.estado AS estado_incidencia,
+            pr.id AS prioridad_id,
+            pr.nombre AS prioridad,
+            eq.id AS equipo_id,
+            eq.nombre AS equipo_nombre,
+            ED.id AS edificio_id,
+            ED.nombre AS edificio,
+            A.id AS aula_id,
+            A.nombre AS aula,
+            i.autorizada AS autorizada,
+            t.nombre AS tecnico_nombre
+        FROM incidente i
+        INNER JOIN equipo eq ON i.equipo_id = eq.id
+        INNER JOIN aula A ON eq.aula_id = A.id
+        INNER JOIN Edificio ED ON A.edificio_id = ED.id
+        INNER JOIN persona p ON ed.encargado_id = p.id
+        INNER JOIN prioridad pr ON i.prioridad_id = pr.id
+        LEFT JOIN persona t ON i.tecnico_id = t.id
+        WHERE 1=1
+    `;
+
+    if (estado === "AUTORIZADO") {
+        query += ` AND i.autorizada = true`;
+    }
+
+    if (estado === "NO AUTORIZADO") {
+        query += ` AND i.autorizada = false`;
+    }
+
+    if (estado === "SINTÉCNICO") {
+        query += ` AND i.tecnico_id IS NULL`;
+    }
+
+    if (estado === "TECNICOASIGNADO") {
+        query += ` AND i.tecnico_id IS NOT NULL`;
+    }
+
+    if (estado === "NO INICIADO") {
+        query += ` AND i.estado = 'NO INICIADO'`;
+    }
+
+    if (estado === "EN PROCESO") {
+        query += ` AND i.estado = 'EN PROCESO'`;
+    }
+
+    if (estado === "TERMINADO") {
+        query += ` AND i.estado = 'TERMINADO'`;
+    }
+
+    if (estado === "LIBERADO") {
+        query += ` AND i.estado = 'LIBERADO'`;
+    }
+
+    query += ` ORDER BY i.fecha DESC`;
+
+
+    try {
+        const result = await pool.query(query);
+        console.log(result.rows);
+
+        res.json({ success: true, incidencias: result.rows });
+    } catch (err) {
+        console.error("Error en la DB:", err);
+        res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});

@@ -27,6 +27,8 @@ import Incidencias from "../pages/Incidencias";
 import IncidenciasLiberadasEncargado from "../pages/IncidenciasLiberadasEncargado";
 import EquiposEncargado from "../pages/EquiposEncargado";
 import ServiciosEquipoEncargado from "../pages/ServiciosEquipoEncargado";
+import IncidenciasAsignadasTecnico from "../pages/incidenciaAsignadasTecnico";
+import IncidenciasAdmin from "../pages/IncidenciasAdmin";
 
 const drawerWidth = 200;
 
@@ -85,7 +87,7 @@ function ResponsiveDrawer() {
                     <Divider />
                     <List>
                         {[
-                            "Incidencias",
+                            "Incidencias Creadas",
                             "Incidencias Liberadas",
                             "Servicios",
                             "Ubicaciones",
@@ -265,10 +267,12 @@ function ResponsiveDrawer() {
                 <Toolbar />
 
                 {/* CONTEN MAIN */}
-                {selectedContent === "Incidencias Asignadas" && <div>Contenido de Incidencias Asignadas</div>}
+                {selectedContent === "Incidencias Asignadas" && <IncidenciasAsignadasTecnico />}
                 {selectedContent === "Incidencias" && <Incidencias />}
                 {selectedContent === "Incidencias Liberadas"&& <IncidenciasLiberadasEncargado />}
                 {selectedContent === "Servicios de mis equipos" && <ServiciosEquipoEncargado />}
+
+                {selectedContent === "Incidencias Creadas" && <IncidenciasAdmin />}
 
 
 

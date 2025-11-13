@@ -1,5 +1,3 @@
-// NO TERMINADO
-
 import type { EquiposPorEncargado } from "../../types";
 import { useSesion } from "../hook/useSesion";
 import { useQuery } from "@tanstack/react-query";
