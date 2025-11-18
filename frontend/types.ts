@@ -108,3 +108,10 @@ export interface EquipoConServicios {
   nombre_edificio: string;
   servicios: ServicioDeEquipo[]; // ← array de servicios del equipo
 }
+
+export interface DarServicio {
+    nombre: string;
+    descripcion: string;
+    horas: number;
+    encargado_id: number;
+}

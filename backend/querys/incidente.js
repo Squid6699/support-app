@@ -635,7 +635,7 @@ IncidenciasTecnicoRouter.get("/incidenciasTecnico/:tecnicoId", async (req, res) 
         INNER JOIN persona p ON ed.encargado_id = p.id
         INNER JOIN prioridad pr ON i.prioridad_id = pr.id
         INNER JOIN persona t ON i.tecnico_id = t.id
-        WHERE t.id = $1
+        WHERE t.id = $1 AND i.servicio_id IS NULL
     `;
 
 

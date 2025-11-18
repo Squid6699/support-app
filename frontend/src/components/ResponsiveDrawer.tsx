@@ -29,6 +29,7 @@ import EquiposEncargado from "../pages/EquiposEncargado";
 import ServiciosEquipoEncargado from "../pages/ServiciosEquipoEncargado";
 import IncidenciasAsignadasTecnico from "../pages/incidenciaAsignadasTecnico";
 import IncidenciasAdmin from "../pages/IncidenciasAdmin";
+import ServiciosDadosTecnico from "../pages/ServiciosDadosTecnico";
 
 const drawerWidth = 200;
 
@@ -282,6 +283,8 @@ function ResponsiveDrawer() {
                 {selectedContent === "Piezas" && <div>Contenido de Piezas</div>}
                 {selectedContent === "Marcas" && <div>Contenido de Marcas</div>}
                 {selectedContent === "Prioridades" && <div>Contenido de Prioridades</div>}
+
+                {selectedContent === "Servicios realizados" && <ServiciosDadosTecnico />}
 
 
 

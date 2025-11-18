@@ -15,9 +15,9 @@ CrearServicioRouter.post("/crearServicio", async (req, res) => {
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { id_incidencia, nombre, descripcion, tecnico_id, horas } = req.body;
+    const { id_incidencia, nombre, descripcion, horas, tecnico_id } = req.body;
 
-    if (!nombre || !descripcion || !tecnico_id || !horas)
+    if (!nombre || !descripcion || !tecnico_id || !horas || !id_incidencia)
         return res.status(400).json({ success: false, msg: "Faltan datos" });
 
     try {
@@ -27,7 +27,7 @@ CrearServicioRouter.post("/crearServicio", async (req, res) => {
         );
 
         const resultIncidencia = await pool.query(
-            "UPDATE Incidente SET servicio_id=$1 WHERE id=$2",
+            "UPDATE Incidente SET servicio_id=$1, estado = 'TERMINADO' WHERE id=$2",
             [result.rows[0].id, id_incidencia]
         );
 
@@ -123,6 +123,7 @@ EliminarServicioRouter.delete("/eliminarServicio", async (req, res) => {
 });
 
 //Ruta para que el tecnico pueda ver sus servicios dados.
+// NO TERMINADO
 ObtenerServiciosDeTecnicoRouter.get("/obtenerServiciosDeTecnico/:id", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
 
@@ -131,6 +132,9 @@ ObtenerServiciosDeTecnicoRouter.get("/obtenerServiciosDeTecnico/:id", async (req
     }
 
     const { id } = req.params;
+
+    // QUITAR EL *
+    // OBTENER FECHA, DESCRIPCION, PERSONA QUE SOLICITO (usuario_id), EQUIPO (innerjoin a equipos), PRIORIDAD (innerjoin a prioridad), DATOS DEL SERVICIO (nombre, descripcion, horas), CALIFICACION DEL SERVICIO (inner join a servicio)
 
     try {
         const result = await pool.query("SELECT * FROM Servicio WHERE tecnico_id=$1", [id]);

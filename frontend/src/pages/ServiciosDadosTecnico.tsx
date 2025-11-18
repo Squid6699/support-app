@@ -1,63 +1,31 @@
-import Button from "@mui/material/Button";
-import { useState } from "react";
+// NO TERMINADO
+
 import Typography from "@mui/material/Typography";
 import type { Incidencias } from "../../types";
 import { useSesion } from "../hook/useSesion";
 import { useQuery } from "@tanstack/react-query";
 
 import Accordion from '@mui/material/Accordion';
-import AccordionActions from '@mui/material/AccordionActions';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import dayjs from "dayjs";
-import Box from "@mui/material/Box";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import ModalDarServicio from "../components/ModalDarServicio";
 
-function IncidenciasAsignadasTecnico() {
+function ServiciosDadosTecnico() {
     const { id } = useSesion();
 
     const HOST = import.meta.env.VITE_HOST
 
-    const [filtroEstado, setFiltroEstado] = useState<string>("TODOS");
-
-    const { data: incidencias, isLoading: isLoadingIncidencias, refetch: refetchIncidencias } = useQuery<Incidencias[]>({
-        queryKey: ["IncidenciasTecnico", filtroEstado],
-        queryFn: obtenerIncidenciasTecnico,
+    const { data: incidencias, isLoading: isLoadingIncidencias } = useQuery<Incidencias[]>({
+        queryKey: ["Incidencias"],
+        queryFn: obtenerIncidencias,
     });
 
-    const [openModalDarServicio, setOpenModalDarServicio] = useState(false);
-    const [incidenciaSeleccionada, setIncidenciaSeleccionada] = useState<number | null>(0);
 
-    const handleOpenModal = (incidenciaId: number) => {
-        setIncidenciaSeleccionada(incidenciaId);
-        setOpenModalDarServicio(true);
-    }
-
-    const handleModalClose = () => {
-        setOpenModalDarServicio(false);
-    }
-
-
-
-
-    //SACAR INCIDENCIAS ASIGNADAS AL TECNICO
-    async function obtenerIncidenciasTecnico() {
+    //SACAR INCIDENCIAS LIBERADAS DEL ENCARGADO
+    async function obtenerIncidencias() {
         try {
-            let url = HOST + "api/incidenciasTecnico/" + id;
-
-            const params = new URLSearchParams();
-            if (filtroEstado && filtroEstado !== "TODOS") params.append("estado", filtroEstado);
-
-            if (params.toString()) {
-                url += "?" + params.toString();
-            }
-
-            const response = await fetch(url, {
+            const response = await fetch(HOST + "api/verIncidenciasLiberadas/" + id, {
                 method: 'GET',
                 headers: {
                     'x-frontend-header': 'frontend',
@@ -66,7 +34,7 @@ function IncidenciasAsignadasTecnico() {
             const data = await response.json();
 
             if (data.success) {
-                return (data.incidencias);
+                return (data.result);
             } else {
                 return [];
             }
@@ -76,38 +44,13 @@ function IncidenciasAsignadasTecnico() {
     }
 
 
-
     return (
 
         <>
             <header>
-
-                <Box
-                    sx={{ m: 2, display: 'flex', gap: 2, flexDirection: 'row', flexWrap: 'nowrap' }}
-                >
-                    <FormControl>
-                        <InputLabel id="demo-simple-select-autowidth-label">Filtros</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-autowidth-label"
-                            id="demo-simple-select-autowidth"
-                            value={filtroEstado}
-                            onChange={(e) => { setFiltroEstado(e.target.value); refetchIncidencias(); }}
-                            label="Filtros"
-
-                        >
-                            <MenuItem key={0} value={"TODOS"} selected>TODOS</MenuItem>
-                            <MenuItem key={1} value={"AUTORIZADO"}>AUTORIZADO</MenuItem>
-                            <MenuItem key={2} value={"NO AUTORIZADO"}>NO AUTORIZADO</MenuItem>
-                            <MenuItem key={3} value={"NO INICIADO"}>NO INICIADO</MenuItem>
-                            <MenuItem key={4} value={"EN PROCESO"}>EN PROCESO</MenuItem>
-                            <MenuItem key={5} value={"TERMINADO"}>TERMINADO</MenuItem>
-                            <MenuItem key={6} value={"LIBERADO"}>LIBERADO</MenuItem>
-                            <MenuItem key={7} value={"SINTÉCNICO"}>SIN TÉCNICO</MenuItem>
-                            <MenuItem key={8} value={"TECNICOASIGNADO"}>TÉCNICO ASIGNADO</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Box>
-
+                {/* <Button className="boton" variant="contained" startIcon={<AddCircleIcon />} onClick={() => handleOpenModalIncidencia(true)}>
+                    CREAR
+                </Button> */}
             </header>
 
             <main>
@@ -178,25 +121,15 @@ function IncidenciasAsignadasTecnico() {
                                         <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
 
                                     </AccordionDetails>
-                                    <AccordionActions>
-
-                                        <Button onClick={() => handleOpenModal(incidencia.incidencia_id)}>DAR SERVICIO</Button>
-                                    </AccordionActions>
                                 </Accordion>
                             );
                         })
-                    ) : "No hay incidencias asignadas a tu cargo"}
+                    ) : "No hay incidencias liberadas a tu cargo"}
             </main >
+            
 
-            <ModalDarServicio
-                open={openModalDarServicio}
-                incidenciaSeleccionada={incidenciaSeleccionada}
-                handleModalClose={handleModalClose}
-                refetchIncidencias={refetchIncidencias}
-            />
         </>
-
 
     );
 }
-export default IncidenciasAsignadasTecnico;
+export default ServiciosDadosTecnico;
