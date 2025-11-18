@@ -36,30 +36,20 @@ function IncidenciasAsignadasTecnico() {
         queryFn: obtenerIncidenciasTecnico,
     });
 
-    const [openModalIncidencia, setOpenModalIncidencia] = useState(false);
+    const [openModalDarServicio, setOpenModalDarServicio] = useState(false);
+    const [incidenciaSeleccionada, setIncidenciaSeleccionada] = useState<number | null>(null);
 
-    const handleOpenModalIncidencia = (value: boolean) => {
-        setOpenModalIncidencia(value);
+    const handleOpenModal = (incidenciaId: number) => {
+        setIncidenciaSeleccionada(incidenciaId);
+        setOpenModalDarServicio(true);
     }
 
-    const [incidenciaEditar, setIncidenciaEditar] = useState<Incidencias | null>(null);
-    const [openModalIncidenciaEditar, setOpenModalIncidenciaEditar] = useState(false);
-
-    const handleOpenModalIncidenciaEditar = (value: boolean) => {
-        setOpenModalIncidenciaEditar(value);
+    const handleModalClose = () => {
+        setOpenModalDarServicio(false);
     }
 
-    const [openModalLiberarIncidencia, setOpenModalLiberarIncidencia] = useState(false);
-    const handleOpenModalLiberarIncidencia = (value: boolean) => {
-        setOpenModalLiberarIncidencia(value);
-    }
-    const [incidenciaLiberar, setIncidenciaLiberar] = useState<number | null>(null);
 
-    const [openModalEliminarIncidencia, setOpenModalEliminarIncidencia] = useState(false);
-    const handleOpenModalEliminarIncidencia = (value: boolean) => {
-        setOpenModalEliminarIncidencia(value);
-    }
-    const [incidenciaEliminar, setIncidenciaEliminar] = useState<number | null>(null);
+    
 
     //SACAR INCIDENCIAS ASIGNADAS AL TECNICO
     async function obtenerIncidenciasTecnico() {
@@ -195,44 +185,16 @@ function IncidenciasAsignadasTecnico() {
 
                                     </AccordionDetails>
                                     <AccordionActions>
-                                        <Button disabled={incidencia.autorizada} onClick={() => { handleOpenModalIncidenciaEditar(true); setIncidenciaEditar(incidencia); }}>EDITAR</Button>
-                                        {incidencia.estado_incidencia.toLowerCase() !== "terminado" ? null : <Button onClick={() => { handleOpenModalLiberarIncidencia(true); setIncidenciaLiberar(incidencia.incidencia_id); }}>LIBERAR</Button>}
-                                        <Button onClick={() => { handleOpenModalEliminarIncidencia(true); setIncidenciaEliminar(incidencia.incidencia_id); }} disabled={incidencia.autorizada}>ELIMINAR</Button>
+                
+                                        <Button onClick={()=>handleOpenModal(incidencia.incidencia_id)}>DAR SERVICIO</Button>
                                     </AccordionActions>
                                 </Accordion>
                             );
                         })
                     ) : "No hay incidencias asignadas a tu cargo"}
             </main >
-            <ModalCrearIncidencia
-                open={openModalIncidencia}
-                setOpenModalIncidencia={handleOpenModalIncidencia}
-                refetchIncidencias={refetchIncidencias}
-            />
-
-            <ModalEditarIncidencia
-                open={openModalIncidenciaEditar}
-                setOpenModalIncidencia={handleOpenModalIncidenciaEditar}
-                refetchIncidencias={refetchIncidencias}
-                incidencia={incidenciaEditar}
-            />
-
-            <ModalLiberarIncidencia
-                open={openModalLiberarIncidencia}
-                setOpenModalIncidencia={handleOpenModalLiberarIncidencia}
-                refetchIncidencias={refetchIncidencias}
-                id={incidenciaLiberar}
-            />
-
-            <ModalEliminarIncidencia
-                open={openModalEliminarIncidencia}
-                setOpenModalIncidencia={handleOpenModalEliminarIncidencia}
-                refetchIncidencias={refetchIncidencias}
-                id={incidenciaEliminar}
-            />
-
         </>
-
+        <ModalDarServicio></ModalDarServicio>
     );
 }
 export default IncidenciasAsignadasTecnico;
