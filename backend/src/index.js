@@ -9,8 +9,8 @@ import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEqu
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
-import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter, ObtenerIncidenciasLiberadasRouter, ObtenerIncidenciasAdminRouter } from '../querys/incidente.js';
-import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeEquiposRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
+import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter, ObtenerIncidenciasLiberadasRouter, ObtenerIncidenciasAdminRouter, ObtenerIncidenciasLiberadasAdminRouter } from '../querys/incidente.js';
+import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeEquiposAdminRouter, ObtenerServiciosDeEquiposRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
 import { userAuth } from '../querys/Auth.js';
 import { CrearAulaRouter, CrearEdificioRouter, EditarAulaRouter, EditarEdificioRouter, EliminarAulaRouter, EliminarEdificioRouter, ObtenerAulasPorEdificioRouter, ObtenerAulasRouter, ObtenerEdificiosPorEncargadoRouter, ObtenerEdificiosRouter } from '../querys/ubicacion.js';
 import 'dotenv/config';
@@ -128,6 +128,12 @@ app.use("/api/", IncidenciasTecnicoRouter);
 
 //Ruta para que el administrador pueda ver todas las incidencias
 app.use("/api/", ObtenerIncidenciasAdminRouter);
+
+//Ruta para que el administrador pueda ver todas las incidencias liberadas
+app.use("/api/", ObtenerIncidenciasLiberadasAdminRouter);
+
+// Ruta para que el administrador pueda ver los servicios de todos los equipos
+app.use("/api/", ObtenerServiciosDeEquiposAdminRouter);
 
 
 app.use("/api/", userAuth);

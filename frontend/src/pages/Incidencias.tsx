@@ -196,9 +196,9 @@ function Incidencias() {
 
                                     </AccordionDetails>
                                     <AccordionActions>
-                                        <Button disabled={incidencia.autorizada} onClick={() => { handleOpenModalIncidenciaEditar(true); setIncidenciaEditar(incidencia); }}>EDITAR</Button>
+                                        <Button disabled={incidencia.autorizada || incidencia.estado_incidencia.toLowerCase() === "terminado" || incidencia.estado_incidencia.toLowerCase() === "liberado"} onClick={() => { handleOpenModalIncidenciaEditar(true); setIncidenciaEditar(incidencia); }}>EDITAR</Button>
                                         {incidencia.estado_incidencia.toLowerCase() !== "terminado" ? null : <Button onClick={() => { handleOpenModalLiberarIncidencia(true); setIncidenciaLiberar(incidencia.incidencia_id); }}>LIBERAR</Button>}
-                                        <Button onClick={() => { handleOpenModalEliminarIncidencia(true); setIncidenciaEliminar(incidencia.incidencia_id); }} disabled={incidencia.autorizada}>ELIMINAR</Button>
+                                        <Button onClick={() => { handleOpenModalEliminarIncidencia(true); setIncidenciaEliminar(incidencia.incidencia_id); }} disabled={incidencia.autorizada || incidencia.estado_incidencia.toLowerCase() === "terminado" || incidencia.estado_incidencia.toLowerCase() === "liberado"}>ELIMINAR</Button>
                                     </AccordionActions>
                                 </Accordion>
                             );

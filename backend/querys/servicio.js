@@ -9,7 +9,9 @@ export const EliminarServicioRouter = express.Router();
 export const ObtenerServiciosDeTecnicoRouter = express.Router();
 export const ObtenerDetallesServicioRouter = express.Router();
 export const ObtenerServiciosDeEquiposRouter = express.Router();
+export const ObtenerServiciosDeEquiposAdminRouter = express.Router();
 
+//Crear Servicio
 CrearServicioRouter.post("/crearServicio", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
     if (customHeader !== 'frontend')
@@ -206,6 +208,7 @@ ObtenerServiciosDeEquiposRouter.get("/obtenerServiciosDeEquipos/:id", async (req
                         'descripcion_incidencia', I.descripcion,
                         'nombre_tecnico', Tec.nombre,
                         'prioridad', PR.nombre,
+                        'id_servicio', S.id,
                         'nombre_servicio', S.nombre,
                         'descripcion_servicio', S.descripcion,
                         'horas_servicio', S.horas,
@@ -228,6 +231,59 @@ ObtenerServiciosDeEquiposRouter.get("/obtenerServiciosDeEquipos/:id", async (req
             GROUP BY EQ.id, EQ.nombre, EQ.fecha, A.nombre, E.nombre
             ORDER BY EQ.nombre;
         `, [id]);
+
+        res.json({ success: true, result: result.rows });
+
+    } catch (error) {
+        console.error('Error al obtener los servicios de equipos:', error);
+        res.status(500).send('Error interno del servidor');
+    }
+});
+
+// Ruta para que el administrador pueda ver los servicios de todos los equipos
+ObtenerServiciosDeEquiposAdminRouter.get("/obtenerServiciosDeEquiposAdmin", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const result = await pool.query(`
+            SELECT 
+                EQ.id AS id_equipo,
+                EQ.nombre AS nombre_equipo,
+                EQ.fecha AS fecha_equipo,
+                A.nombre AS nombre_aula,
+                E.nombre AS nombre_edificio,
+                json_agg(
+                    json_build_object(
+                        'id_incidencia', I.id,
+                        'descripcion_incidencia', I.descripcion,
+                        'nombre_tecnico', Tec.nombre,
+                        'prioridad', PR.nombre,
+                        'id_servicio', S.id,
+                        'nombre_servicio', S.nombre,
+                        'descripcion_servicio', S.descripcion,
+                        'horas_servicio', S.horas,
+                        'incidencia_finalizada', I.finalizado,
+                        'fecha_termino_incidencia', I.fecha_fin,
+                        'calificacion_servicio', S.calificacion,
+                        'autorizada_incidencia', I.autorizada,
+                        'estado_incidencia', I.estado
+                    )
+                ) FILTER (WHERE I.id IS NOT NULL) AS servicios
+            FROM equipo EQ
+            INNER JOIN aula A ON EQ.aula_id = A.id
+            INNER JOIN edificio E ON A.edificio_id = E.id
+            INNER JOIN persona P ON E.encargado_id = P.id
+            LEFT JOIN incidente I ON I.equipo_id = EQ.id
+            LEFT JOIN persona Tec ON I.tecnico_id = Tec.id
+            LEFT JOIN prioridad PR ON I.prioridad_id = PR.id
+            LEFT JOIN servicio S ON I.servicio_id = S.id
+            GROUP BY EQ.id, EQ.nombre, EQ.fecha, A.nombre, E.nombre
+            ORDER BY EQ.nombre;
+        `);
 
         res.json({ success: true, result: result.rows });
 

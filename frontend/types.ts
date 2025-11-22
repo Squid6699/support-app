@@ -86,6 +86,7 @@ export interface EquipoDetalles {
 }
 
 export interface ServicioDeEquipo {
+  id_servicio: number;
   id_incidencia: number | null;
   descripcion_incidencia: string | null;
   nombre_tecnico: string | null;

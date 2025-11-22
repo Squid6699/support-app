@@ -18,33 +18,33 @@ export const AsignarTecnico = express.Router();
 export const IncidenciasTecnicoRouter = express.Router();
 export const ObtenerIncidenciasLiberadasRouter = express.Router();
 export const ObtenerIncidenciasAdminRouter = express.Router();
+export const ObtenerIncidenciasLiberadasAdminRouter = express.Router();
 
 
+CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
 
-// CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
-//     const customHeader = req.headers['x-frontend-header'];
-//     if (customHeader !== 'frontend') {
-//         return res.status(401).send('Unauthorized');
-//     }
+    const { fecha, descripcion, usuario_id, equipo_id, prioridad_id } = req.body;
 
-//     const { fecha, descripcion, usuario_id, equipo_id, prioridad_id } = req.body;
+    if (!fecha || !descripcion || !usuario_id || !equipo_id || !prioridad_id) {
+        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    }
 
-//     if (!fecha || !descripcion || !usuario_id || !equipo_id || !prioridad_id) {
-//         return res.status(400).json({ success: false, msg: "Faltan datos" });
-//     }
+    try {
+        const result = await pool.query(
+            "INSERT INTO incidente (fecha, descripcion, usuario_id, equipo_id, prioridad_id) VALUES ($1, $2, $3, $4, $5)",
+            [fecha, descripcion, usuario_id, equipo_id, prioridad_id]
+        );
 
-//     try {
-//         const result = await pool.query(
-//             "INSERT INTO incidente (fecha, descripcion, usuario_id, equipo_id, prioridad_id) VALUES ($1, $2, $3, $4, $5)",
-//             [fecha, descripcion, usuario_id, equipo_id, prioridad_id]
-//         );
-
-//         res.json({ success: true, msg: "Incidente creado correctamente", result: result.rows[0] });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ success: false, msg: "Error en DB" });
-//     }
-// });
+        res.json({ success: true, msg: "Incidente creado correctamente", result: result.rows[0] });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
 
 ObtenerIncidenciasRouter.get("/obtenerIncidencias", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
@@ -336,7 +336,7 @@ TerminarIncidenciaRouter.put("/terminarIncidencia", async (req, res) => {
 });
 
 //Ruta para que el encargado pueda dar una calificacion a la incidencia en servicio.
-CalificarIncidenciaRouter.put("/calificarIncidencia", async (req, res) => {
+CalificarIncidenciaRouter.put("/calificarServicio", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
@@ -531,53 +531,50 @@ ObtenerIncidenciasLiberadasRouter.get("/verIncidenciasLiberadas/:personaId", asy
 
 // Ruta para que el administrador acepte o rechace una incidencia.
 
-ActualizarEstadoIncidenciaRouter.put("/actualizarIncidencia/:incidenciaId", async (req, res) => {
+ActualizarEstadoIncidenciaRouter.put("/autorizarIncidencia", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
 
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
     }
 
-    const { incidenciaId } = req.params;
-    const { estado } = req.body;
+    const { incidenciaId } = req.body;
 
-    if (!["aceptada", "rechazada"].includes(estado)) {
-        return res.status(400).json({ success: false, msg: "Estado inválido. Solo se permite 'aceptada' o 'rechazada'." });
+    if (!incidenciaId) {
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
         const result = await pool.query(
             `UPDATE incidente 
-             SET estado = $1
-             WHERE id = $2
-             RETURNING id, estado`,
-            [estado, incidenciaId]
+             SET autorizada = true
+             WHERE id = $1`,
+            [incidenciaId]
         );
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, msg: "No se encontró la incidencia" });
+        if (result.rows === 0) {
+            return res.status(404).json({ success: false, msg: "NO SE ENCONTRO LA INCIDENCIA" });
         }
 
-        res.json({ success: true, msg: "Incidencia actualizada", result: result.rows[0] });
+        res.json({ success: true, msg: "INCIDENCIA AUTORIZADA" });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en la base de datos" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
 // Ruta para que el administrador asigne un técnico a una incidencia
 
-AsignarTecnico.put("/asignarTecnico/:incidenciaId", async (req, res) => {
+AsignarTecnico.put("/asignarTecnico", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
 
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
     }
 
-    const { incidenciaId } = req.params;
-    const { tecnicoId } = req.body;
+    const { tecnicoId, incidenciaId } = req.body;
 
-    if (!tecnicoId) {
-        return res.status(400).json({ success: false, msg: "Debes proporcionar el ID del técnico" });
+    if (!tecnicoId || !incidenciaId) {
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -688,7 +685,6 @@ IncidenciasTecnicoRouter.get("/incidenciasTecnico/:tecnicoId", async (req, res) 
 
 // RUTA PARA QUE EL ADMINISTRADOR VEA TODAS LAS INCIDENCIAS
 ObtenerIncidenciasAdminRouter.get("/incidenciasAdmin", async (req, res) => {
-    console.log("Llegó a la ruta de incidenciasAdmin");
     const customHeader = req.headers['x-frontend-header'];
 
     if (customHeader !== 'frontend') {
@@ -760,9 +756,56 @@ ObtenerIncidenciasAdminRouter.get("/incidenciasAdmin", async (req, res) => {
 
     try {
         const result = await pool.query(query);
-        console.log(result.rows);
 
         res.json({ success: true, incidencias: result.rows });
+    } catch (err) {
+        console.error("Error en la DB:", err);
+        res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+
+// Ruta para que el administrador vea todas las incidencias liberadas
+ObtenerIncidenciasLiberadasAdminRouter.get("/verIncidenciasLiberadasAdmin", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const result = await pool.query(`
+            SELECT 
+                i.id AS incidencia_id,
+                i.fecha as fechaincidencia,
+                i.descripcion as descripcion_incidencia,
+                i.estado AS estado_incidencia,
+                pr.id AS prioridad_id,
+                pr.nombre AS prioridad,
+                eq.id AS equipo_id,
+                eq.nombre AS equipo_nombre,
+                ED.id AS edificio_id,
+                ED.nombre AS edificio,
+                A.id AS aula_id,
+                A.nombre AS aula,
+                i.autorizada AS autorizada,
+                t.nombre AS tecnico_nombre
+            FROM incidente i
+            INNER JOIN equipo eq ON i.equipo_id = eq.id
+            INNER JOIN aula A ON eq.aula_id = A.id
+            INNER JOIN Edificio ED ON A.edificio_id = ED.id
+            INNER JOIN persona p ON ed.encargado_id = p.id
+            INNER JOIN prioridad pr ON i.prioridad_id = pr.id
+            LEFT JOIN persona t ON i.tecnico_id = t.id
+            WHERE i.estado = 'LIBERADO'
+            ORDER BY i.fecha DESC
+        `);
+
+        if (result.rows.length === 0) {
+            return res.json({ success: false, msg: "No se encontraron incidencias para este encargado" });
+        }
+
+        res.json({ success: true, result: result.rows });
     } catch (err) {
         console.error("Error en la DB:", err);
         res.status(500).json({ success: false, msg: "Error en la base de datos" });

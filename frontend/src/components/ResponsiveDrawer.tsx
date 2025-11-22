@@ -27,9 +27,11 @@ import Incidencias from "../pages/Incidencias";
 import IncidenciasLiberadasEncargado from "../pages/IncidenciasLiberadasEncargado";
 import EquiposEncargado from "../pages/EquiposEncargado";
 import ServiciosEquipoEncargado from "../pages/ServiciosEquipoEncargado";
-import IncidenciasAsignadasTecnico from "../pages/incidenciaAsignadasTecnico";
+import IncidenciasAsignadasTecnico from "../pages/IncidenciaAsignadasTecnico";
 import IncidenciasAdmin from "../pages/IncidenciasAdmin";
 import ServiciosDadosTecnico from "../pages/ServiciosDadosTecnico";
+import IncidenciasLiberadasAdmin from "../pages/incidenciasLiberadasAdmin";
+import ServiciosEquipoEncargadoAdmin from "../pages/ServiciosEquipoAdmin";
 
 const drawerWidth = 200;
 
@@ -270,7 +272,10 @@ function ResponsiveDrawer() {
                 {/* CONTEN MAIN */}
                 {selectedContent === "Incidencias Asignadas" && <IncidenciasAsignadasTecnico />}
                 {selectedContent === "Incidencias" && <Incidencias />}
-                {selectedContent === "Incidencias Liberadas"&& <IncidenciasLiberadasEncargado />}
+                {selectedContent === "Incidencias Liberadas" && rol === "Administrador" && <IncidenciasLiberadasAdmin />}
+                {selectedContent === "Servicios" && rol === "Administrador" && <ServiciosEquipoEncargadoAdmin />}
+
+                {selectedContent === "Incidencias Liberadas" && rol === "Encargado Edificio" && <IncidenciasLiberadasEncargado />}
                 {selectedContent === "Servicios de mis equipos" && <ServiciosEquipoEncargado />}
 
                 {selectedContent === "Incidencias Creadas" && <IncidenciasAdmin />}

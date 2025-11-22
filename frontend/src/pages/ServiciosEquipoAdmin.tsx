@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ServicioDeEquipo } from "../../types";
-import { useSesion } from "../hook/useSesion";
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -10,18 +9,16 @@ import Button from "@mui/material/Button";
 import { useState } from "react";
 import ModalCalificarServicio from "../components/ModalCalificarServicio";
 
-function ServiciosEquipoEncargado() {
+function ServiciosEquipoEncargadoAdmin() {
 
     const HOST = import.meta.env.VITE_HOST
-
-    const { id } = useSesion();
 
     const { data: serviciosEquipos, isLoading: isLoadingServiciosEquipos, refetch } = useQuery<ServicioDeEquipo[]>({
         queryKey: ["ServiciosEquipo"],
         queryFn: obtenerServiciosEquipo,
     });
 
-    const [servicioSeleccionado, setServicioSeleccionado] =  useState<number | null>(null);
+    const [servicioSeleccionado, setServicioSeleccionado] = useState<number | null>(null);
     const [openModalCalificarServicio, setOpenModalCalificarServicio] = useState<boolean>(false);
     const handleOpenModalCalificarServicio = (id_servicio: number) => {
         setServicioSeleccionado(id_servicio);
@@ -34,7 +31,7 @@ function ServiciosEquipoEncargado() {
 
     async function obtenerServiciosEquipo() {
         try {
-            const response = await fetch(HOST + "api/obtenerServiciosDeEquipos/" + id, {
+            const response = await fetch(HOST + "api/obtenerServiciosDeEquiposAdmin", {
                 method: 'GET',
                 headers: {
                     'x-frontend-header': 'frontend',
@@ -94,7 +91,7 @@ function ServiciosEquipoEncargado() {
                                                 {/* <strong>Finalizado:</strong> {serv.incidencia_finalizada ? "Sí" : "No"} <br /> */}
                                                 <strong>Fecha término:</strong> {serv.fecha_termino_incidencia || "Pendiente"}<br />
                                                 <strong>Calificacion:</strong> {serv.calificacion_servicio}<br />
-                                                <Button disabled={serv.calificacion_servicio !== 0}  onClick={() => handleOpenModalCalificarServicio(serv.id_servicio)} >CALIFICAR</Button>
+                                                <Button disabled={serv.calificacion_servicio !== 0} onClick={() => handleOpenModalCalificarServicio(serv.id_servicio)} >CALIFICAR</Button>
                                             </Typography>
                                             <hr style={{ margin: "1rem 0" }} />
                                         </div>
@@ -124,4 +121,4 @@ function ServiciosEquipoEncargado() {
 
 }
 
-export default ServiciosEquipoEncargado;
+export default ServiciosEquipoEncargadoAdmin;
