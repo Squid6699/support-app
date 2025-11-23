@@ -14,14 +14,14 @@ CrearPersonaRouter.post("/crearPersona", async (req, res) => {
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { nombre, celular, correo, contraseña, rol_id } = req.body;
-    if (!nombre || !correo || !contraseña)
-        return res.status(400).json({ success: false, msg: "Faltan datos " });
+    const { nombre, celular, correo, password, rol_id } = req.body;
+    if (!nombre || !correo || !password || !rol_id)
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
 
     try {
         const result = await pool.query(
             "INSERT INTO persona (nombre, celular, correo, contraseña, rol_id) VALUES ($1, $2, $3, $4, $5)",
-            [nombre, celular, correo, contraseña, rol_id]
+            [nombre, celular, correo, password, rol_id]
         );
         res.json({ success: true, msg: "USUARIO CREADO CORRECTAMENTE", result: result.rows[0] });
     } catch (err) {
@@ -37,10 +37,14 @@ ObtenerPersonasRouter.get("/obtenerPersonas", async (req, res) => {
     }
 
     try {
-        const result = await pool.query("SELECT * FROM persona");
+        const result = await pool.query(`
+            SELECT P.id AS id, P.nombre AS nombre, P.celular AS celular, P.correo AS correo, R.nombre AS rol
+            FROM persona P
+            INNER JOIN rol R ON P.rol_id = R.id
+        `);
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 

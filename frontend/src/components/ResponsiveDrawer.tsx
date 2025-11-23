@@ -33,6 +33,7 @@ import ServiciosDadosTecnico from "../pages/ServiciosDadosTecnico";
 import IncidenciasLiberadasAdmin from "../pages/incidenciasLiberadasAdmin";
 import ServiciosEquipoEncargadoAdmin from "../pages/ServiciosEquipoAdmin";
 import UbicacionesAdmin from "../pages/UbicacionesAdmin";
+import Personas from "../pages/Personas";
 
 const drawerWidth = 200;
 
@@ -97,9 +98,9 @@ function ResponsiveDrawer() {
                             "Ubicaciones",
                             "Usuarios",
                             "Equipos",
-                            "Piezas",
-                            "Marcas",
-                            "Prioridades",
+                            // "Piezas",
+                            // "Marcas",
+                            // "Prioridades",
                         ].map((text, index) => (
                             <ListItem key={text} disablePadding>
                                 <ListItemButton onClick={() => handleContentChange(text)}>
@@ -110,9 +111,9 @@ function ResponsiveDrawer() {
                                         {index === 3 && <RoomPreferencesIcon />}
                                         {index === 4 && <AccountCircleIcon />}
                                         {index === 5 && <DevicesIcon />}
-                                        {index === 6 && <ExtensionIcon />}
-                                        {index === 7 && <BookmarkIcon />}
-                                        {index === 8 && <PriorityHighIcon />}
+                                        {/* {index === 6 && <ExtensionIcon />} */}
+                                        {/* {index === 7 && <BookmarkIcon />} */}
+                                        {/* {index === 8 && <PriorityHighIcon />} */}
 
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
@@ -285,11 +286,11 @@ function ResponsiveDrawer() {
 
                 {selectedContent === "Ubicaciones" && rol === "Administrador" && <UbicacionesAdmin />}
                 
-                {selectedContent === "Usuarios" && <div>Contenido de Usuarios</div>}
+                {selectedContent === "Usuarios" && <Personas />}
                 {selectedContent === "Equipos" && <EquiposEncargado />}
-                {selectedContent === "Piezas" && <div>Contenido de Piezas</div>}
-                {selectedContent === "Marcas" && <div>Contenido de Marcas</div>}
-                {selectedContent === "Prioridades" && <div>Contenido de Prioridades</div>}
+                {/* {selectedContent === "Piezas" && <div>Contenido de Piezas</div>} */}
+                {/* {selectedContent === "Marcas" && <div>Contenido de Marcas</div>} */}
+                {/* {selectedContent === "Prioridades" && <div>Contenido de Prioridades</div>} */}
 
                 {selectedContent === "Servicios realizados" && <ServiciosDadosTecnico />}
 
