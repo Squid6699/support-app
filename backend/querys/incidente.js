@@ -286,7 +286,7 @@ IniciarIncidenciaRouter.put("/iniciarIncidencia", async (req, res) => {
     const { id } = req.body;
 
     if (!id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -299,9 +299,9 @@ IniciarIncidenciaRouter.put("/iniciarIncidencia", async (req, res) => {
             return res.status(404).json({ success: false, msg: "Incidencia no encontrada" });
         }
 
-        res.json({ success: true, msg: "Incidencia iniciada correctamente" });
+        res.json({ success: true, msg: "INCIDENCIA INICIADA CORRECTAMENTE" });
     } catch (err) {
-        return res.status(500).json({ success: false, msg: "Error en la base de datos" });
+        return res.status(500).json({ success: false, msg: "NO SE PUDO INICIAR LA INCIDENCIA" });
     }
 });
 

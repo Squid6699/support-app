@@ -125,7 +125,6 @@ EliminarServicioRouter.delete("/eliminarServicio", async (req, res) => {
 });
 
 //Ruta para que el tecnico pueda ver sus servicios dados.
-// NO TERMINADO
 ObtenerServiciosDeTecnicoRouter.get("/obtenerServiciosDeTecnico/:id", async (req, res) => {
     const customHeader = req.headers['x-frontend-header'];
 
@@ -135,14 +134,51 @@ ObtenerServiciosDeTecnicoRouter.get("/obtenerServiciosDeTecnico/:id", async (req
 
     const { id } = req.params;
 
-    // QUITAR EL *
-    // OBTENER FECHA, DESCRIPCION, PERSONA QUE SOLICITO (usuario_id), EQUIPO (innerjoin a equipos), PRIORIDAD (innerjoin a prioridad), DATOS DEL SERVICIO (nombre, descripcion, horas), CALIFICACION DEL SERVICIO (inner join a servicio)
-
     try {
-        const result = await pool.query("SELECT * FROM Servicio WHERE tecnico_id=$1", [id]);
+        const result = await pool.query(`
+            SELECT 
+            S.id AS id_servicio,
+            S.nombre AS nombre_servicio,
+            S.descripcion AS descripcion_servicio,
+            T.nombre AS nombre_tecnico,
+            S.horas AS horas_servicio,
+            S.calificacion AS calificacion_servicio,
+
+            I.id AS id_incidencia,
+            I.fecha AS fecha_incidencia,
+            I.descripcion AS descripcion_incidencia,
+            EN.nombre AS nombre_encargado,
+
+            E.id AS id_equipo,
+            E.nombre AS nombre_equipo,
+
+            A.nombre AS nombre_aula,
+            ED.nombre AS nombre_edificio,
+
+            P.nombre AS prioridad_incidencia,
+            I.finalizado AS incidencia_finalizada,
+            I.autorizada AS incidencia_autorizada,
+            I.estado AS estado_incidencia
+
+
+            FROM incidente I
+            INNER JOIN servicio S ON I.servicio_id = S.id
+            INNER JOIN persona T ON I.tecnico_id = T.id
+            INNER JOIN persona EN ON I.usuario_id = EN.id
+            INNER JOIN prioridad P ON I.prioridad_id = P.id
+            INNER JOIN equipo E ON I.equipo_id = E.id
+            INNER JOIN aula A ON E.aula_id = A.id
+            INNER JOIN edificio ED ON A.edificio_id = ED.id
+            WHERE S.tecnico_id = $1
+        `, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, msg: "NO TIENES SERVICIOS" });
+        }
         res.json({ success: true, result: result.rows });
+        
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 

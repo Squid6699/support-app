@@ -1,7 +1,5 @@
-// NO TERMINADO
-
 import Typography from "@mui/material/Typography";
-import type { Incidencias } from "../../types";
+import type { ServiciosDadosTecnico } from "../../types";
 import { useSesion } from "../hook/useSesion";
 import { useQuery } from "@tanstack/react-query";
 
@@ -16,16 +14,16 @@ function ServiciosDadosTecnico() {
 
     const HOST = import.meta.env.VITE_HOST
 
-    const { data: incidencias, isLoading: isLoadingIncidencias } = useQuery<Incidencias[]>({
-        queryKey: ["Incidencias"],
-        queryFn: obtenerIncidencias,
+    const { data: servicios, isLoading: isLoadingServicios } = useQuery<ServiciosDadosTecnico[]>({
+        queryKey: ["ServiciosDadosTecnico"],
+        queryFn: obtenerServicios,
     });
 
 
-    //SACAR INCIDENCIAS LIBERADAS DEL ENCARGADO
-    async function obtenerIncidencias() {
+    //SACAR SERVICIOS DEL TECNICO
+    async function obtenerServicios() {
         try {
-            const response = await fetch(HOST + "api/verIncidenciasLiberadas/" + id, {
+            const response = await fetch(HOST + "api/obtenerServiciosDeTecnico/" + id, {
                 method: 'GET',
                 headers: {
                     'x-frontend-header': 'frontend',
@@ -54,12 +52,12 @@ function ServiciosDadosTecnico() {
             </header>
 
             <main>
-                {isLoadingIncidencias ? <p>Cargando...</p> :
+                {isLoadingServicios ? <p>Cargando...</p> :
 
-                    incidencias && incidencias.length > 0 ? (
-                        incidencias.map((incidencia) => {
+                    servicios && servicios.length > 0 ? (
+                        servicios.map((servicio) => {
                             let colorCirculo = "";
-                            switch (incidencia.prioridad.toLowerCase()) {
+                            switch (servicio.prioridad_incidencia.toLowerCase()) {
                                 case "alta":
                                     colorCirculo = "red";
                                     break;
@@ -74,7 +72,7 @@ function ServiciosDadosTecnico() {
                             }
 
                             return (
-                                <Accordion key={incidencia.incidencia_id}>
+                                <Accordion key={servicio.id_servicio}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel1a-content"
@@ -91,9 +89,9 @@ function ServiciosDadosTecnico() {
                                             }}
                                         >
                                             <Typography style={{ maxWidth: "80%" }} component="span">
-                                                {dayjs(incidencia.fechaincidencia).format("DD/MM/YYYY") +
+                                                {dayjs(servicio.fecha_incidencia).format("DD/MM/YYYY") +
                                                     " - " +
-                                                    incidencia.descripcion_incidencia}
+                                                    servicio.descripcion_incidencia}
                                             </Typography>
 
                                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -108,23 +106,35 @@ function ServiciosDadosTecnico() {
                                                         }}
                                                     ></span>
                                                 )}
-                                                <Typography component="span">{incidencia.prioridad}</Typography>
+                                                <Typography component="span">{servicio.prioridad_incidencia}</Typography>
                                             </div>
                                         </div>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        <Typography component="span">AUTORIZADO: {incidencia.autorizada ? "SI" : "NO"} <br /></Typography>
-                                        <Typography component="span">ESTADO: {incidencia.estado_incidencia} <br /></Typography>
-                                        <Typography component="span">EDIFICIO: {incidencia.edificio.toUpperCase()} <br /></Typography>
-                                        <Typography component="span">AULA: {incidencia.aula.toUpperCase()} <br /></Typography>
-                                        <Typography component="span">EQUIPO: {incidencia.equipo_nombre.toUpperCase()} <br /></Typography>
-                                        <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
+                                        <Typography component="span">AUTORIZADO: {servicio.incidencia_autorizada ? "SI" : "NO"} <br /></Typography>
+                                        <Typography component="span">ESTADO: {servicio.estado_incidencia} <br /></Typography>
+                                        <Typography component="span">EDIFICIO: {servicio.nombre_edificio.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">AULA: {servicio.nombre_aula.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">EQUIPO: {servicio.nombre_equipo.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">TECNICO ASIGNADO: {servicio.nombre_tecnico ? servicio.nombre_tecnico.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
+                                        <br />
+                                        <Typography component="span">SERVICIO <br /></Typography>
+                                        <Typography component="span">NOMBRE DEL SERVICIO: {servicio.nombre_servicio.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">DESCRIPCIÓN DEL SERVICIO: {servicio.descripcion_servicio.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">HORAS DEL SERVICIO: {servicio.horas_servicio} <br /></Typography>
+                                        <Typography component="span">CALIFICACIÓN DEL SERVICIO: {servicio.calificacion_servicio ? servicio.calificacion_servicio : "SIN CALIFICAR"} <br /></Typography>
+
+                                        <br />
+                                        <Typography component="span">UBICACION <br /></Typography>
+                                        <Typography component="span">AULA: {servicio.nombre_aula.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">EDIFICIO: {servicio.nombre_edificio.toUpperCase()} <br /></Typography>
+
 
                                     </AccordionDetails>
                                 </Accordion>
                             );
                         })
-                    ) : "No hay incidencias liberadas a tu cargo"}
+                    ) : "No hay servicios asignados."}
             </main >
             
 

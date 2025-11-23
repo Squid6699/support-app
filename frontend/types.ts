@@ -116,3 +116,24 @@ export interface DarServicio {
     horas: number;
     encargado_id: number;
 }
+
+export interface ServiciosDadosTecnico{
+    id_servicio: number;
+    nombre_servicio: string;
+    descripcion_servicio: string;
+    nombre_tecnico: string;
+    horas_servicio: number;
+    calificacion_servicio: number;
+    id_incidencia: number;
+    fecha_incidencia: Date;
+    descripcion_incidencia: string;
+    nombre_encargado: string;
+    id_equipo: number;
+    nombre_equipo: string;
+    nombre_aula: string;
+    nombre_edificio: string;
+    prioridad_incidencia: string;
+    incidencia_finalizada: boolean;
+    incidencia_autorizada: boolean;
+    estado_incidencia: string;
+}
