@@ -23,9 +23,9 @@ CrearPersonaRouter.post("/crearPersona", async (req, res) => {
             "INSERT INTO persona (nombre, celular, correo, contraseña, rol_id) VALUES ($1, $2, $3, $4, $5)",
             [nombre, celular, correo, contraseña, rol_id]
         );
-        res.json({ success: true, msg: "Persona creada correctamente", result: result.rows[0] });
+        res.json({ success: true, msg: "USUARIO CREADO CORRECTAMENTE", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -125,5 +125,27 @@ ObtenerTecnicosRouter.get("/obtenerTecnicos", async (req, res) => {
         res.json({ success: true, result: result.rows });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+// Ruta para obtener a todos los encargados de edificios
+export const ObtenerEncargadosRouter = express.Router();
+ObtenerEncargadosRouter.get("/obtenerEncargados", async (req, res) => {
+
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const result = await pool.query(`
+            SELECT P.id AS id, P.nombre AS nombre, P.celular AS celular, P.correo AS correo, R.nombre AS rol
+            FROM persona P
+            INNER JOIN rol R ON P.rol_id = R.id
+            WHERE rol_id = 4
+        `);
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });

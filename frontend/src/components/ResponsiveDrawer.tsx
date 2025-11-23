@@ -32,6 +32,7 @@ import IncidenciasAdmin from "../pages/IncidenciasAdmin";
 import ServiciosDadosTecnico from "../pages/ServiciosDadosTecnico";
 import IncidenciasLiberadasAdmin from "../pages/incidenciasLiberadasAdmin";
 import ServiciosEquipoEncargadoAdmin from "../pages/ServiciosEquipoAdmin";
+import UbicacionesAdmin from "../pages/UbicacionesAdmin";
 
 const drawerWidth = 200;
 
@@ -129,14 +130,14 @@ function ResponsiveDrawer() {
                         {[
                             "Incidencias Asignadas",
                             "Servicios realizados",
-                            "Ubicaciones",
+                            // "Ubicaciones",
                         ].map((text, index) => (
                             <ListItem key={text} disablePadding>
                                 <ListItemButton onClick={() => handleContentChange(text)}>
                                     <ListItemIcon>
                                         {index === 0 && <SummarizeIcon />}
                                         {index === 1 && <ElectricalServicesIcon />}
-                                        {index === 2 && <RoomPreferencesIcon />}
+                                        {/* {index === 2 && <RoomPreferencesIcon />} */}
 
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
@@ -282,7 +283,8 @@ function ResponsiveDrawer() {
 
 
 
-                {selectedContent === "Ubicaciones" && <div>Contenido de Ubicaciones</div>}
+                {selectedContent === "Ubicaciones" && rol === "Administrador" && <UbicacionesAdmin />}
+                
                 {selectedContent === "Usuarios" && <div>Contenido de Usuarios</div>}
                 {selectedContent === "Equipos" && <EquiposEncargado />}
                 {selectedContent === "Piezas" && <div>Contenido de Piezas</div>}

@@ -137,3 +137,31 @@ export interface ServiciosDadosTecnico{
     incidencia_autorizada: boolean;
     estado_incidencia: string;
 }
+
+export interface Equipo {
+    equipo_id: number;
+    equipo_nombre: string;
+    equipo_fecha: string;
+}
+
+export interface AulaUbicacion {
+    aula_id: number;
+    aula_nombre: string;
+    equipos: Equipo[];
+}
+
+export interface EdificioUbicacion {
+    edificio_id: number;
+    edificio_nombre: string;
+    persona_id: number;
+    persona_nombre: string;
+    aulas: AulaUbicacion[];
+}
+
+export interface Encargados {
+    id: number;
+    nombre: string;
+    celular: string;
+    correo: string;
+    rol: string;
+}

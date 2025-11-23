@@ -19,20 +19,25 @@ CrearEdificioRouter.post('/crearEdificio', async (req, res) => {
         return res.status(401).send('Unauthorized');
     }
 
-    const { nombre, encargado_id } = req.body;
+    const { nombre } = req.body;
 
-    if (!nombre || !encargado_id) {
+    if (!nombre) {
         return res.status(400).json({ success: false, msg: "Faltan datos" });
     }
 
     try {
         const result = await pool.query(
-            "INSERT INTO Edificio (nombre, encargado_id) VALUES ($1, $2)",
-            [nombre, encargado_id]
+            "INSERT INTO Edificio (nombre) VALUES ($1)",
+            [nombre]
         );
-        res.json({ success: true, msg: "Edificio creado correctamente", result: result.rows[0] });
+
+        if (result.rowCount === 0) {
+            return res.status(500).json({ success: false, msg: "NO SE PUDO CREAR EL EDIFICIO" });
+        }
+
+        res.json({ success: true, msg: "EDIFICIO CREADO CORRECTAMENTE", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -53,7 +58,7 @@ CrearAulaRouter.post('/crearAula', async (req, res) => {
             "INSERT INTO Aula (nombre, edificio_id) VALUES ($1, $2)",
             [nombre, edificio_id]
         );
-        res.json({ success: true, msg: "Aula creada correctamente", result: result.rows[0] });
+        res.json({ success: true, msg: "AULA CREADA CORRECTAMENTE", result: result.rows[0] });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });
     }
@@ -129,7 +134,7 @@ EditarAulaRouter.put('/editarAula', async (req, res) => {
         res.json({ success: true, msg: "Aula editada correctamente", result: result.rows[0] });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });
-    }   
+    }
 });
 
 EliminarEdificioRouter.delete('/eliminarEdificio', async (req, res) => {
@@ -179,7 +184,7 @@ EliminarAulaRouter.delete('/eliminarAula', async (req, res) => {
 });
 
 ObtenerAulasPorEdificioRouter.get('/obtenerAulasPorEdificio/:edificioId', async (req, res) => {
-    const customHeader = req.headers['x-frontend-header']; 
+    const customHeader = req.headers['x-frontend-header'];
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
     }
@@ -204,7 +209,7 @@ ObtenerEdificiosPorEncargadoRouter.get('/obtenerEdificiosPorEncargado/:encargado
     const customHeader = req.headers['x-frontend-header'];
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
-    }  
+    }
     const { encargadoId } = req.params;
 
     if (!encargadoId) {
@@ -219,5 +224,85 @@ ObtenerEdificiosPorEncargadoRouter.get('/obtenerEdificiosPorEncargado/:encargado
         res.json({ success: true, data: result.rows });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+
+// Ruta para obtener los edificios con sus aulas y los equipos de cada aula
+export const ObtenerEdificiosConAulasYEquiposRouter = express.Router();
+
+ObtenerEdificiosConAulasYEquiposRouter.get('/obtenerEdificiosConAulasYEquiposAdmin', async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const result = await pool.query(`
+            SELECT 
+                ED.id AS edificio_id,
+                ED.nombre AS edificio_nombre,
+                P.id AS persona_id,
+                P.nombre AS persona_nombre,
+                COALESCE(
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'aula_id', A.id,
+                            'aula_nombre', A.nombre,
+                            'equipos', (
+                                SELECT JSON_AGG(
+                                    JSON_BUILD_OBJECT(
+                                        'equipo_id', E.id,
+                                        'equipo_nombre', E.nombre,
+                                        'equipo_fecha', E.fecha
+                                    )
+                                )
+                                FROM equipo E
+                                WHERE E.aula_id = A.id
+                            )
+                        )
+                    ) FILTER (WHERE A.id IS NOT NULL),
+                    '[]'
+                ) AS aulas
+            FROM edificio ED
+            LEFT JOIN persona P ON ED.encargado_id = P.id
+            LEFT JOIN aula A ON A.edificio_id = ED.id
+            GROUP BY ED.id, ED.nombre, P.id, P.nombre;
+        `);
+
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
+    }
+});
+
+//Ruta para asignar encargado a un edificio
+export const AsignarEncargadoRouter = express.Router();
+AsignarEncargadoRouter.put('/asignarEncargado', async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { edificio_id, encargado_id } = req.body;
+
+    if (!edificio_id || !encargado_id) {
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE edificio SET encargado_id=$1 WHERE id=$2",
+            [encargado_id, edificio_id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, msg: "EDIFICIO NO ENCONTRADO" });
+        }
+
+        res.json({ success: true, msg: "ENCARGADO ASIGNADO CORRECTAMENTE", result: result.rows[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
