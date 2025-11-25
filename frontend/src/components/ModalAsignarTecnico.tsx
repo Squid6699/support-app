@@ -120,7 +120,7 @@ function ModalAsignarTecnico({ open, handleCloseModalAsignarTecnico, refetchInci
                                 {isLoadingUsuarios ? <MenuItem value={0}>Cargando...</MenuItem> : null}
                                 <MenuItem value={0} selected disabled>Seleccione un tecnico</MenuItem>
                                 {usuarios ? usuarios.map((usuario) => (
-                                    <MenuItem key={usuario.id} value={usuario.id}>{usuario.nombre}</MenuItem>
+                                    <MenuItem key={usuario.id} value={usuario.id}>{usuario.nombre} - {usuario.rol}</MenuItem>
                                 )) : <MenuItem key={0} value={0}>No hay tecnicos disponibles</MenuItem>}
                             </Select>
                             <FormHelperText error>{error}</FormHelperText>

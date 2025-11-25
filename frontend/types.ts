@@ -165,3 +165,18 @@ export interface Encargados {
     correo: string;
     rol: string;
 }
+
+export interface Equipo {
+  id: number;
+  nombre: string;
+  fecha: string; // O Date
+  marca_id: number;
+  tipo_id: number;
+  aula_id: number;
+}
+
+export interface AulaEquipos {
+  id: number;
+  nombre: string;
+  equipos: Equipo[];
+}

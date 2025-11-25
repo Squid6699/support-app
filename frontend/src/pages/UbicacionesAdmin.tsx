@@ -104,7 +104,7 @@ function UbicacionesAdmin() {
                             </AccordionDetails>
 
                             <AccordionActions>
-                                <Button onClick={() => handleAbrirModalAsignar(edificio.edificio_id)} disabled={edificio.persona_nombre !== null} >
+                                <Button onClick={() => handleAbrirModalAsignar(edificio.edificio_id)} >
                                     ASIGNAR ENCARGADO
                                 </Button>
 

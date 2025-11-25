@@ -135,7 +135,7 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
     //SACAR EQUIPOS DEL AULA
     async function obtenerEquiposPorAula() {
         try {
-            const response = await fetch(HOST + "api/obtenerEquiposPorAula/" + selectedAula, {
+            const response = await fetch(HOST + "api/obtenerEquiposPorAulaIncidencia/" + selectedAula, {
                 method: 'GET',
                 headers: {
                     'x-frontend-header': 'frontend',

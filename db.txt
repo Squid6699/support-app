@@ -50,7 +50,7 @@ CREATE TABLE Aula (
 CREATE TABLE Equipo (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    fecha DATE,
+    fecha DATE DEFAULT CURRENT_DATE,
     aula_id INT REFERENCES Aula(id),
     marca_id INT REFERENCES Marca(id),
     tipo_id INT REFERENCES TipoEquipo(id)
@@ -137,7 +137,8 @@ INSERT INTO Persona (nombre, celular, correo, contraseña, rol_id) VALUES
 ('Carlos Pérez', '5551234567', 'carlos.perez@uni.edu', 'pass123', 1), -- Admin
 ('Ana Torres', '5559876543', 'ana.torres@uni.edu', 'pass123', 2), -- Técnico HW
 ('Luis Gómez', '5553217890', 'luis.gomez@uni.edu', 'pass123', 3), -- Técnico SW
-('Marta López', '5556543210', 'marta.lopez@uni.edu', 'pass123', 4); -- Encargada
+('Marta López', '5556543210', 'marta.lopez@uni.edu', 'pass123', 4), -- Encargada
+('Victoria Armenta', '6672945113', 'victoria.armenta@uni.edu', 'pass123', 4); -- Encargada
 
 
 -- Insertar edificios

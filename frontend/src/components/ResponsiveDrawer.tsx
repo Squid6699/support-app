@@ -34,6 +34,7 @@ import IncidenciasLiberadasAdmin from "../pages/incidenciasLiberadasAdmin";
 import ServiciosEquipoEncargadoAdmin from "../pages/ServiciosEquipoAdmin";
 import UbicacionesAdmin from "../pages/UbicacionesAdmin";
 import Personas from "../pages/Personas";
+import EquiposAll from "../pages/EquiposAll";
 
 const drawerWidth = 200;
 
@@ -287,7 +288,8 @@ function ResponsiveDrawer() {
                 {selectedContent === "Ubicaciones" && rol === "Administrador" && <UbicacionesAdmin />}
                 
                 {selectedContent === "Usuarios" && <Personas />}
-                {selectedContent === "Equipos" && <EquiposEncargado />}
+                {selectedContent === "Equipos" && rol === "Administrador" && <EquiposAll />}
+                {selectedContent === "Equipos"  && rol === "Encargado Edificio" && <EquiposEncargado />}
                 {/* {selectedContent === "Piezas" && <div>Contenido de Piezas</div>} */}
                 {/* {selectedContent === "Marcas" && <div>Contenido de Marcas</div>} */}
                 {/* {selectedContent === "Prioridades" && <div>Contenido de Prioridades</div>} */}
