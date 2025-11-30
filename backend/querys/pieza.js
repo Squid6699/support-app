@@ -114,3 +114,6 @@ EliminarPiezaRouter.delete("/eliminarPieza", async (req, res) => {
         res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
+
+// NO TERMINADO
+//Ruta para crear una solicitud de pieza
