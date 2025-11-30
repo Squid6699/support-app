@@ -44,7 +44,7 @@ CrearEquipoRouter.post("/crearEquipo", async (req, res) => {
             "INSERT INTO equipo (nombre, aula_id) VALUES ($1, $2)",
             [nombre, aula_id]
         );
-        res.json({ success: true, msg: "EQUIPO CREADO CORRECTAMENTE"});
+        res.json({ success: true, msg: "EQUIPO CREADO CORRECTAMENTE" });
     } catch (err) {
         res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
@@ -125,7 +125,7 @@ EditarEquipoRouter.put("/editarEquipo", async (req, res) => {
 
     let query = "UPDATE equipo SET nombre=$1, aula_id=$2 WHERE id=$3";
 
-    if (!aula_id){
+    if (!aula_id) {
         query = "UPDATE equipo SET nombre=$1 WHERE id=$2";
     }
 
@@ -266,6 +266,77 @@ ObtenerEquiposPorAulaRouter.get("/obtenerEquiposPorAula", async (req, res) => {
     `;
 
         const result = await pool.query(query);
+
+        // Agrupar aulas
+        const aulasMap = new Map();
+
+        result.rows.forEach(row => {
+            const aulaId = row.aula_id;
+
+            if (!aulasMap.has(aulaId)) {
+                aulasMap.set(aulaId, {
+                    id: aulaId,
+                    nombre: row.aula_nombre,
+                    equipos: []
+                });
+            }
+
+            // Si el aula tiene equipos, agrégalos
+            if (row.equipo_id) {
+                aulasMap.get(aulaId).equipos.push({
+                    id: row.equipo_id,
+                    nombre: row.equipo_nombre,
+                    fecha: row.equipo_fecha,
+                    marca_id: row.marca_id,
+                    tipo_id: row.tipo_id
+                });
+            }
+        });
+
+        // Convertir map → array
+        const aulas = Array.from(aulasMap.values());
+
+        res.json({ success: true, result: aulas });
+
+    } catch (error) {
+        res.status(500).json({ message: "OCURRIO UN ERROR" });
+    }
+});
+
+// Ruta para obtener equipos por aula de encargado
+export const ObtenerEquiposPorAulaEncargadoRouter = express.Router();
+ObtenerEquiposPorAulaEncargadoRouter.get("/obtenerEquiposPorAulaEncargado/:encargadoId", async (req, res) => {
+    console.log("Solicitud recibida en /obtenerEquiposPorAulaEncargado");
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { encargadoId } = req.params;
+
+    if (!encargadoId) {
+        return res.status(400).json({ message: "FALTAN DATOS" });
+    }
+
+    try {
+        const query = `
+            SELECT 
+                a.id AS aula_id,
+                a.nombre AS aula_nombre,
+                e.id AS equipo_id,
+                e.nombre AS equipo_nombre,
+                e.fecha AS equipo_fecha,
+                e.marca_id,
+                e.tipo_id
+            FROM Aula a
+            LEFT JOIN Equipo e ON e.aula_id = a.id
+            INNER JOIN Edificio ed ON a.edificio_id = ed.id
+            WHERE ed.encargado_id = $1
+            ORDER BY a.id;
+        `;
+
+        const result = await pool.query(query, [encargadoId]);
 
         // Agrupar aulas
         const aulasMap = new Map();

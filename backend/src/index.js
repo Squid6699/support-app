@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { CrearPersonaRouter, EditarPersonaRouter, EliminarPersonaRouter, ObtenerPersonasRouter, ObtenerPersonaRouter, ObtenerTecnicosRouter, ObtenerEncargadosRouter } from '../querys/personas.js';
 import { CrearRolRouter, EditarRolRouter, EliminarRolRouter, ObtenerRolesRouter, ObtenerRolRouter } from '../querys/rol.js';
 import { CrearPrioridadRouter, EditarPrioridadRouter, EliminarPrioridadRouter, ObtenerPrioridadesRouter, ObtenerPrioridadRouter } from '../querys/prioridad.js';
-import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquiposRouter, ObtenerEquipoRouter, ObtenerEquiposEncargadoRouter, ObtenerEquiposPorAulaRouter, ObtenerDetallesEquiposRouter, ObtenerEquiposPorAulaIncidenciaRouter } from '../querys/equipo.js';
+import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquiposRouter, ObtenerEquipoRouter, ObtenerEquiposEncargadoRouter, ObtenerEquiposPorAulaRouter, ObtenerDetallesEquiposRouter, ObtenerEquiposPorAulaIncidenciaRouter, ObtenerEquiposPorAulaEncargadoRouter } from '../querys/equipo.js';
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
@@ -162,6 +162,8 @@ app.use("/api/", ObtenerEncargadosRouter);
 //Ruta para que el administrador asigne la prioridad a una incidencia.
 app.use("/api/", AsignarPrioridadRouter);
 
+// Ruta para obtener equipos por aula de encargado
+app.use("/api/", ObtenerEquiposPorAulaEncargadoRouter);
 
 
 
