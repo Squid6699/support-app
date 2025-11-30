@@ -15,7 +15,7 @@ CrearRolRouter.post("/crearRol", async (req, res) => {
 
     const { nombre } = req.body;
     if (!nombre)
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
 
     try {
         const result = await pool.query(
@@ -24,7 +24,7 @@ CrearRolRouter.post("/crearRol", async (req, res) => {
         );
         res.json({ success: true, msg: "Rol creado correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -38,7 +38,7 @@ ObtenerRolesRouter.get("/obtenerRoles", async (req, res) => {
         const result = await pool.query("SELECT * FROM rol");
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -59,7 +59,7 @@ ObtenerRolRouter.get("/obtenerRol/:id", async (req, res) => {
 
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -81,7 +81,7 @@ EditarRolRouter.put("/editarRol", async (req, res) => {
 
         res.json({ success: true, message: "Rol actualizado correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, error: "OCURRIO UN ERROR" });
     }
 });
 
@@ -99,6 +99,6 @@ EliminarRolRouter.delete("/eliminarRol", async (req, res) => {
 
         res.json({ success: true, message: "Rol eliminado correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, error: "OCURRIO UN ERROR" });
     }
 });

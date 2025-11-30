@@ -85,15 +85,16 @@ function ServiciosEquipoEncargado() {
                                     equipo.servicios.map((serv) => (
                                         <div key={serv.id_incidencia} style={{ marginBottom: "1rem" }}>
                                             <Typography component="span">
-                                                <strong>Servicio:</strong> {serv.nombre_servicio?.toUpperCase()} <br />
-                                                <strong>Descripción:</strong> {serv.descripcion_servicio || "Sin descripción"} <br />
-                                                <strong>Técnico:</strong> {serv.nombre_tecnico || "No asignado"} <br />
-                                                <strong>Horas:</strong> {serv.horas_servicio ?? "N/A"} <br />
-                                                <strong>Prioridad:</strong> {serv.prioridad || "No definida"} <br />
-                                                <strong>Estado:</strong> {serv.estado_incidencia || "Desconocido"} <br />
+                                                <strong>SERVICIO:</strong> {serv.nombre_servicio?.toUpperCase()} <br />
+                                                <strong>DESCRIPCION:</strong> {serv.descripcion_servicio.toUpperCase() || "Sin descripción"} <br />
+                                                <strong>SOLUCION:</strong> {serv.solucion_servicio.toUpperCase() || "Sin solucion"} <br />
+                                                <strong>TÉCNICO:</strong> {serv.nombre_tecnico.toUpperCase() || "No asignado"} <br />
+                                                <strong>HORAS:</strong> {serv.horas_servicio ?? "N/A"} <br />
+                                                <strong>PRIORIDAD:</strong> {serv.prioridad.toUpperCase() || "No definida"} <br />
+                                                <strong>ESTADO:</strong> {serv.estado_incidencia.toUpperCase() || "Desconocido"} <br />
                                                 {/* <strong>Finalizado:</strong> {serv.incidencia_finalizada ? "Sí" : "No"} <br /> */}
-                                                <strong>Fecha término:</strong> {serv.fecha_termino_incidencia || "Pendiente"}<br />
-                                                <strong>Calificacion:</strong> {serv.calificacion_servicio}<br />
+                                                <strong>FECHA TÉRMINO:</strong> {serv.fecha_termino_incidencia || "Pendiente"}<br />
+                                                <strong>CALIFICACION:</strong> {serv.calificacion_servicio}<br />
                                                 <Button disabled={serv.calificacion_servicio !== 0}  onClick={() => handleOpenModalCalificarServicio(serv.id_servicio)} >CALIFICAR</Button>
                                             </Typography>
                                             <hr style={{ margin: "1rem 0" }} />

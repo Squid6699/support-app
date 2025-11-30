@@ -10,7 +10,7 @@ import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter
 import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
 import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter, ObtenerIncidenciasLiberadasRouter, ObtenerIncidenciasAdminRouter, ObtenerIncidenciasLiberadasAdminRouter, AsignarPrioridadRouter } from '../querys/incidente.js';
-import { CrearServicioRouter, EditarServicioRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeEquiposAdminRouter, ObtenerServiciosDeEquiposRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
+import { CrearIncidenteCatalogoRouter, CrearServicioRouter, EditarIncidenteCatalogoRouter, EditarServicioRouter, EliminarIncidenteCatalogoRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeEquiposAdminRouter, ObtenerServiciosDeEquiposRouter, ObtenerServiciosDesdeCatalogoRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
 import { userAuth } from '../querys/Auth.js';
 import { AsignarEncargadoRouter, CrearAulaRouter, CrearEdificioRouter, EditarAulaRouter, EditarEdificioRouter, EliminarAulaRouter, EliminarEdificioRouter, ObtenerAulasPorEdificioRouter, ObtenerAulasRouter, ObtenerEdificiosConAulasYEquiposRouter, ObtenerEdificiosPorEncargadoRouter, ObtenerEdificiosRouter } from '../querys/ubicacion.js';
 import 'dotenv/config';
@@ -165,7 +165,17 @@ app.use("/api/", AsignarPrioridadRouter);
 // Ruta para obtener equipos por aula de encargado
 app.use("/api/", ObtenerEquiposPorAulaEncargadoRouter);
 
+//Ruta para obtener los incidentes desde el catalogo
+app.use("/api/", ObtenerServiciosDesdeCatalogoRouter);
 
+// Ruta para crear un incidente en catalogo de incidentes
+app.use("/api/", CrearIncidenteCatalogoRouter);
+
+// Ruta para editar un incidente en catalogo de incidentes
+app.use("/api/", EditarIncidenteCatalogoRouter);
+
+// Ruta para eliminar un incidente en catalogo de incidentes
+app.use("/api/", EliminarIncidenteCatalogoRouter);
 
 app.post("/api/", (req, res) => {
     const token = req.cookies.sesion;

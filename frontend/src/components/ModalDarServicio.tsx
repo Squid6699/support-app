@@ -4,11 +4,16 @@ import TextField from "@mui/material/TextField";
 import { style } from "../css/componentsStyle";
 import Typography from "@mui/material/Typography";
 import { useSesion } from "../hook/useSesion";
-import type { DarServicio } from "../../types";
-import { useState } from "react";
+import type { CatalogoIncidencias } from "../../types";
+import { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import toast from "react-hot-toast";
-
+import { useQuery } from "@tanstack/react-query";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormHelperText from "@mui/material/FormHelperText";
 
 interface ModalDarServiciosProps {
     open: boolean;
@@ -19,172 +24,198 @@ interface ModalDarServiciosProps {
 
 function ModalDarServicio({ open, incidenciaSeleccionada, handleModalClose, refetchIncidencias }: ModalDarServiciosProps) {
     const { id, usuario } = useSesion();
-    const HOST = import.meta.env.VITE_HOST
+    const HOST = import.meta.env.VITE_HOST;
 
+    const { data: catalogo, isLoading: isLoadingCatalogo } = useQuery<CatalogoIncidencias[]>({
+        queryKey: ["CatalogoIncidentes"],
+        queryFn: obtenerCatalogoIncidencias,
+    });
 
-    const [servicioValue, setServicioValue] = useState<DarServicio>({
-        nombre: '',
-        descripcion: '',
+    async function obtenerCatalogoIncidencias(): Promise<CatalogoIncidencias[]> {
+        const response = await fetch(HOST + "api/catalogoIncidencias", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "x-frontend-header": "frontend",
+            },
+        });
+        const data = await response.json();
+        return data.success ? data.result : [];
+    }
+
+    const [descSeleccionada, setDescSeleccionada] = useState<number>(0);
+
+    const handleChangeDescripcion = (value: number) => {
+        setDescSeleccionada(value);
+    };
+
+    const [servicioValue, setServicioValue] = useState<any>({
+        nombre: "",
+        descripcion: "",
         horas: 0,
-        encargado_id: id
+        solucion: "",
+        encargado_id: id,
+    });
+
+    const [servicioError, setServicioError] = useState({
+        descripcion: "",
     });
 
     const handleCloseModalIncidencia = () => {
         handleModalClose();
         setServicioValue({
-            nombre: '',
-            descripcion: '',
+            nombre: "",
+            descripcion: "",
             horas: 0,
-            encargado_id: id
+            solucion: "",
+            encargado_id: id,
         });
-    }
+        setDescSeleccionada(0);
+    };
 
-    const [servicioError, setServicioError] = useState({
-        nombre: '',
-        descripcion: '',
-        horas: '',
-        encargado_id: id
-    });
+    // ---------------------------------------------------------
+    // AUTOCOMPLETAR TODO CUANDO SE SELECCIONA UNA DESCRIPCIÓN
+    // ---------------------------------------------------------
+    useEffect(() => {
+        if (!descSeleccionada || !catalogo) return;
 
-    const handleValueErroresServicio = (newValue: any) => {
-        setServicioError({ ...servicioError, ...newValue });
-    }
+        const seleccionado = catalogo.find(
+            (p) => p.id_catalogo_incidente === descSeleccionada
+        );
 
-    const handleValueChangeServicio = (newValue: any) => {
-        setServicioValue({ ...servicioValue, ...newValue });
-    }
+        if (seleccionado) {
+            setServicioValue({
+                nombre: seleccionado.titulo_catalogo_incidente,
+                descripcion: seleccionado.descripcion_catalogo_incidente,
+                horas: seleccionado.horas_promedio_catalogo_incidente,
+                solucion: seleccionado.solucion_catalogo_incidente,
+                encargado_id: id,
+            });
+        }
+    }, [descSeleccionada, catalogo]);
 
     async function submitIncidencia(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        handleValueErroresServicio({
-            descripcion: "",
-            fecha: "",
-            equipo_id: "",
-            prioridad_id: "",
-            edificio_id: "",
-            aula_id: ""
-        });
 
-        if (servicioValue.nombre === null) {
-            handleValueErroresServicio({ nombre: "El nombre es requerido" });
+        setServicioError({ descripcion: "" });
+
+        if (descSeleccionada === 0) {
+            setServicioError({ descripcion: "Debe seleccionar una descripción" });
             return;
         }
-
-        if (servicioValue.descripcion === '') {
-            handleValueErroresServicio({ descripcion: "La descripcion es requerida" });
-            return;
-        }
-
-        if (servicioValue.horas === 0) {
-            handleValueErroresServicio({ horas: "Las horas son requeridas" });
-            return;
-        }
-
 
         try {
             const response = await fetch(HOST + "api/crearServicio", {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'x-frontend-header': 'frontend',
+                    "Content-Type": "application/json",
+                    "x-frontend-header": "frontend",
                 },
-                body: JSON.stringify({ "id_incidencia": incidenciaSeleccionada, "nombre": servicioValue.nombre, "descripcion": servicioValue.descripcion, "horas": servicioValue.horas, "tecnico_id": servicioValue.encargado_id }),
+                body: JSON.stringify({
+                    id_incidencia: incidenciaSeleccionada,
+                    nombre: servicioValue.nombre,
+                    descripcion: servicioValue.descripcion,
+                    horas: servicioValue.horas,
+                    solucion: servicioValue.solucion,
+                    tecnico_id: servicioValue.encargado_id,
+                }),
             });
 
             const data = await response.json();
+
             if (data.success) {
                 toast.success(data.msg);
                 handleCloseModalIncidencia();
-                setServicioValue({
-                    nombre: '',
-                    descripcion: '',
-                    horas: 0,
-                    encargado_id: id,
-                });
                 refetchIncidencias();
             } else {
                 toast.error(data.msg);
             }
-
         } catch (error) {
             toast.error("OCURRIO UN ERROR");
         }
     }
+
     return (
-        <>
+        <Modal open={open} onClose={handleModalClose}>
+            <Box sx={style} component={"form"} onSubmit={submitIncidencia}>
+                <Typography variant="h6">DAR SERVICIO A INCIDENCIA</Typography>
 
-            <Modal
-                open={open}
-                onClose={handleModalClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style} component={"form"} onSubmit={submitIncidencia}>
-                    <Typography id="modal-modal-title" variant="h6" component="h2">
-                        DAR SERVICIO A INCIDENCIA
-                    </Typography>
-                    <Box id="modal-modal-description" sx={{ mt: 2 }}>
+                {/* SELECT DESCRIPCIÓN */}
+                <Box sx={{ m: 2, width: "100%" }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="select-descripcion">Descripción</InputLabel>
 
-                        <Box
-                            sx={{ m: 2, width: '100%' }}
+                        <Select
+                            labelId="select-descripcion"
+                            value={descSeleccionada}
+                            onChange={(e) => handleChangeDescripcion(e.target.value as number)}
+                            label="Descripción"
                         >
-                            <TextField
-                                id="outlined-multiline-static"
-                                label="Nombre"
-                                defaultValue={servicioValue.nombre}
-                                onChange={(e) => handleValueChangeServicio({ nombre: e.target.value })}
-                                error={servicioError.nombre !== ""}
-                                helperText={servicioError.nombre}
-                                fullWidth
-                            />
-                        </Box>
+                            {isLoadingCatalogo && (
+                                <MenuItem value={0}>Cargando...</MenuItem>
+                            )}
 
-                        <Box
-                            sx={{ m: 2, width: '100%' }}
-                        >
-                            <TextField
-                                id="outlined-multiline-static"
-                                label="Descripcion"
-                                multiline
-                                rows={4}
-                                defaultValue={servicioValue.descripcion}
-                                onChange={(e) => handleValueChangeServicio({ descripcion: e.target.value })}
-                                error={servicioError.descripcion !== ""}
-                                helperText={servicioError.descripcion}
-                                fullWidth
-                            />
-                        </Box>
+                            <MenuItem value={0} disabled>
+                                Seleccione una descripción
+                            </MenuItem>
 
-                        <Box
-                            sx={{ m: 2, width: '100%' }}
-                        >
-                            <TextField id="outlined-basic" label="Encargado" variant="outlined" defaultValue={usuario} disabled fullWidth />
-                        </Box>
+                            {catalogo?.map((p) => (
+                                <MenuItem key={p.id_catalogo_incidente} value={p.id_catalogo_incidente}>
+                                    {p.descripcion_catalogo_incidente}
+                                </MenuItem>
+                            ))}
+                        </Select>
 
-                        <Box
-                            sx={{ m: 2, width: '100%' }}
-                        >
-                            <TextField
-                                id="outlined-multiline-static"
-                                label="Horas"
-                                defaultValue={servicioValue.horas}
-                                onChange={(e) => handleValueChangeServicio({ horas: e.target.value })}
-                                error={servicioError.horas !== ""}
-                                helperText={servicioError.horas}
-                                fullWidth
-                            />
-                        </Box>
+                        <FormHelperText error>{servicioError.descripcion}</FormHelperText>
+                    </FormControl>
+                </Box>
 
-                        <Box sx={{ m: 2, width: '100%' }}>
-                            <Button type="submit" variant="contained" className="boton" fullWidth>
-                                Dar Servicio
-                            </Button>
-                        </Box>
+                {/* NOMBRE */}
+                <Box sx={{ m: 2 }}>
+                    <TextField
+                        label="Nombre"
+                        value={servicioValue.nombre}
+                        disabled
+                        fullWidth
+                    />
+                </Box>
 
-                    </Box>
-                </Box >
-            </Modal >
-        </>
+                {/* SOLUCIÓN */}
+                <Box sx={{ m: 2 }}>
+                    <TextField
+                        label="Solución"
+                        value={servicioValue.solucion}
+                        multiline
+                        rows={3}
+                        disabled
+                        fullWidth
+                    />
+                </Box>
+
+                {/* ENCARGADO */}
+                <Box sx={{ m: 2 }}>
+                    <TextField value={usuario} label="Encargado" disabled fullWidth />
+                </Box>
+
+                {/* HORAS */}
+                <Box sx={{ m: 2 }}>
+                    <TextField
+                        label="Horas"
+                        type="number"
+                        value={servicioValue.horas}
+                        disabled
+                        fullWidth
+                    />
+                </Box>
+
+                <Box sx={{ m: 2 }}>
+                    <Button type="submit" variant="contained" className="boton" fullWidth>
+                        Dar Servicio
+                    </Button>
+                </Box>
+            </Box>
+        </Modal>
     );
 }
+
 export default ModalDarServicio;

@@ -14,7 +14,7 @@ CrearMarcaRouter.post("/crearMarca", async (req, res) => {
     const { nombre } = req.body;
 
     if (!nombre) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -29,7 +29,7 @@ CrearMarcaRouter.post("/crearMarca", async (req, res) => {
 
         res.json({ success: true, msg: "Marca creada correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -43,7 +43,7 @@ ObtenerMarcasRouter.get("/obtenerMarcas", async (req, res) => {
         const result = await pool.query("SELECT * FROM marca");
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -60,7 +60,7 @@ ObtenerMarcaRouter.get("/obtenerMarca/:id", async (req, res) => {
         }
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -72,7 +72,7 @@ EditarMarcaRouter.put("/editarMarca", async (req, res) => {
     const { id, nombre } = req.body;
 
     if (!id || !nombre) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -85,7 +85,7 @@ EditarMarcaRouter.put("/editarMarca", async (req, res) => {
         }
         res.json({ success: true, msg: "Marca actualizada correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -97,7 +97,7 @@ EliminarMarcaRouter.delete("/eliminarMarca", async (req, res) => {
     const { id } = req.body;
 
     if (!id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -110,6 +110,6 @@ EliminarMarcaRouter.delete("/eliminarMarca", async (req, res) => {
         }
         res.json({ success: true, msg: "Marca eliminada correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });

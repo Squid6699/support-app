@@ -17,7 +17,7 @@ export const ObtenerEquiposPorAulaRouter = express.Router();
 
 //     const { nombre, fecha, aula_id, marca_id, tipo_id } = req.body;
 //     if (!nombre || !fecha || !aula_id || !marca_id || !tipo_id)
-//         return res.status(400).json({ success: false, msg: "Faltan datos" });
+//         return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
 
 //     try {
 //         const result = await pool.query(
@@ -26,7 +26,7 @@ export const ObtenerEquiposPorAulaRouter = express.Router();
 //         );
 //         res.json({ success: true, msg: "Equipo creado correctamente", result: result.rows[0] });
 //     } catch (err) {
-//         res.status(500).json({ success: false, msg: "Error en DB" });
+//         res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
 //     }
 // });
 
@@ -61,7 +61,7 @@ ObtenerEquiposRouter.get("/obtenerEquipos", async (req, res) => {
         const result = await pool.query("SELECT id, nombre, fecha, aula_id FROM equipo");
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -84,7 +84,7 @@ ObtenerEquipoRouter.get("/obtenerEquipo/:id", async (req, res) => {
 
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -96,7 +96,7 @@ ObtenerEquipoRouter.get("/obtenerEquipo/:id", async (req, res) => {
 
 //     const { id, nombre, fecha, aula_id, marca_id, tipo_id } = req.body;
 //     if (!nombre || !fecha || !aula_id || !marca_id || !tipo_id)
-//         return res.status(400).json({ success: false, msg: "Faltan datos" });
+//         return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
 
 //     try {
 //         const result = await pool.query(
@@ -109,7 +109,7 @@ ObtenerEquipoRouter.get("/obtenerEquipo/:id", async (req, res) => {
 
 //         res.json({ success: true, message: "Equipo actualizado correctamente", result: result.rows[0] });
 //     } catch (err) {
-//         res.status(500).json({ success: false, error: "Error en DB" });
+//         res.status(500).json({ success: false, error: "OCURRIO UN ERROR" });
 //     }
 // });
 
@@ -121,7 +121,7 @@ EditarEquipoRouter.put("/editarEquipo", async (req, res) => {
 
     const { id, nombre, aula_id } = req.body;
     if (!nombre)
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
 
     let query = "UPDATE equipo SET nombre=$1, aula_id=$2 WHERE id=$3";
 
@@ -186,7 +186,7 @@ ObtenerEquiposEncargadoRouter.get("/verEquiposEncargado/:id", async (req, res) =
         `, [id]);
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -393,6 +393,6 @@ ObtenerEquiposPorAulaIncidenciaRouter.get("/obtenerEquiposPorAulaIncidencia/:id"
         `, [id]);
         res.json({ success: true, data: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });

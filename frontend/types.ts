@@ -92,6 +92,7 @@ export interface ServicioDeEquipo {
   prioridad: string | null;
   nombre_servicio: string | null;
   descripcion_servicio: string | null;
+  solucion_servicio: string | null;
   horas_servicio: number | null;
   incidencia_finalizada: boolean | null;
   fecha_termino_incidencia: string | null;
@@ -123,6 +124,7 @@ export interface ServiciosDadosTecnico{
     nombre_tecnico: string;
     horas_servicio: number;
     calificacion_servicio: number;
+    solucion_servicio: string;
     id_incidencia: number;
     fecha_incidencia: Date;
     descripcion_incidencia: string;
@@ -178,4 +180,12 @@ export interface AulaEquipos {
   id: number;
   nombre: string;
   equipos: Equipo[];
+}
+
+export interface CatalogoIncidencias {
+    id_catalogo_incidente: number;
+    titulo_catalogo_incidente: string;
+    descripcion_catalogo_incidente: string;
+    solucion_catalogo_incidente: string;
+    horas_promedio_catalogo_incidente: number;
 }

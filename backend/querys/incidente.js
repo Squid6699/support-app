@@ -30,7 +30,7 @@ CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
     const { fecha, descripcion, usuario_id, equipo_id } = req.body;
 
     if (!fecha || !descripcion || !usuario_id || !equipo_id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -42,7 +42,7 @@ CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
         res.json({ success: true, msg: "INCIDENCIA CREADA CORRECTAMENTE", result: result.rows[0] });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -56,7 +56,7 @@ ObtenerIncidenciasRouter.get("/obtenerIncidencias", async (req, res) => {
         const result = await pool.query("SELECT * FROM incidente");
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -76,7 +76,7 @@ ObtenerIncidenciaRouter.get("/obtenerIncidencia/:id", async (req, res) => {
         }
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -89,7 +89,7 @@ EditarIncidenciaRouter.put("/editarIncidencia", async (req, res) => {
     const { fecha, descripcion, usuario_id, equipo_id } = req.body;
 
     if (!fecha || !descripcion || !usuario_id || !equipo_id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -104,7 +104,7 @@ EditarIncidenciaRouter.put("/editarIncidencia", async (req, res) => {
 
         res.json({ success: true, msg: "Incidencia editada correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -116,7 +116,7 @@ EliminarIncidenciaRouter.delete("/eliminarIncidencia", async (req, res) => {
     }
     const { id } = req.body;
     if (!id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -126,7 +126,7 @@ EliminarIncidenciaRouter.delete("/eliminarIncidencia", async (req, res) => {
         }
         res.json({ success: true, msg: "Incidencia eliminada correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -344,7 +344,7 @@ TerminarIncidenciaRouter.put("/terminarIncidencia", async (req, res) => {
     const { id } = req.body;
 
     if (!id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -373,7 +373,7 @@ CalificarIncidenciaRouter.put("/calificarServicio", async (req, res) => {
     const { id, calificacion } = req.body;
 
     if (!id || !calificacion) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -402,7 +402,7 @@ LiberarIncidenciaRouter.put("/liberarIncidencia", async (req, res) => {
     const { id } = req.body;
 
     if (!id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {

@@ -17,16 +17,20 @@ CrearServicioRouter.post("/crearServicio", async (req, res) => {
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { id_incidencia, nombre, descripcion, horas, tecnico_id } = req.body;
+    const { id_incidencia, nombre, descripcion, horas, solucion, tecnico_id, } = req.body;
+    console.log(req.body);
 
-    if (!nombre || !descripcion || !tecnico_id || !horas || !id_incidencia)
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+    if (!nombre || !descripcion || !tecnico_id || !horas || !solucion || !id_incidencia) {
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
+    }
 
     try {
         const result = await pool.query(
-            "INSERT INTO servicio ( nombre, descripcion, tecnico_id, horas) VALUES ($1, $2, $3, $4) RETURNING *",
-            [nombre, descripcion, tecnico_id, horas]
+            "INSERT INTO servicio ( nombre, descripcion, solucion, tecnico_id, horas) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+            [nombre, descripcion, solucion, tecnico_id, horas]
         );
+
+        console.log(result.rows);
 
         const resultIncidencia = await pool.query(
             "UPDATE Incidente SET servicio_id=$1, estado = 'TERMINADO' WHERE id=$2",
@@ -34,10 +38,12 @@ CrearServicioRouter.post("/crearServicio", async (req, res) => {
         );
 
 
-        res.json({ success: true, msg: "Servicio creado correctamente" });
+
+
+        res.json({ success: true, msg: "SERVICIO TERMINADO CORRECTAMENTE" });
     } catch (err) {
         console.log(err);
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -53,7 +59,7 @@ ObtenerServiciosRouter.get("/obtenerServicios", async (req, res) => {
         const result = await pool.query("SELECT * FROM Servicio");
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -76,7 +82,7 @@ ObtenerServicioRouter.get("/obtenerServicio/:id", async (req, res) => {
 
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -88,7 +94,7 @@ EditarServicioRouter.put("/editarServicio", async (req, res) => {
 
     const { id, nombre, descripcion, tecnico_id, horas } = req.body;
     if (!nombre || !descripcion || !tecnico_id || !horas || !tipo_id)
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
 
     try {
         const result = await pool.query(
@@ -101,7 +107,7 @@ EditarServicioRouter.put("/editarServicio", async (req, res) => {
 
         res.json({ success: true, message: "Servicio actualizado correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, error: "OCURRIO UN ERROR" });
     }
 });
 
@@ -120,7 +126,7 @@ EliminarServicioRouter.delete("/eliminarServicio", async (req, res) => {
 
         res.json({ success: true, message: "Servicio eliminado correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, error: "OCURRIO UN ERROR" });
     }
 });
 
@@ -143,6 +149,7 @@ ObtenerServiciosDeTecnicoRouter.get("/obtenerServiciosDeTecnico/:id", async (req
             T.nombre AS nombre_tecnico,
             S.horas AS horas_servicio,
             S.calificacion AS calificacion_servicio,
+            S.solucion AS solucion_servicio,
 
             I.id AS id_incidencia,
             I.fecha AS fecha_incidencia,
@@ -176,7 +183,7 @@ ObtenerServiciosDeTecnicoRouter.get("/obtenerServiciosDeTecnico/:id", async (req
             return res.status(404).json({ success: false, msg: "NO TIENES SERVICIOS" });
         }
         res.json({ success: true, result: result.rows });
-        
+
     } catch (err) {
         res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
@@ -216,7 +223,7 @@ ObtenerDetallesServicioRouter.get("/obtenerDetallesServicio/:id", async (req, re
 
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -247,6 +254,7 @@ ObtenerServiciosDeEquiposRouter.get("/obtenerServiciosDeEquipos/:id", async (req
                         'id_servicio', S.id,
                         'nombre_servicio', S.nombre,
                         'descripcion_servicio', S.descripcion,
+                        'solucion_servicio', S.solucion,
                         'horas_servicio', S.horas,
                         'incidencia_finalizada', I.finalizado,
                         'fecha_termino_incidencia', I.fecha_fin,
@@ -328,3 +336,130 @@ ObtenerServiciosDeEquiposAdminRouter.get("/obtenerServiciosDeEquiposAdmin", asyn
         res.status(500).send('Error interno del servidor');
     }
 });
+
+//Ruta para obtener los incidentes desde el catalogo
+export const ObtenerServiciosDesdeCatalogoRouter = express.Router();
+ObtenerServiciosDesdeCatalogoRouter.get("/catalogoIncidencias", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const result = await pool.query(`
+            SELECT Ci.id AS id_catalogo_incidente,
+            Ci.titulo AS titulo_catalogo_incidente,
+            Ci.descripcion AS descripcion_catalogo_incidente,
+            Ci.horas_promedio AS horas_promedio_catalogo_incidente,
+            Ci.solucion AS solucion_catalogo_incidente
+
+            FROM CatalogoIncidentes CI
+        `);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, msg: "No hay catalogo de incidentes" });
+        }
+
+        res.json({ success: true, result: result.rows });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
+    }
+});
+
+// Ruta para crear un incidente en catalogo de incidentes
+export const CrearIncidenteCatalogoRouter = express.Router();
+CrearIncidenteCatalogoRouter.post("/crearIncidenteCatalogo", async (req, res) => {
+
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { titulo, descripcion, solucion, horas_promedio } = req.body;
+
+    if (!titulo || !descripcion || !horas_promedio || !solucion) {
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
+    }
+
+    try {
+        const result = await pool.query(
+            "INSERT INTO CatalogoIncidentes ( titulo, descripcion, solucion, horas_promedio) VALUES ($1, $2, $3, $4)",
+            [titulo, descripcion, solucion, horas_promedio]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(500).json({ success: false, msg: "NO SE PUDO CREAR EL INCIDENTE EN CATALOGO" });
+        }
+
+        res.json({ success: true, msg: "INCIDENTE EN CATALOGO CREADO CORRECTAMENTE" });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
+    }
+});
+
+// Ruta para editar un incidente en catalogo de incidentes
+export const EditarIncidenteCatalogoRouter = express.Router();
+EditarIncidenteCatalogoRouter.put("/editarIncidenteCatalogo", async (req, res) => {
+
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id_catalogo_incidente, titulo, descripcion, solucion, horas_promedio } = req.body;
+
+    if (!id_catalogo_incidente || !titulo || !descripcion || !horas_promedio || !solucion) {
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE CatalogoIncidentes SET titulo = $1, descripcion = $2, solucion = $3, horas_promedio = $4 WHERE id = $5",
+            [titulo, descripcion, solucion, horas_promedio, id_catalogo_incidente]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(500).json({ success: false, msg: "NO SE PUDO EDITAR EL INCIDENTE EN CATALOGO" });
+        }
+
+        res.json({ success: true, msg: "INCIDENTE EN CATALOGO EDITADO CORRECTAMENTE" });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
+    }
+});
+
+// Ruta para eliminar un incidente en catalogo de incidentes
+export const EliminarIncidenteCatalogoRouter = express.Router();
+EliminarIncidenteCatalogoRouter.delete("/eliminarIncidenteCatalogo", async (req, res) => {
+
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { id } = req.body;
+
+    if (!id) {
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
+    }
+
+    try {
+        const result = await pool.query(
+            "DELETE FROM CatalogoIncidentes WHERE id = $1",
+            [id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(500).json({ success: false, msg: "NO SE PUDO ELIMINAR EL INCIDENTE EN CATALOGO" });
+        }
+
+        res.json({ success: true, msg: "INCIDENTE EN CATALOGO ELIMINADO CORRECTAMENTE" });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
+    }
+});
+
+
+
+

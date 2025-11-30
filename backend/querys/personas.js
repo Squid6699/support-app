@@ -67,7 +67,7 @@ ObtenerPersonaRouter.get("/obtenerPersona/:id", async (req, res) => {
 
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -90,7 +90,7 @@ EditarPersonaRouter.put("/editarPersona", async (req, res) => {
 
         res.json({ success: true, message: "Persona actualizada correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, error: "OCURRIO UN ERROR" });
     }
 });
 
@@ -109,7 +109,7 @@ EliminarPersonaRouter.delete("/eliminarPersona", async (req, res) => {
 
         res.json({ success: true, message: "Persona eliminada correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, error: "OCURRIO UN ERROR" });
     }
 });
 
@@ -128,7 +128,7 @@ ObtenerTecnicosRouter.get("/obtenerTecnicos", async (req, res) => {
         );
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 

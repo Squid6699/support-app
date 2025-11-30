@@ -16,7 +16,7 @@ CrearTipoEquipoRouter.post("/crearTipoEquipo", async (req, res) => {
     const { nombre } = req.body;
 
     if (!nombre) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -26,7 +26,7 @@ CrearTipoEquipoRouter.post("/crearTipoEquipo", async (req, res) => {
         );
         res.json({ success: true, msg: "Tipo de equipo creado correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -41,7 +41,7 @@ ObtenerTiposEquiposRouter.get("/obtenerTiposEquipos", async (req, res) => {
         const result = await pool.query("SELECT * FROM tipoequipo");
         res.json({ success: true, data: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -60,7 +60,7 @@ ObtenerTipoEquipoRouter.get("/obtenerTipoEquipo/:id", async (req, res) => {
         }
         res.json({ success: true, data: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -72,7 +72,7 @@ EditarTipoEquipoRouter.put("/editarTipoEquipo", async (req, res) => {
 
     const { id, nombre } = req.body;
     if (!id || !nombre) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
     
     try {
@@ -85,6 +85,6 @@ EditarTipoEquipoRouter.put("/editarTipoEquipo", async (req, res) => {
         }
         res.json({ success: true, msg: "Tipo de equipo actualizado correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });

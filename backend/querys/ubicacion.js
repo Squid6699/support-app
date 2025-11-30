@@ -22,7 +22,7 @@ CrearEdificioRouter.post('/crearEdificio', async (req, res) => {
     const { nombre } = req.body;
 
     if (!nombre) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -50,7 +50,7 @@ CrearAulaRouter.post('/crearAula', async (req, res) => {
     const { nombre, edificio_id } = req.body;
 
     if (!nombre || !edificio_id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -60,7 +60,7 @@ CrearAulaRouter.post('/crearAula', async (req, res) => {
         );
         res.json({ success: true, msg: "AULA CREADA CORRECTAMENTE", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -74,7 +74,7 @@ ObtenerEdificiosRouter.get('/obtenerEdificios', async (req, res) => {
         const result = await pool.query("SELECT * FROM Edificio");
         res.json({ success: true, data: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -88,7 +88,7 @@ ObtenerAulasRouter.get('/obtenerAulas', async (req, res) => {
         const result = await pool.query("SELECT * FROM Aula");
         res.json({ success: true, data: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -101,7 +101,7 @@ EditarEdificioRouter.put('/editarEdificio', async (req, res) => {
     const { id, nombre, encargado_id } = req.body;
 
     if (!id || !nombre || !encargado_id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -111,7 +111,7 @@ EditarEdificioRouter.put('/editarEdificio', async (req, res) => {
         );
         res.json({ success: true, msg: "Edificio editado correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -123,7 +123,7 @@ EditarAulaRouter.put('/editarAula', async (req, res) => {
     const { id, nombre, edificio_id } = req.body;
 
     if (!id || !nombre || !edificio_id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -133,7 +133,7 @@ EditarAulaRouter.put('/editarAula', async (req, res) => {
         );
         res.json({ success: true, msg: "Aula editada correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -146,7 +146,7 @@ EliminarEdificioRouter.delete('/eliminarEdificio', async (req, res) => {
     const { id } = req.body;
 
     if (!id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -156,7 +156,7 @@ EliminarEdificioRouter.delete('/eliminarEdificio', async (req, res) => {
         );
         res.json({ success: true, msg: "Edificio eliminado correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -169,7 +169,7 @@ EliminarAulaRouter.delete('/eliminarAula', async (req, res) => {
     const { id } = req.body;
 
     if (!id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -179,7 +179,7 @@ EliminarAulaRouter.delete('/eliminarAula', async (req, res) => {
         );
         res.json({ success: true, msg: "Aula eliminada correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -191,7 +191,7 @@ ObtenerAulasPorEdificioRouter.get('/obtenerAulasPorEdificio/:edificioId', async 
     const { edificioId } = req.params;
 
     if (!edificioId) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -201,7 +201,7 @@ ObtenerAulasPorEdificioRouter.get('/obtenerAulasPorEdificio/:edificioId', async 
         );
         res.json({ success: true, data: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -213,7 +213,7 @@ ObtenerEdificiosPorEncargadoRouter.get('/obtenerEdificiosPorEncargado/:encargado
     const { encargadoId } = req.params;
 
     if (!encargadoId) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -223,7 +223,7 @@ ObtenerEdificiosPorEncargadoRouter.get('/obtenerEdificiosPorEncargado/:encargado
         );
         res.json({ success: true, data: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 

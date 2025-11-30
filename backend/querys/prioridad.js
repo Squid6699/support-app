@@ -15,7 +15,7 @@ CrearPrioridadRouter.post("/crearPrioridad", async (req, res) => {
 
     const { nombre } = req.body;
     if (!nombre)
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
 
     try {
         const result = await pool.query(
@@ -24,7 +24,7 @@ CrearPrioridadRouter.post("/crearPrioridad", async (req, res) => {
         );
         res.json({ success: true, msg: "Prioridad creada correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -39,7 +39,7 @@ ObtenerPrioridadesRouter.get("/obtenerPrioridades", async (req, res) => {
         const result = await pool.query("SELECT id, nombre FROM prioridad");
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -61,7 +61,7 @@ ObtenerPrioridadRouter.get("/obtenerPrioridad/:id", async (req, res) => {
 
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -74,7 +74,7 @@ EditarPrioridadRouter.put("/editarPrioridad", async (req, res) => {
     const { id, nombre } = req.body;
 
     if (!nombre)
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
 
     try {
         const result = await pool.query(
@@ -87,7 +87,7 @@ EditarPrioridadRouter.put("/editarPrioridad", async (req, res) => {
 
         res.json({ success: true, message: "Prioridad actualizada correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, error: "OCURRIO UN ERROR" });
     }
 });
 
@@ -106,6 +106,6 @@ EliminarPrioridadRouter.delete("/eliminarPrioridad", async (req, res) => {
 
         res.json({ success: true, message: "Prioridad eliminada correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, error: "Error en DB" });
+        res.status(500).json({ success: false, error: "OCURRIO UN ERROR" });
     }
 });

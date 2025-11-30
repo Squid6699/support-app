@@ -1,10 +1,12 @@
--- Tabla de roles
+-- ================================
+--  CREACION DE TABLAS BASE
+-- ================================
+
 CREATE TABLE Rol (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL
 );
 
--- Tabla de personas
 CREATE TABLE Persona (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -14,39 +16,33 @@ CREATE TABLE Persona (
     rol_id INT REFERENCES Rol(id)
 );
 
--- Tabla de prioridades
 CREATE TABLE Prioridad (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL
 );
 
--- Tabla de marcas
 CREATE TABLE Marca (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL
 );
 
--- Tabla de tipos de equipos (se necesitaba crear antes de Equipo)
 CREATE TABLE TipoEquipo (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL
 );
 
---Tabla de Edificio
 CREATE TABLE Edificio (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     encargado_id INT REFERENCES Persona(id)
 );
 
--- Tabla de Aulas
 CREATE TABLE Aula (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     edificio_id INT REFERENCES Edificio(id)
 );
 
--- Tabla de equipos
 CREATE TABLE Equipo (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -56,7 +52,6 @@ CREATE TABLE Equipo (
     tipo_id INT REFERENCES TipoEquipo(id)
 );
 
--- Tabla de piezas
 CREATE TABLE Pieza (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -64,27 +59,48 @@ CREATE TABLE Pieza (
     marca_id INT REFERENCES Marca(id)
 );
 
--- Relación N:M entre equipos y piezas
 CREATE TABLE Equipo_Pieza (
     equipo_id INT REFERENCES Equipo(id),
     pieza_id INT REFERENCES Pieza(id),
     PRIMARY KEY (equipo_id, pieza_id)
 );
 
--- Tabla de servicios (se pone después porque necesita Persona ya creada)
+-- ================================
+-- Catalogo de Problemas Comunes
+-- ================================
+
+CREATE TABLE CatalogoIncidentes (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    descripcion TEXT NOT NULL,
+    solucion TEXT NOT NULL,
+    horas_promedio INT NOT NULL
+);
+
+-- ================================
+-- Servicios (modificada)
+-- ================================
+
 CREATE TABLE Servicio (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT NOT NULL,
+    solucion TEXT NOT NULL,
     tecnico_id INT REFERENCES Persona(id),
     horas INT,
     calificacion INT DEFAULT 0
 );
 
--- ENUM para estado de incidentes
+-- ================================
+-- ENUM estado de incidentes
+-- ================================
+
 CREATE TYPE estado_incidente AS ENUM ('NO INICIADO', 'EN PROCESO', 'TERMINADO', 'LIBERADO');
 
--- Tabla de incidentes
+-- ================================
+-- Tabla Incidente
+-- ================================
+
 CREATE TABLE Incidente (
     id SERIAL PRIMARY KEY,
     fecha DATE,
@@ -100,8 +116,9 @@ CREATE TABLE Incidente (
     estado estado_incidente DEFAULT 'NO INICIADO' NOT NULL
 );
 
-
-
+-- ================================
+-- INSERTS
+-- ================================
 
 INSERT INTO Rol (nombre) VALUES
 ('Administrador'),
@@ -109,13 +126,11 @@ INSERT INTO Rol (nombre) VALUES
 ('Tecnico Software'),
 ('Encargado Edificio');
 
-
 INSERT INTO Prioridad (nombre) VALUES
 ('Alta'),
 ('Media'),
 ('Baja'),
 ('Preventiva');
-
 
 INSERT INTO Marca (nombre) VALUES
 ('Dell'),
@@ -124,7 +139,6 @@ INSERT INTO Marca (nombre) VALUES
 ('Asus'),
 ('Logitech');
 
-
 INSERT INTO TipoEquipo (nombre) VALUES
 ('Laptop'),
 ('Proyector'),
@@ -132,42 +146,13 @@ INSERT INTO TipoEquipo (nombre) VALUES
 ('Servidor'),
 ('PC Escritorio');
 
-
 INSERT INTO Persona (nombre, celular, correo, contraseña, rol_id) VALUES
-('Carlos Pérez', '5551234567', 'carlos.perez@uni.edu', 'pass123', 1), -- Admin
-('Ana Torres', '5559876543', 'ana.torres@uni.edu', 'pass123', 2), -- Técnico HW
-('Luis Gómez', '5553217890', 'luis.gomez@uni.edu', 'pass123', 3), -- Técnico SW
-('Marta López', '5556543210', 'marta.lopez@uni.edu', 'pass123', 4), -- Encargada
-('Victoria Armenta', '6672945113', 'victoria.armenta@uni.edu', 'pass123', 4); -- Encargada
+('Carlos Pérez', '5551234567', 'carlos.perez@uni.edu', 'pass123', 1),
+('Ana Torres', '5559876543', 'ana.torres@uni.edu', 'pass123', 2),
+('Luis Gómez', '5553217890', 'luis.gomez@uni.edu', 'pass123', 3),
+('Marta López', '5556543210', 'marta.lopez@uni.edu', 'pass123', 4),
+('Victoria Armenta', '6672945113', 'victoria.armenta@uni.edu', 'pass123', 4);
 
-
--- Insertar edificios
-INSERT INTO Edificio (nombre, encargado_id) VALUES
-('Edificio A', 4),
-('Edificio B', 4),
-('Edificio C', 4),
-('Edificio D', 4),
-('Edificio E', 4);
-
--- Insertar aulas (ligadas a los edificios)
-INSERT INTO Aula (nombre, edificio_id) VALUES
-('Aula 101', 1), -- Edificio A
-('Aula 102', 1), -- Edificio A
-('Lab 201', 2),  -- Edificio B
-('Aula 201', 3), -- Edificio C
-('Aula 202', 4), -- Edificio D
-('Aula 203', 5); -- Edificio E
-
--- Insertar equipos (ajustado a aula_id en vez de ubicacion_id)
-INSERT INTO Equipo (nombre, fecha, aula_id, marca_id, tipo_id) VALUES
-('Laptop Docente 1', '2024-01-15', 1, 1, 1), -- Aula 101
-('Proyector Aula 102', '2023-05-20', 2, 2, 2), -- Aula 102
-('Impresora Lab 201', '2022-11-10', 3, 3, 3), -- Lab 201
-('Servidor Principal', '2021-07-01', 3, 4, 4), -- Lab 201
-('Laptop', '2024-01-15', 4, 1, 1), -- Aula 201
-('Proyector', '2023-05-20', 4, 2, 2), -- Aula 201
-('Impresora', '2022-11-10', 5, 3, 3), -- Aula 202
-('Servidor', '2021-07-01', 6, 4, 4); -- Aula 203
 
 INSERT INTO Pieza (nombre, fecha, marca_id) VALUES
 ('Disco Duro 1TB', '2024-03-01', 1),
@@ -176,32 +161,20 @@ INSERT INTO Pieza (nombre, fecha, marca_id) VALUES
 ('Tarjeta Madre ATX', '2023-12-15', 4),
 ('Mouse Inalámbrico', '2024-04-05', 5);
 
+-- INSERT INTO Equipo_Pieza (equipo_id, pieza_id) VALUES
+-- (1, 1),
+-- (1, 2),
+-- (3, 3),
+-- (4, 4),
+-- (1, 5);
 
-INSERT INTO Equipo_Pieza (equipo_id, pieza_id) VALUES
-(1, 1),
-(1, 2),
-(3, 3),
-(4, 4),
-(1, 5);
+-- ================================
+-- INSERTS EN CATALOGO
+-- ================================
 
-
-INSERT INTO Servicio (nombre, descripcion, tecnico_id, horas) VALUES
-('Mantenimiento Correctivo', 'Reparación de fallas en hardware', 2, 5),
-('Instalación de Software', 'Instalación de sistemas y aplicaciones', 3, 3),
-('Revisión Preventiva', 'Chequeo general de equipos', 2, 2);
-
-
-INSERT INTO Incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, autorizada, estado) VALUES
-('2024-06-01', 'Laptop no enciende', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
-('2024-06-01', 'Laptop no enciende 2', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
-('2024-06-01', 'Laptop no enciende 3', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
-('2024-06-01', 'Laptop no enciende 4', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
-('2024-06-01', 'Laptop no enciende 5', 1, 2, 1, 1, 1, false, false, 'NO INICIADO'),
-('2024-06-05', 'Proyector sin señal', 1, 3, 2, 2, 2, false, false, 'EN PROCESO'),
-('2024-06-10', 'Impresora atascada', 1, 2, 3, 3, 1, true, true, 'TERMINADO'),
-('2024-06-15', 'Servidor requiere actualización', 1, 3, 4, 4, 3, false, false, 'NO INICIADO');
-
-
-INSERT INTO Incidente (fecha, descripcion, usuario_id, tecnico_id, equipo_id, prioridad_id, servicio_id, finalizado, autorizada, estado) VALUES
-('2024-06-15', 'Servidor requiere actualización 2', 1, 3, 4, 4, null, false, false, 'NO INICIADO');
-
+INSERT INTO CatalogoIncidentes (titulo, descripcion, solucion, horas_promedio) VALUES
+('Falla en Disco Duro', 'El equipo no arranca debido a sectores dañados en el disco.', 'Reemplazo del disco duro', 3),
+('Falla en Memoria RAM', 'El equipo muestra pantallazos o reinicios inesperados.', 'Cambio o reinstalación de memoria RAM', 2),
+('Fuente de Poder Dañada', 'El equipo no enciende o se apaga solo.', 'Sustitución de la fuente de poder', 2),
+('Tarjeta Madre Defectuosa', 'No hay señal de video o fallas graves.', 'Reparación o reemplazo de la tarjeta madre', 4),
+('Falla en Mouse Inalámbrico', 'Movimientos erráticos o sin respuesta.', 'Reemplazo o reparación del mouse', 1);

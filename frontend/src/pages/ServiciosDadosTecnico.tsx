@@ -91,7 +91,7 @@ function ServiciosDadosTecnico() {
                                             <Typography style={{ maxWidth: "80%" }} component="span">
                                                 {dayjs(servicio.fecha_incidencia).format("DD/MM/YYYY") +
                                                     " - " +
-                                                    servicio.descripcion_incidencia}
+                                                    servicio.descripcion_incidencia.toUpperCase()}
                                             </Typography>
 
                                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -121,6 +121,7 @@ function ServiciosDadosTecnico() {
                                         <Typography component="span">SERVICIO <br /></Typography>
                                         <Typography component="span">NOMBRE DEL SERVICIO: {servicio.nombre_servicio.toUpperCase()} <br /></Typography>
                                         <Typography component="span">DESCRIPCIÓN DEL SERVICIO: {servicio.descripcion_servicio.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">SOLUCIÓN DEL SERVICIO: {servicio.solucion_servicio.toUpperCase()} <br /></Typography>
                                         <Typography component="span">HORAS DEL SERVICIO: {servicio.horas_servicio} <br /></Typography>
                                         <Typography component="span">CALIFICACIÓN DEL SERVICIO: {servicio.calificacion_servicio ? servicio.calificacion_servicio : "SIN CALIFICAR"} <br /></Typography>
 

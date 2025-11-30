@@ -1,0 +1,149 @@
+import Button from "@mui/material/Button";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { useState } from "react";
+import Typography from "@mui/material/Typography";
+import type { CatalogoIncidencias, Incidencias } from "../../types";
+import { useSesion } from "../hook/useSesion";
+import { useQuery } from "@tanstack/react-query";
+
+import Accordion from '@mui/material/Accordion';
+import AccordionActions from '@mui/material/AccordionActions';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ModalCrearProblema from "../components/ModalCrearProblema";
+import ModalEditarProblema from "../components/ModalEditarProblema";
+import ModalEliminarProblema from "../components/ModalEliminarProblema";
+
+function Problemas() {
+    const { id } = useSesion();
+
+    const HOST = import.meta.env.VITE_HOST
+
+    const { data: problemas, isLoading: isLoadingProblemas, refetch: refetchProblemas } = useQuery<CatalogoIncidencias[]>({
+        queryKey: ["Problemas"],
+        queryFn: obtenerCatalogosProblemas,
+    });
+
+
+    //SACAR INCIDENCIAS DEL ENCARGADO
+    async function obtenerCatalogosProblemas() {
+        try {
+
+            const response = await fetch(HOST + "api/catalogoIncidencias", {
+                method: 'GET',
+                headers: {
+                    'x-frontend-header': 'frontend',
+                },
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                return (data.result);
+            } else {
+                return [];
+            }
+        } catch {
+            throw new Error("OCURRIO UN ERROR");
+        }
+    }
+
+    const [openModalCrear, setOpenModalCrear] = useState(false);
+
+    const handleOpenModalCrearProblema = () => setOpenModalCrear(true);
+    const handleCloseModalCrearProblema = () => setOpenModalCrear(false);
+
+
+    const [openEditar, setOpenEditar] = useState(false);
+    const [openEliminar, setOpenEliminar] = useState(false);
+
+    const [problemaSeleccionado, setProblemaSeleccionado] = useState<any>(null);
+
+    const abrirEditar = (problema: any) => {
+        setProblemaSeleccionado(problema);
+        setOpenEditar(true);
+    };
+
+    const abrirEliminar = (id: number) => {
+        setProblemaSeleccionado(id);
+        setOpenEliminar(true);
+    };
+
+
+
+    return (
+
+        <>
+            <header>
+                <Button
+                    className="boton"
+                    variant="contained"
+                    startIcon={<AddCircleIcon />}
+                    onClick={handleOpenModalCrearProblema}
+                >
+                    CREAR
+                </Button>
+            </header>
+
+            <main>
+                {isLoadingProblemas ? <p>Cargando...</p> :
+
+                    problemas && problemas.length > 0 ? (
+                        problemas.map((problema) => {
+
+                            return (
+                                <Accordion key={problema.id_catalogo_incidente}>
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="panel1a-content"
+                                        id="panel1a-header"
+                                    >
+                                        <Typography>{problema.titulo_catalogo_incidente.toUpperCase()}</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Typography component="span">DESCRIPCION: {problema.descripcion_catalogo_incidente.toUpperCase()}<br /></Typography>
+                                        <Typography component="span">SOLUCION: {problema.solucion_catalogo_incidente.toUpperCase()}<br /></Typography>
+                                        <Typography component="span">HORAS: {problema.horas_promedio_catalogo_incidente}</Typography>
+
+                                    </AccordionDetails>
+                                    <AccordionActions>
+                                        <Button onClick={() => abrirEditar(problema)}>
+                                            Editar
+                                        </Button>
+
+                                        <Button color="error" onClick={() => abrirEliminar(problema.id_catalogo_incidente)}>
+                                            Eliminar
+                                        </Button>
+                                    </AccordionActions>
+                                </Accordion>
+                            );
+                        })
+                    ) : "No hay incidencias asignadas a tu cargo"}
+            </main >
+
+            <ModalCrearProblema
+                open={openModalCrear}
+                handleClose={handleCloseModalCrearProblema}
+                refetchProblemas={refetchProblemas}
+            />
+
+            <ModalEditarProblema
+                open={openEditar}
+                problema={problemaSeleccionado}
+                handleClose={() => setOpenEditar(false)}
+                refetchProblemas={refetchProblemas}
+            />
+
+            <ModalEliminarProblema
+                open={openEliminar}
+                problemaId={problemaSeleccionado}
+                handleClose={() => setOpenEliminar(false)}
+                refetchProblemas={refetchProblemas}
+            />
+
+
+        </>
+
+    );
+}
+export default Problemas;

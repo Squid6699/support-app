@@ -12,7 +12,7 @@ userAuth.post("/auth/login", async (req, res) => {
 
     const { correo, contrasena } = req.body;
     if (!correo || !contrasena) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {

@@ -35,6 +35,9 @@ import ServiciosEquipoEncargadoAdmin from "../pages/ServiciosEquipoAdmin";
 import UbicacionesAdmin from "../pages/UbicacionesAdmin";
 import Personas from "../pages/Personas";
 import EquiposAll from "../pages/EquiposAll";
+import FlagCircleIcon from '@mui/icons-material/FlagCircle';
+import Problemas from "../pages/Problemas";
+import ProblemasAdmin from "../pages/ProblemasAdmin";
 
 const drawerWidth = 200;
 
@@ -99,6 +102,7 @@ function ResponsiveDrawer() {
                             "Ubicaciones",
                             "Usuarios",
                             "Equipos",
+                            "Gestion de problemas"
                             // "Piezas",
                             // "Marcas",
                             // "Prioridades",
@@ -112,6 +116,7 @@ function ResponsiveDrawer() {
                                         {index === 3 && <RoomPreferencesIcon />}
                                         {index === 4 && <AccountCircleIcon />}
                                         {index === 5 && <DevicesIcon />}
+                                        {index === 6 && <FlagCircleIcon/>}
                                         {/* {index === 6 && <ExtensionIcon />} */}
                                         {/* {index === 7 && <BookmarkIcon />} */}
                                         {/* {index === 8 && <PriorityHighIcon />} */}
@@ -132,6 +137,7 @@ function ResponsiveDrawer() {
                         {[
                             "Incidencias Asignadas",
                             "Servicios realizados",
+                            "Gestion de problemas"
                             // "Ubicaciones",
                         ].map((text, index) => (
                             <ListItem key={text} disablePadding>
@@ -139,7 +145,7 @@ function ResponsiveDrawer() {
                                     <ListItemIcon>
                                         {index === 0 && <SummarizeIcon />}
                                         {index === 1 && <ElectricalServicesIcon />}
-                                        {/* {index === 2 && <RoomPreferencesIcon />} */}
+                                        {index === 2 && <FlagCircleIcon/>}
 
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
@@ -283,8 +289,6 @@ function ResponsiveDrawer() {
 
                 {selectedContent === "Incidencias Creadas" && <IncidenciasAdmin />}
 
-
-
                 {selectedContent === "Ubicaciones" && rol === "Administrador" && <UbicacionesAdmin />}
                 
                 {selectedContent === "Usuarios" && <Personas />}
@@ -296,7 +300,9 @@ function ResponsiveDrawer() {
 
                 {selectedContent === "Servicios realizados" && <ServiciosDadosTecnico />}
 
+                {selectedContent === "Gestion de problemas" && (rol === "Tecnico Hardware" || rol === "Tecnico Software") && <Problemas />}
 
+                {selectedContent === "Gestion de problemas" && rol === "Administrador" && <ProblemasAdmin />}
 
             </Box>
         </Box>

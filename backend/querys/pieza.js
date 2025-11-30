@@ -15,7 +15,7 @@ CrearPiezaRouter.post("/crearPieza", async (req, res) => {
     const { nombre, fecha, marca_id } = req.body;
 
     if (!nombre || !fecha || !marca_id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -31,7 +31,7 @@ CrearPiezaRouter.post("/crearPieza", async (req, res) => {
         res.json({ success: true, msg: "Pieza creada correctamente", result: result.rows[0] });
     }
     catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     } 
 });
 
@@ -46,7 +46,7 @@ ObtenerPiezasRouter.get("/obtenerPiezas", async (req, res) => {
         const result = await pool.query("SELECT * FROM pieza");
         res.json({ success: true, result: result.rows });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -65,7 +65,7 @@ ObtenerPiezaRouter.get("/obtenerPieza/:id", async (req, res) => {
         }
         res.json({ success: true, result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     } 
 });
 
@@ -77,7 +77,7 @@ EditarPiezaRouter.put("/editarPieza", async (req, res) => {
 
     const { id, nombre, fecha, marca_id } = req.body;
     if (!id || !nombre || !fecha || !marca_id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
     try {
         const result = await pool.query(
@@ -89,7 +89,7 @@ EditarPiezaRouter.put("/editarPieza", async (req, res) => {
         }
         res.json({ success: true, msg: "Pieza actualizada correctamente", result: result.rows[0] });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -101,7 +101,7 @@ EliminarPiezaRouter.delete("/eliminarPieza", async (req, res) => {
 
     const { id } = req.body;
     if (!id) {
-        return res.status(400).json({ success: false, msg: "Faltan datos" });
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
@@ -111,6 +111,6 @@ EliminarPiezaRouter.delete("/eliminarPieza", async (req, res) => {
         }
         res.json({ success: true, msg: "Pieza eliminada correctamente" });
     } catch (err) {
-        res.status(500).json({ success: false, msg: "Error en DB" });
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
