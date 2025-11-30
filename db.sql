@@ -88,7 +88,8 @@ CREATE TABLE Servicio (
     solucion TEXT NOT NULL,
     tecnico_id INT REFERENCES Persona(id),
     horas INT,
-    calificacion INT DEFAULT 0
+    calificacion INT DEFAULT 0,
+    observaciones TEXT
 );
 
 -- ================================

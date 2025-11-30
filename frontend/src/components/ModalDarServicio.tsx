@@ -55,6 +55,7 @@ function ModalDarServicio({ open, incidenciaSeleccionada, handleModalClose, refe
         horas: 0,
         solucion: "",
         encargado_id: id,
+        observaciones: "",
     });
 
     const [servicioError, setServicioError] = useState({
@@ -69,6 +70,7 @@ function ModalDarServicio({ open, incidenciaSeleccionada, handleModalClose, refe
             horas: 0,
             solucion: "",
             encargado_id: id,
+            observaciones: "",
         });
         setDescSeleccionada(0);
     };
@@ -90,6 +92,7 @@ function ModalDarServicio({ open, incidenciaSeleccionada, handleModalClose, refe
                 horas: seleccionado.horas_promedio_catalogo_incidente,
                 solucion: seleccionado.solucion_catalogo_incidente,
                 encargado_id: id,
+                observaciones: servicioValue.observaciones,
             });
         }
     }, [descSeleccionada, catalogo]);
@@ -118,6 +121,7 @@ function ModalDarServicio({ open, incidenciaSeleccionada, handleModalClose, refe
                     horas: servicioValue.horas,
                     solucion: servicioValue.solucion,
                     tecnico_id: servicioValue.encargado_id,
+                    observaciones: servicioValue.observaciones,
                 }),
             });
 
@@ -189,6 +193,18 @@ function ModalDarServicio({ open, incidenciaSeleccionada, handleModalClose, refe
                         rows={3}
                         disabled
                         fullWidth
+                    />
+                </Box>
+
+                {/* OBSERVACIONES */}
+                <Box sx={{ m: 2 }}>
+                    <TextField
+                        label="Observaciones"
+                        value={servicioValue.observaciones}
+                        multiline
+                        rows={3}
+                        fullWidth
+                        onChange={(e) => setServicioValue({ ...servicioValue, observaciones: e.target.value })}
                     />
                 </Box>
 

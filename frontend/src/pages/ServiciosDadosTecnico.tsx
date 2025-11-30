@@ -123,6 +123,7 @@ function ServiciosDadosTecnico() {
                                         <Typography component="span">DESCRIPCIÓN DEL SERVICIO: {servicio.descripcion_servicio.toUpperCase()} <br /></Typography>
                                         <Typography component="span">SOLUCIÓN DEL SERVICIO: {servicio.solucion_servicio.toUpperCase()} <br /></Typography>
                                         <Typography component="span">HORAS DEL SERVICIO: {servicio.horas_servicio} <br /></Typography>
+                                        <Typography component="span">OBSERVACIONES DEL SERVICIO: {servicio.observaciones_servicio ? servicio.observaciones_servicio.toUpperCase() : "SIN OBSERVACIONES"} <br /></Typography>
                                         <Typography component="span">CALIFICACIÓN DEL SERVICIO: {servicio.calificacion_servicio ? servicio.calificacion_servicio : "SIN CALIFICAR"} <br /></Typography>
 
                                         <br />

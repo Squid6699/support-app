@@ -88,6 +88,7 @@ function ServiciosEquipoEncargado() {
                                                 <strong>SERVICIO:</strong> {serv.nombre_servicio?.toUpperCase()} <br />
                                                 <strong>DESCRIPCION:</strong> {serv.descripcion_servicio.toUpperCase() || "Sin descripción"} <br />
                                                 <strong>SOLUCION:</strong> {serv.solucion_servicio.toUpperCase() || "Sin solucion"} <br />
+                                                <strong>OBSERVACIONES:</strong> {serv.observaciones_servicio ? serv.observaciones_servicio.toUpperCase() : "SIN OBSERVACIONES"} <br />
                                                 <strong>TÉCNICO:</strong> {serv.nombre_tecnico.toUpperCase() || "No asignado"} <br />
                                                 <strong>HORAS:</strong> {serv.horas_servicio ?? "N/A"} <br />
                                                 <strong>PRIORIDAD:</strong> {serv.prioridad.toUpperCase() || "No definida"} <br />

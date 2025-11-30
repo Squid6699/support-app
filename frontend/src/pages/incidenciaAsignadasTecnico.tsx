@@ -209,6 +209,8 @@ return (
                                 <AccordionActions>
                                     {incidencia.estado_incidencia === "EN PROCESO" && <Button onClick={() => handleOpenModal(incidencia.incidencia_id)}>DAR SERVICIO</Button>}
                                     <Button onClick={() => handleIniciarIncidencia(incidencia.incidencia_id)} disabled={incidencia.estado_incidencia === "EN PROCESO"}>INICIAR INCIDENCIA</Button>
+                                    {incidencia.estado_incidencia === "EN PROCESO" && <Button onClick={() => console.log("Solicitar pieza")}>SOLICITAR PIEZA</Button>}
+
                                 </AccordionActions>
                             </Accordion>
                         );

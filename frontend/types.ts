@@ -125,6 +125,7 @@ export interface ServiciosDadosTecnico{
     horas_servicio: number;
     calificacion_servicio: number;
     solucion_servicio: string;
+    observaciones_servicio: string;
     id_incidencia: number;
     fecha_incidencia: Date;
     descripcion_incidencia: string;

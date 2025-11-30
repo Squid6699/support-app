@@ -17,20 +17,17 @@ CrearServicioRouter.post("/crearServicio", async (req, res) => {
     if (customHeader !== 'frontend')
         return res.status(401).send('Unauthorized');
 
-    const { id_incidencia, nombre, descripcion, horas, solucion, tecnico_id, } = req.body;
-    console.log(req.body);
-
-    if (!nombre || !descripcion || !tecnico_id || !horas || !solucion || !id_incidencia) {
+    const { id_incidencia, nombre, descripcion, horas, solucion, tecnico_id, observaciones } = req.body;
+    
+    if (!nombre || !descripcion || !tecnico_id || !horas || !solucion || !id_incidencia || !observaciones) {
         return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
     }
 
     try {
         const result = await pool.query(
-            "INSERT INTO servicio ( nombre, descripcion, solucion, tecnico_id, horas) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-            [nombre, descripcion, solucion, tecnico_id, horas]
+            "INSERT INTO servicio ( nombre, descripcion, solucion, tecnico_id, horas, observaciones) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+            [nombre, descripcion, solucion, tecnico_id, horas, observaciones]
         );
-
-        console.log(result.rows);
 
         const resultIncidencia = await pool.query(
             "UPDATE Incidente SET servicio_id=$1, estado = 'TERMINADO' WHERE id=$2",
@@ -38,11 +35,8 @@ CrearServicioRouter.post("/crearServicio", async (req, res) => {
         );
 
 
-
-
         res.json({ success: true, msg: "SERVICIO TERMINADO CORRECTAMENTE" });
     } catch (err) {
-        console.log(err);
         res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
@@ -150,6 +144,7 @@ ObtenerServiciosDeTecnicoRouter.get("/obtenerServiciosDeTecnico/:id", async (req
             S.horas AS horas_servicio,
             S.calificacion AS calificacion_servicio,
             S.solucion AS solucion_servicio,
+            S.observaciones AS observaciones_servicio,
 
             I.id AS id_incidencia,
             I.fecha AS fecha_incidencia,
@@ -255,6 +250,7 @@ ObtenerServiciosDeEquiposRouter.get("/obtenerServiciosDeEquipos/:id", async (req
                         'nombre_servicio', S.nombre,
                         'descripcion_servicio', S.descripcion,
                         'solucion_servicio', S.solucion,
+                        'observaciones_servicio', S.observaciones,
                         'horas_servicio', S.horas,
                         'incidencia_finalizada', I.finalizado,
                         'fecha_termino_incidencia', I.fecha_fin,
