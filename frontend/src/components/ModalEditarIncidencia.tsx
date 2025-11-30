@@ -38,7 +38,6 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
         descripcion: incidencia?.descripcion_incidencia || '',
         usuario_id: id,
         equipo_id: incidencia?.equipo_id || 0,
-        prioridad_id: incidencia?.id_prioridad || 0,
     });
     const [selectedEdificio, setSelectedEdificio] = useState<number>(incidencia?.edificio_id || 0);
     const [selectedAula, setSelectedAula] = useState<number>(incidencia?.aula_id || 0);
@@ -50,7 +49,6 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
             descripcion: '',
             usuario_id: id,
             equipo_id: 0,
-            prioridad_id: 0,
         });
         setSelectedEdificio(0);
         setSelectedAula(0);
@@ -60,7 +58,6 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
         fecha: "",
         descripcion: "",
         equipo_id: "",
-        prioridad_id: "",
         edificio_id: "",
         aula_id: ""
     });
@@ -86,11 +83,6 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
     const { data: equipos, isLoading: isLoadingEquipos, refetch: refetchEquipos } = useQuery<EquipoAula[]>({
         queryKey: ["Equipos"],
         queryFn: obtenerEquiposPorAula,
-    });
-
-    const { data: prioridades, isLoading: isLoadingPrioridades } = useQuery<Prioridad[]>({
-        queryKey: ["Prioridades"],
-        queryFn: obtenerPrioridades,
     });
 
     //SACAR EDIFICIOS DEL ENCARGADO
@@ -156,28 +148,6 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
         }
     }
 
-    //SACAR PRIORIDADES
-    async function obtenerPrioridades() {
-        try {
-            const response = await fetch(HOST + "api/obtenerPrioridades", {
-                method: 'GET',
-                headers: {
-                    'x-frontend-header': 'frontend',
-                },
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                return (data.result);
-            } else {
-                return [];
-            }
-        } catch {
-            throw new Error("OCURRIO UN ERROR");
-        }
-    }
-
-
     useEffect(() => {
         refetchAulas();
         setSelectedAula(0);
@@ -197,7 +167,6 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
             descripcion: "",
             fecha: "",
             equipo_id: "",
-            prioridad_id: "",
             edificio_id: "",
             aula_id: ""
         });
@@ -227,11 +196,6 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
             return;
         }
 
-        if (incidenciaValue.prioridad_id === 0) {
-            handleValueErroresIncidencia({ prioridad_id: "Seleccione una prioridad" });
-            return;
-        }
-
         try {
             const response = await fetch(HOST + "api/crearIncidencia", {
                 method: 'POST',
@@ -239,7 +203,7 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
                     'Content-Type': 'application/json',
                     'x-frontend-header': 'frontend',
                 },
-                body: JSON.stringify({ "fecha": incidenciaValue.fecha, "descripcion": incidenciaValue.descripcion, "usuario_id": incidenciaValue.usuario_id, "equipo_id": incidenciaValue.equipo_id, "prioridad_id": incidenciaValue.prioridad_id }),
+                body: JSON.stringify({ "fecha": incidenciaValue.fecha, "descripcion": incidenciaValue.descripcion, "usuario_id": incidenciaValue.usuario_id, "equipo_id": incidenciaValue.equipo_id }),
             });
 
             const data = await response.json();
@@ -251,7 +215,6 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
                     descripcion: '',
                     usuario_id: id,
                     equipo_id: 0,
-                    prioridad_id: 0,
                 });
                 setSelectedEdificio(0);
                 setSelectedAula(0);
@@ -378,29 +341,7 @@ function ModalEditarIncidencia({ open, setOpenModalIncidencia, refetchIncidencia
                                 <FormHelperText error>{incidenciaError.equipo_id}</FormHelperText>
                             </FormControl>
                         </Box>
-
-                        <Box
-                            sx={{ m: 2, width: '100%' }}
-                        >
-                            <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-autowidth-label">Prioridad</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-autowidth-label"
-                                    id="demo-simple-select-autowidth"
-                                    value={incidencia?.id_prioridad}
-                                    onChange={(e) => handleValueChangeIncidencia({ prioridad_id: e.target.value })}
-                                    label="Prioridad"
-                                >
-                                    {isLoadingPrioridades ? <MenuItem value={0}>Cargando...</MenuItem> : null}
-                                    <MenuItem value={0} selected disabled>Seleccione una prioridad</MenuItem>
-                                    {prioridades ? prioridades.map((prioridad) => (
-                                        <MenuItem key={prioridad.id} value={prioridad.id}>{prioridad.nombre}</MenuItem>
-                                    )) : <MenuItem key={0} value={0}>No hay prioridades disponibles</MenuItem>}
-                                </Select>
-                                <FormHelperText error>{incidenciaError.prioridad_id}</FormHelperText>
-                            </FormControl>
-                        </Box>
-
+                        
                         <Box sx={{ m: 2, width: '100%' }}>
                             <Button type="submit" variant="contained" className="boton" fullWidth>
                                 Editar Incidencia

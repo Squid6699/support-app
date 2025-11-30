@@ -5,7 +5,6 @@ export interface Incidencia {
     descripcion: string;
     usuario_id: number;
     equipo_id: number;
-    prioridad_id: number;
 }
 
 export interface Incidencias {

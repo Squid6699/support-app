@@ -34,8 +34,7 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
         fecha: null,
         descripcion: '',
         usuario_id: id,
-        equipo_id: 0,
-        prioridad_id: 0
+        equipo_id: 0
     });
     const [selectedEdificio, setSelectedEdificio] = useState<number>(0);
     const [selectedAula, setSelectedAula] = useState<number>(0);
@@ -46,8 +45,7 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
             fecha: null,
             descripcion: '',
             usuario_id: id,
-            equipo_id: 0,
-            prioridad_id: 0,
+            equipo_id: 0
         });
         setSelectedEdificio(0);
         setSelectedAula(0);
@@ -57,7 +55,6 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
         fecha: "",
         descripcion: "",
         equipo_id: "",
-        prioridad_id: "",
         edificio_id: "",
         aula_id: ""
     });
@@ -83,11 +80,6 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
     const { data: equipos, isLoading: isLoadingEquipos, refetch: refetchEquipos } = useQuery<EquipoAula[]>({
         queryKey: ["Equipos"],
         queryFn: obtenerEquiposPorAula,
-    });
-
-    const { data: prioridades, isLoading: isLoadingPrioridades } = useQuery<Prioridad[]>({
-        queryKey: ["Prioridades"],
-        queryFn: obtenerPrioridades,
     });
 
     //SACAR EDIFICIOS DEL ENCARGADO
@@ -153,27 +145,6 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
         }
     }
 
-    //SACAR PRIORIDADES
-    async function obtenerPrioridades() {
-        try {
-            const response = await fetch(HOST + "api/obtenerPrioridades", {
-                method: 'GET',
-                headers: {
-                    'x-frontend-header': 'frontend',
-                },
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                return (data.result);
-            } else {
-                return [];
-            }
-        } catch {
-            throw new Error("OCURRIO UN ERROR");
-        }
-    }
-
 
     useEffect(() => {
         refetchAulas();
@@ -194,7 +165,6 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
             descripcion: "",
             fecha: "",
             equipo_id: "",
-            prioridad_id: "",
             edificio_id: "",
             aula_id: ""
         });
@@ -224,11 +194,6 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
             return;
         }
 
-        if (incidenciaValue.prioridad_id === 0) {
-            handleValueErroresIncidencia({ prioridad_id: "Seleccione una prioridad" });
-            return;
-        }
-
         try {
             const response = await fetch(HOST + "api/crearIncidencia", {
                 method: 'POST',
@@ -236,7 +201,7 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
                     'Content-Type': 'application/json',
                     'x-frontend-header': 'frontend',
                 },
-                body: JSON.stringify({ "fecha": incidenciaValue.fecha, "descripcion": incidenciaValue.descripcion, "usuario_id": incidenciaValue.usuario_id, "equipo_id": incidenciaValue.equipo_id, "prioridad_id": incidenciaValue.prioridad_id }),
+                body: JSON.stringify({ "fecha": incidenciaValue.fecha, "descripcion": incidenciaValue.descripcion, "usuario_id": incidenciaValue.usuario_id, "equipo_id": incidenciaValue.equipo_id}),
             });
 
             const data = await response.json();
@@ -248,7 +213,6 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
                     descripcion: '',
                     usuario_id: id,
                     equipo_id: 0,
-                    prioridad_id: 0,
                 });
                 setSelectedEdificio(0);
                 setSelectedAula(0);
@@ -376,27 +340,7 @@ function ModalCrearIncidencia({ open, setOpenModalIncidencia, refetchIncidencias
                             </FormControl>
                         </Box>
 
-                        <Box
-                            sx={{ m: 2, width: '100%' }}
-                        >
-                            <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-autowidth-label">Prioridad</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-autowidth-label"
-                                    id="demo-simple-select-autowidth"
-                                    value={incidenciaValue.prioridad_id}
-                                    onChange={(e) => handleValueChangeIncidencia({ prioridad_id: e.target.value })}
-                                    label="Prioridad"
-                                >
-                                    {isLoadingPrioridades ? <MenuItem value={0}>Cargando...</MenuItem> : null}
-                                    <MenuItem value={0} selected disabled>Seleccione una prioridad</MenuItem>
-                                    {prioridades ? prioridades.map((prioridad) => (
-                                        <MenuItem key={prioridad.id} value={prioridad.id}>{prioridad.nombre}</MenuItem>
-                                    )) : <MenuItem key={0} value={0}>No hay prioridades disponibles</MenuItem>}
-                                </Select>
-                                <FormHelperText error>{incidenciaError.prioridad_id}</FormHelperText>
-                            </FormControl>
-                        </Box>
+                        
 
                         <Box sx={{ m: 2, width: '100%' }}>
                             <Button type="submit" variant="contained" className="boton" fullWidth>

@@ -22,6 +22,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import ModalAsignarTecnico from "../components/ModalAsignarTecnico";
 import toast from "react-hot-toast";
+import ModalAsignarPrioridad from "../components/ModalAsignarPrioridad";
 
 function IncidenciasAdmin() {
 
@@ -70,6 +71,19 @@ function IncidenciasAdmin() {
         setOpenModalAsignarTecnico(false);
         setIncidenciaAsignarTecnico(null);
     }
+
+    const [openModalAsignarPrioridad, setOpenModalAsignarPrioridad] = useState(false);
+    const [incidenciaAsignarPrioridad, setIncidenciaAsignarPrioridad] = useState<number | null>(null);
+
+    const handleOpenModalAsignarPrioridad = (value: boolean, incidenciaId: number | null) => {
+        setOpenModalAsignarPrioridad(value);
+        setIncidenciaAsignarPrioridad(incidenciaId);
+    };
+
+    const handleCloseModalAsignarPrioridad = () => {
+        setOpenModalAsignarPrioridad(false);
+        setIncidenciaAsignarPrioridad(null);
+    };
 
     //SACAR INCIDENCIAS DEL ENCARGADO
     async function obtenerIncidenciasAdmin() {
@@ -128,159 +142,177 @@ function IncidenciasAdmin() {
 
 
 
-        return (
+    return (
 
-            <>
-                <header>
-                    <Button className="boton" variant="contained" startIcon={<AddCircleIcon />} onClick={() => handleOpenModalIncidencia(true)}>
-                        CREAR
-                    </Button>
+        <>
+            <header>
+                <Button className="boton" variant="contained" startIcon={<AddCircleIcon />} onClick={() => handleOpenModalIncidencia(true)}>
+                    CREAR
+                </Button>
 
-                    <Box
-                        sx={{ m: 2, display: 'flex', gap: 2, flexDirection: 'row', flexWrap: 'nowrap' }}
-                    >
-                        <FormControl>
-                            <InputLabel id="demo-simple-select-autowidth-label">Filtros</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-autowidth-label"
-                                id="demo-simple-select-autowidth"
-                                value={filtroEstado}
-                                onChange={(e) => { setFiltroEstado(e.target.value); refetchIncidencias(); }}
-                                label="Filtros"
+                <Box
+                    sx={{ m: 2, display: 'flex', gap: 2, flexDirection: 'row', flexWrap: 'nowrap' }}
+                >
+                    <FormControl>
+                        <InputLabel id="demo-simple-select-autowidth-label">Filtros</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-autowidth-label"
+                            id="demo-simple-select-autowidth"
+                            value={filtroEstado}
+                            onChange={(e) => { setFiltroEstado(e.target.value); refetchIncidencias(); }}
+                            label="Filtros"
 
-                            >
-                                <MenuItem key={0} value={"TODOS"} selected>TODOS</MenuItem>
-                                <MenuItem key={1} value={"AUTORIZADO"}>AUTORIZADO</MenuItem>
-                                <MenuItem key={2} value={"NO AUTORIZADO"}>NO AUTORIZADO</MenuItem>
-                                <MenuItem key={3} value={"NO INICIADO"}>NO INICIADO</MenuItem>
-                                <MenuItem key={4} value={"EN PROCESO"}>EN PROCESO</MenuItem>
-                                <MenuItem key={5} value={"TERMINADO"}>TERMINADO</MenuItem>
-                                <MenuItem key={6} value={"LIBERADO"}>LIBERADO</MenuItem>
-                                <MenuItem key={7} value={"SINTÉCNICO"}>SIN TÉCNICO</MenuItem>
-                                <MenuItem key={8} value={"TECNICOASIGNADO"}>TÉCNICO ASIGNADO</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
+                        >
+                            <MenuItem key={0} value={"TODOS"} selected>TODOS</MenuItem>
+                            <MenuItem key={1} value={"AUTORIZADO"}>AUTORIZADO</MenuItem>
+                            <MenuItem key={2} value={"NO AUTORIZADO"}>NO AUTORIZADO</MenuItem>
+                            <MenuItem key={3} value={"NO INICIADO"}>NO INICIADO</MenuItem>
+                            <MenuItem key={4} value={"EN PROCESO"}>EN PROCESO</MenuItem>
+                            <MenuItem key={5} value={"TERMINADO"}>TERMINADO</MenuItem>
+                            <MenuItem key={6} value={"LIBERADO"}>LIBERADO</MenuItem>
+                            <MenuItem key={7} value={"SINTÉCNICO"}>SIN TÉCNICO</MenuItem>
+                            <MenuItem key={8} value={"TECNICOASIGNADO"}>TÉCNICO ASIGNADO</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
 
-                </header>
+            </header>
 
-                <main>
-                    {isLoadingIncidencias ? <p>Cargando...</p> :
+            <main>
+                {isLoadingIncidencias ? <p>Cargando...</p> :
 
-                        incidencias && incidencias.length > 0 ? (
-                            incidencias.map((incidencia) => {
-                                let colorCirculo = "";
-                                switch (incidencia.prioridad.toLowerCase()) {
-                                    case "alta":
-                                        colorCirculo = "red";
-                                        break;
-                                    case "media":
-                                        colorCirculo = "orange";
-                                        break;
-                                    case "baja":
-                                        colorCirculo = "green";
-                                        break;
-                                    default:
-                                        colorCirculo = "";
-                                }
+                    incidencias && incidencias.length > 0 ? (
+                        incidencias.map((incidencia) => {
 
-                                return (
-                                    <Accordion key={incidencia.incidencia_id}>
-                                        <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            aria-controls="panel1a-content"
-                                            id="panel1a-header"
+                            if (!incidencia.prioridad) {
+                                incidencia.prioridad = "SIN PRIORIDAD";
+                            }
+
+                            let colorCirculo = "";
+                            switch (incidencia.prioridad.toLowerCase()) {
+                                case "alta":
+                                    colorCirculo = "red";
+                                    break;
+                                case "media":
+                                    colorCirculo = "orange";
+                                    break;
+                                case "baja":
+                                    colorCirculo = "green";
+                                    break;
+                                default:
+                                    colorCirculo = "";
+                            }
+
+                            return (
+                                <Accordion key={incidencia.incidencia_id}>
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="panel1a-content"
+                                        id="panel1a-header"
+                                    >
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                flexWrap: "nowrap",
+                                                justifyContent: "space-between",
+                                                alignItems: "center",
+                                                width: "100%",
+                                            }}
                                         >
-                                            <div
-                                                style={{
-                                                    display: "flex",
-                                                    flexDirection: "row",
-                                                    flexWrap: "nowrap",
-                                                    justifyContent: "space-between",
-                                                    alignItems: "center",
-                                                    width: "100%",
-                                                }}
-                                            >
-                                                <Typography style={{ maxWidth: "80%" }} component="span">
-                                                    {dayjs(incidencia.fechaincidencia).format("DD/MM/YYYY") +
-                                                        " - " +
-                                                        incidencia.descripcion_incidencia}
-                                                </Typography>
+                                            <Typography style={{ maxWidth: "80%" }} component="span">
+                                                {dayjs(incidencia.fechaincidencia).format("DD/MM/YYYY") +
+                                                    " - " +
+                                                    incidencia.descripcion_incidencia}
+                                            </Typography>
 
-                                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                                    {colorCirculo && (
-                                                        <span
-                                                            style={{
-                                                                width: "12px",
-                                                                height: "12px",
-                                                                borderRadius: "50%",
-                                                                backgroundColor: colorCirculo,
-                                                                display: "inline-block",
-                                                            }}
-                                                        ></span>
-                                                    )}
-                                                    <Typography component="span">{incidencia.prioridad}</Typography>
-                                                </div>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                                {colorCirculo && (
+                                                    <span
+                                                        style={{
+                                                            width: "12px",
+                                                            height: "12px",
+                                                            borderRadius: "50%",
+                                                            backgroundColor: colorCirculo,
+                                                            display: "inline-block",
+                                                        }}
+                                                    ></span>
+                                                )}
+                                                <Typography component="span">{incidencia.prioridad}</Typography>
                                             </div>
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                            <Typography component="span">AUTORIZADO: {incidencia.autorizada ? "SI" : "NO"} <br /></Typography>
-                                            <Typography component="span">ESTADO: {incidencia.estado_incidencia} <br /></Typography>
-                                            <Typography component="span">EDIFICIO: {incidencia.edificio.toUpperCase()} <br /></Typography>
-                                            <Typography component="span">AULA: {incidencia.aula.toUpperCase()} <br /></Typography>
-                                            <Typography component="span">EQUIPO: {incidencia.equipo_nombre.toUpperCase()} <br /></Typography>
-                                            <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
+                                        </div>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Typography component="span">AUTORIZADO: {incidencia.autorizada ? "SI" : "NO"} <br /></Typography>
+                                        <Typography component="span">ESTADO: {incidencia.estado_incidencia} <br /></Typography>
+                                        <Typography component="span">EDIFICIO: {incidencia.edificio.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">AULA: {incidencia.aula.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">EQUIPO: {incidencia.equipo_nombre.toUpperCase()} <br /></Typography>
+                                        <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
 
-                                        </AccordionDetails>
-                                        <AccordionActions>
-                                            <Button disabled={incidencia.autorizada} onClick={() => { handleOpenModalIncidenciaEditar(true); setIncidenciaEditar(incidencia); }}>EDITAR</Button>
-                                            {incidencia.estado_incidencia.toLowerCase() !== "terminado" ? null : <Button onClick={() => { handleOpenModalLiberarIncidencia(true); setIncidenciaLiberar(incidencia.incidencia_id); }}>LIBERAR</Button>}
-                                            <Button onClick={() => { handleOpenModalEliminarIncidencia(true); setIncidenciaEliminar(incidencia.incidencia_id); }} disabled={incidencia.autorizada}>ELIMINAR</Button>
-                                            <Button disabled={incidencia.tecnico_nombre !== null} onClick={() => handleOpenModalAsignarTecnico(true, incidencia.incidencia_id)}>ASIGNAR TECNICO</Button>
-                                            <Button disabled={incidencia.estado_incidencia.toLowerCase() === "terminado" || incidencia.autorizada} onClick={(() => aceptarIncidencia(incidencia.incidencia_id))}>ACEPTAR</Button>
+                                    </AccordionDetails>
+                                    <AccordionActions>
+                                        <Button disabled={incidencia.autorizada} onClick={() => { handleOpenModalIncidenciaEditar(true); setIncidenciaEditar(incidencia); }}>EDITAR</Button>
+                                        {incidencia.estado_incidencia.toLowerCase() !== "terminado" ? null : <Button onClick={() => { handleOpenModalLiberarIncidencia(true); setIncidenciaLiberar(incidencia.incidencia_id); }}>LIBERAR</Button>}
+                                        <Button onClick={() => { handleOpenModalEliminarIncidencia(true); setIncidenciaEliminar(incidencia.incidencia_id); }} disabled={incidencia.autorizada}>ELIMINAR</Button>
+                                        <Button disabled={incidencia.tecnico_nombre !== null} onClick={() => handleOpenModalAsignarTecnico(true, incidencia.incidencia_id)}>ASIGNAR TECNICO</Button>
+                                        <Button disabled={incidencia.estado_incidencia.toLowerCase() === "terminado" || incidencia.autorizada} onClick={(() => aceptarIncidencia(incidencia.incidencia_id))}>ACEPTAR</Button>
+                                        {incidencia.prioridad.toLowerCase() === "sin prioridad" ? (
+                                            <Button onClick={() => handleOpenModalAsignarPrioridad(true, incidencia.incidencia_id)}>
+                                                ASIGNAR PRIORIDAD
+                                            </Button>
+                                        ) : null}
 
-                                        </AccordionActions>
-                                    </Accordion>
-                                );
-                            })
-                        ) : "No hay incidencias asignadas a tu cargo"}
-                </main >
-                <ModalCrearIncidencia
-                    open={openModalIncidencia}
-                    setOpenModalIncidencia={handleOpenModalIncidencia}
-                    refetchIncidencias={refetchIncidencias}
-                />
 
-                <ModalEditarIncidencia
-                    open={openModalIncidenciaEditar}
-                    setOpenModalIncidencia={handleOpenModalIncidenciaEditar}
-                    refetchIncidencias={refetchIncidencias}
-                    incidencia={incidenciaEditar}
-                />
+                                    </AccordionActions>
+                                </Accordion>
+                            );
+                        })
+                    ) : "No hay incidencias asignadas a tu cargo"}
+            </main >
+            <ModalCrearIncidencia
+                open={openModalIncidencia}
+                setOpenModalIncidencia={handleOpenModalIncidencia}
+                refetchIncidencias={refetchIncidencias}
+            />
 
-                <ModalLiberarIncidencia
-                    open={openModalLiberarIncidencia}
-                    setOpenModalIncidencia={handleOpenModalLiberarIncidencia}
-                    refetchIncidencias={refetchIncidencias}
-                    id={incidenciaLiberar}
-                />
+            <ModalEditarIncidencia
+                open={openModalIncidenciaEditar}
+                setOpenModalIncidencia={handleOpenModalIncidenciaEditar}
+                refetchIncidencias={refetchIncidencias}
+                incidencia={incidenciaEditar}
+            />
 
-                <ModalEliminarIncidencia
-                    open={openModalEliminarIncidencia}
-                    setOpenModalIncidencia={handleOpenModalEliminarIncidencia}
-                    refetchIncidencias={refetchIncidencias}
-                    id={incidenciaEliminar}
-                />
+            <ModalLiberarIncidencia
+                open={openModalLiberarIncidencia}
+                setOpenModalIncidencia={handleOpenModalLiberarIncidencia}
+                refetchIncidencias={refetchIncidencias}
+                id={incidenciaLiberar}
+            />
 
-                <ModalAsignarTecnico
-                    open={openModalAsignarTecnico}
-                    handleCloseModalAsignarTecnico={handleCloseModalAsignarTecnico}
-                    id={incidenciaAsignarTecnico}
-                    refetchIncidencias={refetchIncidencias}
-                />
+            <ModalEliminarIncidencia
+                open={openModalEliminarIncidencia}
+                setOpenModalIncidencia={handleOpenModalEliminarIncidencia}
+                refetchIncidencias={refetchIncidencias}
+                id={incidenciaEliminar}
+            />
 
-            </>
+            <ModalAsignarTecnico
+                open={openModalAsignarTecnico}
+                handleCloseModalAsignarTecnico={handleCloseModalAsignarTecnico}
+                id={incidenciaAsignarTecnico}
+                refetchIncidencias={refetchIncidencias}
+            />
 
-        );
-    }
-    export default IncidenciasAdmin;
+            <ModalAsignarPrioridad
+                open={openModalAsignarPrioridad}
+                handleCloseModalAsignarPrioridad={handleCloseModalAsignarPrioridad}
+                id={incidenciaAsignarPrioridad}
+                refetchIncidencias={refetchIncidencias}
+            />
+
+        </>
+
+    );
+}
+export default IncidenciasAdmin;

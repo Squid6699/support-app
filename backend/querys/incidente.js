@@ -27,19 +27,19 @@ CrearIncidenciaRouter.post("/crearIncidencia", async (req, res) => {
         return res.status(401).send('Unauthorized');
     }
 
-    const { fecha, descripcion, usuario_id, equipo_id, prioridad_id } = req.body;
+    const { fecha, descripcion, usuario_id, equipo_id } = req.body;
 
-    if (!fecha || !descripcion || !usuario_id || !equipo_id || !prioridad_id) {
+    if (!fecha || !descripcion || !usuario_id || !equipo_id) {
         return res.status(400).json({ success: false, msg: "Faltan datos" });
     }
 
     try {
         const result = await pool.query(
-            "INSERT INTO incidente (fecha, descripcion, usuario_id, equipo_id, prioridad_id) VALUES ($1, $2, $3, $4, $5)",
-            [fecha, descripcion, usuario_id, equipo_id, prioridad_id]
+            "INSERT INTO incidente (fecha, descripcion, usuario_id, equipo_id) VALUES ($1, $2, $3, $4)",
+            [fecha, descripcion, usuario_id, equipo_id]
         );
 
-        res.json({ success: true, msg: "Incidente creado correctamente", result: result.rows[0] });
+        res.json({ success: true, msg: "INCIDENCIA CREADA CORRECTAMENTE", result: result.rows[0] });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, msg: "Error en DB" });
@@ -86,16 +86,16 @@ EditarIncidenciaRouter.put("/editarIncidencia", async (req, res) => {
     if (customHeader !== 'frontend') {
         return res.status(401).send('Unauthorized');
     }
-    const { fecha, descripcion, usuario_id, equipo_id, prioridad_id } = req.body;
+    const { fecha, descripcion, usuario_id, equipo_id } = req.body;
 
-    if (!fecha || !descripcion || !usuario_id || !equipo_id || !prioridad_id) {
+    if (!fecha || !descripcion || !usuario_id || !equipo_id) {
         return res.status(400).json({ success: false, msg: "Faltan datos" });
     }
 
     try {
         const result = await pool.query(
-            "UPDATE incidente SET fecha = $1, descripcion = $2, usuario_id = $3, equipo_id = $4, prioridad_id = $5 WHERE id = $6",
-            [fecha, descripcion, usuario_id, equipo_id, prioridad_id, id]
+            "UPDATE incidente SET fecha = $1, descripcion = $2, usuario_id = $3, equipo_id = $4 WHERE id = $5",
+            [fecha, descripcion, usuario_id, equipo_id, id]
         );
 
         if (result.rowCount === 0) {
@@ -127,6 +127,34 @@ EliminarIncidenciaRouter.delete("/eliminarIncidencia", async (req, res) => {
         res.json({ success: true, msg: "Incidencia eliminada correctamente" });
     } catch (err) {
         res.status(500).json({ success: false, msg: "Error en DB" });
+    }
+});
+
+//Ruta para que el administrador asigne la prioridad a una incidencia.
+export const AsignarPrioridadRouter = express.Router();
+AsignarPrioridadRouter.put("/asignarPrioridad", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+    const { prioridadId, incidenciaId } = req.body;
+    if (!prioridadId || !incidenciaId) {
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
+    }
+
+    try {
+        const result = await pool.query(
+            "UPDATE incidente SET prioridad_id = $1 WHERE id = $2",
+            [prioridadId, incidenciaId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, msg: "INCIDENCIA NO ENCONTRADA" });
+        }
+
+        res.json({ success: true, msg: "PRIORIDAD ASIGNADA CORRECTAMENTE" });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });
 
@@ -424,7 +452,7 @@ ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", asy
         INNER JOIN aula A ON eq.aula_id = A.id
         INNER JOIN Edificio ED ON A.edificio_id = ED.id
         INNER JOIN persona p ON ed.encargado_id = p.id
-        INNER JOIN prioridad pr ON i.prioridad_id = pr.id
+        LEFT JOIN prioridad pr ON i.prioridad_id = pr.id
         LEFT JOIN persona t ON i.tecnico_id = t.id
         WHERE p.id = $1
     `;
@@ -714,7 +742,7 @@ ObtenerIncidenciasAdminRouter.get("/incidenciasAdmin", async (req, res) => {
         INNER JOIN aula A ON eq.aula_id = A.id
         INNER JOIN Edificio ED ON A.edificio_id = ED.id
         INNER JOIN persona p ON ed.encargado_id = p.id
-        INNER JOIN prioridad pr ON i.prioridad_id = pr.id
+        LEFT JOIN prioridad pr ON i.prioridad_id = pr.id
         LEFT JOIN persona t ON i.tecnico_id = t.id
         WHERE 1=1
     `;

@@ -132,6 +132,11 @@ function Incidencias() {
 
                     incidencias && incidencias.length > 0 ? (
                         incidencias.map((incidencia) => {
+
+                            if (!incidencia.prioridad) {
+                                incidencia.prioridad = "SIN PRIORIDAD";
+                            }
+
                             let colorCirculo = "";
                             switch (incidencia.prioridad.toLowerCase()) {
                                 case "alta":
