@@ -131,7 +131,7 @@ function ModalSolicitarPieza({ open, incidencia, handleModalClose, refetchIncide
     async function submitSolicitudPieza(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        if (solicitudPieza.tipo_pieza.trim() === "") {
+        if (solicitudPieza.id_pieza === 0) {
             setSolicitudError({ tipo_pieza: "Debe especificar el tipo de pieza solicitada" });
             return;
         }
@@ -190,6 +190,7 @@ function ModalSolicitarPieza({ open, incidencia, handleModalClose, refetchIncide
                                     ...solicitudPieza,
                                     id_pieza: Number(e.target.value), // guarda la ID real
                                 })
+                                
                             }
                         >
                             {isLoadingPiezas && (
@@ -221,7 +222,7 @@ function ModalSolicitarPieza({ open, incidencia, handleModalClose, refetchIncide
 
                 <Box sx={{ m: 2 }}>
                     <TextField
-                        name="CANTIDAD"
+                        name="cantidad"
                         label="CANTIDAD"
                         type="number"
                         value={solicitudPieza.cantidad}
@@ -233,7 +234,7 @@ function ModalSolicitarPieza({ open, incidencia, handleModalClose, refetchIncide
                 {/* DESCRIPCIÓN (Campo a rellenar) */}
                 <Box sx={{ m: 2 }}>
                     <TextField
-                        name="DESCRIPCION"
+                        name="descripcion"
                         label="DESCRIPCIÓN / JUSTIFICACIÓN DE LA SOLICITUD"
                         value={solicitudPieza.descripcion}
                         onChange={handleChange}
