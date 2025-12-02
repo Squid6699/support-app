@@ -1,4 +1,3 @@
-// NO TERMINADO, AQUI ESTARAN LAS PIEZAS DISPONBILES Y SE PODRA AGREGAR PIEZAS, ELIMINAR O EDITAR
 
 import Button from "@mui/material/Button";
 import AddCircleIcon from '@mui/icons-material/AddCircle';

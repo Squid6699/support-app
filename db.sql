@@ -117,6 +117,8 @@ CREATE TABLE SolicitudPieza (
     pieza_id INT REFERENCES Pieza(id),
     incidente_id INT REFERENCES Incidente(id),
     cantidad INT NOT NULL,
+    descripcion TEXT,
+    tecnico_id INT REFERENCES Persona(id),
     autorizado BOOLEAN DEFAULT false
 );
 

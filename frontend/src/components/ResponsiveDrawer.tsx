@@ -39,6 +39,8 @@ import FlagCircleIcon from '@mui/icons-material/FlagCircle';
 import Problemas from "../pages/Problemas";
 import ProblemasAdmin from "../pages/ProblemasAdmin";
 import Piezas from "../pages/Piezas";
+import PiezasSolicitadas from "../pages/PiezasSolicitadas";
+import PiezasSolicitadasAdmin from "../pages/PiezasSolicitadasAdmin";
 
 const drawerWidth = 200;
 
@@ -105,6 +107,7 @@ function ResponsiveDrawer() {
                             "Equipos",
                             "Gestion de problemas",
                             "Piezas",
+                            "Solicitudes de Piezas",
                             // "Marcas",
                             // "Prioridades",
                         ].map((text, index) => (
@@ -119,7 +122,7 @@ function ResponsiveDrawer() {
                                         {index === 5 && <DevicesIcon />}
                                         {index === 6 && <FlagCircleIcon/>}
                                         {index === 7 && <ExtensionIcon />}
-                                        {/* {index === 8 && <BookmarkIcon />} */}
+                                        {index === 8 && <BookmarkIcon />}
                                         {/* {index === 9 && <PriorityHighIcon />} */}
 
                                     </ListItemIcon>
@@ -138,7 +141,8 @@ function ResponsiveDrawer() {
                         {[
                             "Incidencias Asignadas",
                             "Servicios realizados",
-                            "Gestion de problemas"
+                            "Gestion de problemas",
+                            "Piezas Solicitadas"
                             // "Ubicaciones",
                         ].map((text, index) => (
                             <ListItem key={text} disablePadding>
@@ -147,7 +151,7 @@ function ResponsiveDrawer() {
                                         {index === 0 && <SummarizeIcon />}
                                         {index === 1 && <ElectricalServicesIcon />}
                                         {index === 2 && <FlagCircleIcon/>}
-
+                                        {index === 3 && <ExtensionIcon />}
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
                                 </ListItemButton>
@@ -306,6 +310,10 @@ function ResponsiveDrawer() {
                 {selectedContent === "Gestion de problemas" && rol === "Administrador" && <ProblemasAdmin />}
 
                 {selectedContent === "Piezas" && rol === "Administrador" && <Piezas />}
+
+                {selectedContent === "Piezas Solicitadas" && (rol === "Tecnico Hardware" || rol === "Tecnico Software") && <PiezasSolicitadas />}
+
+                {selectedContent === "Solicitudes de Piezas" && rol === "Administrador" && <PiezasSolicitadasAdmin />}
 
             </Box>
         </Box>
