@@ -7,7 +7,7 @@ import { CrearRolRouter, EditarRolRouter, EliminarRolRouter, ObtenerRolesRouter,
 import { CrearPrioridadRouter, EditarPrioridadRouter, EliminarPrioridadRouter, ObtenerPrioridadesRouter, ObtenerPrioridadRouter } from '../querys/prioridad.js';
 import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEquiposRouter, ObtenerEquipoRouter, ObtenerEquiposEncargadoRouter, ObtenerEquiposPorAulaRouter, ObtenerDetallesEquiposRouter, ObtenerEquiposPorAulaIncidenciaRouter, ObtenerEquiposPorAulaEncargadoRouter } from '../querys/equipo.js';
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
-import { CrearPiezaRouter, EditarPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
+import { CrearPiezaRouter, EditarPiezaRouter, EditarStockPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
 import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter, ObtenerIncidenciasLiberadasRouter, ObtenerIncidenciasAdminRouter, ObtenerIncidenciasLiberadasAdminRouter, AsignarPrioridadRouter } from '../querys/incidente.js';
 import { CrearIncidenteCatalogoRouter, CrearServicioRouter, EditarIncidenteCatalogoRouter, EditarServicioRouter, EliminarIncidenteCatalogoRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeEquiposAdminRouter, ObtenerServiciosDeEquiposRouter, ObtenerServiciosDesdeCatalogoRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
@@ -66,6 +66,7 @@ app.use("/api/", ObtenerPiezasRouter);
 app.use("/api/", ObtenerPiezaRouter);
 app.use("/api/", EditarPiezaRouter);
 app.use("/api/", EliminarPiezaRouter);
+app.use("/api/", EditarStockPiezaRouter);
 
 app.use("/api/", CrearMarcaRouter);
 app.use("/api/", EditarMarcaRouter);

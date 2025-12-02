@@ -38,6 +38,7 @@ import EquiposAll from "../pages/EquiposAll";
 import FlagCircleIcon from '@mui/icons-material/FlagCircle';
 import Problemas from "../pages/Problemas";
 import ProblemasAdmin from "../pages/ProblemasAdmin";
+import Piezas from "../pages/Piezas";
 
 const drawerWidth = 200;
 
@@ -102,8 +103,8 @@ function ResponsiveDrawer() {
                             "Ubicaciones",
                             "Usuarios",
                             "Equipos",
-                            "Gestion de problemas"
-                            // "Piezas",
+                            "Gestion de problemas",
+                            "Piezas",
                             // "Marcas",
                             // "Prioridades",
                         ].map((text, index) => (
@@ -117,9 +118,9 @@ function ResponsiveDrawer() {
                                         {index === 4 && <AccountCircleIcon />}
                                         {index === 5 && <DevicesIcon />}
                                         {index === 6 && <FlagCircleIcon/>}
-                                        {/* {index === 6 && <ExtensionIcon />} */}
-                                        {/* {index === 7 && <BookmarkIcon />} */}
-                                        {/* {index === 8 && <PriorityHighIcon />} */}
+                                        {index === 7 && <ExtensionIcon />}
+                                        {/* {index === 8 && <BookmarkIcon />} */}
+                                        {/* {index === 9 && <PriorityHighIcon />} */}
 
                                     </ListItemIcon>
                                     <ListItemText primary={text} />
@@ -303,6 +304,8 @@ function ResponsiveDrawer() {
                 {selectedContent === "Gestion de problemas" && (rol === "Tecnico Hardware" || rol === "Tecnico Software") && <Problemas />}
 
                 {selectedContent === "Gestion de problemas" && rol === "Administrador" && <ProblemasAdmin />}
+
+                {selectedContent === "Piezas" && rol === "Administrador" && <Piezas />}
 
             </Box>
         </Box>

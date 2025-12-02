@@ -31,6 +31,7 @@ CREATE TABLE TipoEquipo (
     nombre VARCHAR(100) NOT NULL
 );
 
+
 CREATE TABLE Edificio (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -55,14 +56,7 @@ CREATE TABLE Equipo (
 CREATE TABLE Pieza (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    fecha DATE,
-    marca_id INT REFERENCES Marca(id)
-);
-
-CREATE TABLE Equipo_Pieza (
-    equipo_id INT REFERENCES Equipo(id),
-    pieza_id INT REFERENCES Pieza(id),
-    PRIMARY KEY (equipo_id, pieza_id)
+    stock INT DEFAULT 1
 );
 
 -- ================================
@@ -117,6 +111,15 @@ CREATE TABLE Incidente (
     estado estado_incidente DEFAULT 'NO INICIADO' NOT NULL
 );
 
+CREATE TABLE SolicitudPieza (
+    id SERIAL PRIMARY KEY,
+    fecha DATE DEFAULT CURRENT_DATE,
+    pieza_id INT REFERENCES Pieza(id),
+    incidente_id INT REFERENCES Incidente(id),
+    cantidad INT NOT NULL,
+    autorizado BOOLEAN DEFAULT false
+);
+
 -- ================================
 -- INSERTS
 -- ================================
@@ -155,12 +158,18 @@ INSERT INTO Persona (nombre, celular, correo, contraseña, rol_id) VALUES
 ('Victoria Armenta', '6672945113', 'victoria.armenta@uni.edu', 'pass123', 4);
 
 
-INSERT INTO Pieza (nombre, fecha, marca_id) VALUES
-('Disco Duro 1TB', '2024-03-01', 1),
-('Memoria RAM 16GB', '2024-02-20', 2),
-('Fuente de Poder 600W', '2024-01-10', 3),
-('Tarjeta Madre ATX', '2023-12-15', 4),
-('Mouse Inalámbrico', '2024-04-05', 5);
+INSERT INTO Pieza (nombre, stock) VALUES
+('Disco Duro 1TB', 1),
+('Memoria RAM 16GB', 1),
+('Fuente de Poder 600W', 1),
+('Tarjeta Madre ATX', 1),
+('Mouse Inalámbrico', 1),
+('Teclado Mecánico', 1),
+('Monitor 24 pulgadas', 1),
+('Placa de Red', 1),
+('Ventilador CPU', 1),
+('Batería Laptop', 1),
+('Cargador Laptop', 1);
 
 -- INSERT INTO Equipo_Pieza (equipo_id, pieza_id) VALUES
 -- (1, 1),
