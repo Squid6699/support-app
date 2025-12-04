@@ -22,6 +22,9 @@ export interface Incidencias {
     aula: string;
     autorizada: boolean;
     tecnico_nombre: string | null;
+    problema_comun_titulo: string | null;
+    problema_comun_descripcion: string | null;
+    problema_comun_solucion: string | null;
 }
 
 export interface Usuario {

@@ -9,7 +9,7 @@ import { CrearEquipoRouter, EditarEquipoRouter, EliminarEquipoRouter, ObtenerEqu
 import { CrearTipoEquipoRouter, EditarTipoEquipoRouter, EliminarTipoEquipoRouter, ObtenerTipoEquipoRouter, ObtenerTiposEquiposRouter } from '../querys/tipoEquipo.js';
 import { AutorizarSolicitudPiezaRouter, CrearPiezaRouter, CrearSolicitudPiezaRouter, EditarPiezaRouter, EditarStockPiezaRouter, EliminarPiezaRouter, ObtenerPiezaRouter, ObtenerPiezasRouter, ObtenerSolicitudesPiezasRouter } from '../querys/pieza.js';
 import { CrearMarcaRouter, EditarMarcaRouter, EliminarMarcaRouter, ObtenerMarcaRouter, ObtenerMarcasRouter } from '../querys/marca.js';
-import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter, ObtenerIncidenciasLiberadasRouter, ObtenerIncidenciasAdminRouter, ObtenerIncidenciasLiberadasAdminRouter, AsignarPrioridadRouter } from '../querys/incidente.js';
+import { CalificarIncidenciaRouter, CrearIncidenciaRouter, EditarIncidenciaRouter, EliminarIncidenciaRouter, IniciarIncidenciaRouter, LiberarIncidenciaRouter, ObtenerIncidenciaRouter, ObtenerIncidenciasRouter, TerminarIncidenciaRouter, VerDetallesIncidenciaRouter, ObtenerIncidenciasEncargadoRouter, ActualizarEstadoIncidenciaRouter, AsignarTecnico, IncidenciasTecnicoRouter, ObtenerIncidenciasLiberadasRouter, ObtenerIncidenciasAdminRouter, ObtenerIncidenciasLiberadasAdminRouter, AsignarPrioridadRouter, compararIndiceniasRouter, seleccionarProblemaComunRouter } from '../querys/incidente.js';
 import { CrearIncidenteCatalogoRouter, CrearServicioRouter, EditarIncidenteCatalogoRouter, EditarServicioRouter, EliminarIncidenteCatalogoRouter, EliminarServicioRouter, ObtenerDetallesServicioRouter, ObtenerServicioRouter, ObtenerServiciosDeEquiposAdminRouter, ObtenerServiciosDeEquiposRouter, ObtenerServiciosDesdeCatalogoRouter, ObtenerServiciosDeTecnicoRouter, ObtenerServiciosRouter } from '../querys/servicio.js';
 import { userAuth } from '../querys/Auth.js';
 import { AsignarEncargadoRouter, CrearAulaRouter, CrearEdificioRouter, EditarAulaRouter, EditarEdificioRouter, EliminarAulaRouter, EliminarEdificioRouter, ObtenerAulasPorEdificioRouter, ObtenerAulasRouter, ObtenerEdificiosConAulasYEquiposRouter, ObtenerEdificiosPorEncargadoRouter, ObtenerEdificiosRouter } from '../querys/ubicacion.js';
@@ -184,6 +184,9 @@ app.use("/api/", ObtenerSolicitudesPiezasRouter);
 
 app.use("/api/", AutorizarSolicitudPiezaRouter);
 
+app.use("/api/", compararIndiceniasRouter);
+
+app.use("/api/", seleccionarProblemaComunRouter);
 
 app.post("/api/", (req, res) => {
     const token = req.cookies.sesion;

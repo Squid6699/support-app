@@ -1,6 +1,7 @@
 -- ================================
 --  CREACION DE TABLAS BASE
 -- ================================
+CREATE EXTENSION pg_trgm;
 
 CREATE TABLE Rol (
     id SERIAL PRIMARY KEY,
@@ -108,7 +109,8 @@ CREATE TABLE Incidente (
     finalizado BOOLEAN DEFAULT false,
     fecha_fin DATE,
     autorizada BOOLEAN DEFAULT false,
-    estado estado_incidente DEFAULT 'NO INICIADO' NOT NULL
+    estado estado_incidente DEFAULT 'NO INICIADO' NOT NULL,
+    problema_comun_id INT REFERENCES CatalogoIncidentes(id)
 );
 
 CREATE TABLE SolicitudPieza (
@@ -136,7 +138,8 @@ INSERT INTO Prioridad (nombre) VALUES
 ('Alta'),
 ('Media'),
 ('Baja'),
-('Preventiva');
+('Preventiva'),
+('Investigacion');
 
 INSERT INTO Marca (nombre) VALUES
 ('Dell'),

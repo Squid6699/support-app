@@ -446,7 +446,11 @@ ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", asy
             A.id AS aula_id,
             A.nombre AS aula,
             i.autorizada AS autorizada,
-            t.nombre AS tecnico_nombre
+            t.nombre AS tecnico_nombre,
+            ci.titulo AS problema_comun_titulo,
+            ci.descripcion AS problema_comun_descripcion,
+            ci.solucion AS problema_comun_solucion
+
         FROM incidente i
         INNER JOIN equipo eq ON i.equipo_id = eq.id
         INNER JOIN aula A ON eq.aula_id = A.id
@@ -454,6 +458,7 @@ ObtenerIncidenciasEncargadoRouter.get("/verIncidenciasEncargado/:personaId", asy
         INNER JOIN persona p ON ed.encargado_id = p.id
         LEFT JOIN prioridad pr ON i.prioridad_id = pr.id
         LEFT JOIN persona t ON i.tecnico_id = t.id
+        LEFT JOIN CatalogoIncidentes ci ON i.problema_comun_id = ci.id
         WHERE p.id = $1
     `;
 
@@ -534,7 +539,11 @@ ObtenerIncidenciasLiberadasRouter.get("/verIncidenciasLiberadas/:personaId", asy
                 A.id AS aula_id,
                 A.nombre AS aula,
                 i.autorizada AS autorizada,
-                t.nombre AS tecnico_nombre
+                t.nombre AS tecnico_nombre,
+                ci.titulo AS problema_comun_titulo,
+                ci.descripcion AS problema_comun_descripcion,
+                ci.solucion AS problema_comun_solucion
+
             FROM incidente i
             INNER JOIN equipo eq ON i.equipo_id = eq.id
             INNER JOIN aula A ON eq.aula_id = A.id
@@ -542,6 +551,7 @@ ObtenerIncidenciasLiberadasRouter.get("/verIncidenciasLiberadas/:personaId", asy
             INNER JOIN persona p ON ed.encargado_id = p.id
             INNER JOIN prioridad pr ON i.prioridad_id = pr.id
             LEFT JOIN persona t ON i.tecnico_id = t.id
+            LEFT JOIN CatalogoIncidentes ci ON i.problema_comun_id = ci.id
             WHERE p.id = $1 AND i.estado = 'LIBERADO'
             ORDER BY i.fecha DESC
         `, [personaId]);
@@ -652,7 +662,11 @@ IncidenciasTecnicoRouter.get("/incidenciasTecnico/:tecnicoId", async (req, res) 
             A.id AS aula_id,
             A.nombre AS aula,
             i.autorizada AS autorizada,
-            t.nombre AS tecnico_nombre
+            t.nombre AS tecnico_nombre,
+            ci.titulo AS problema_comun_titulo,
+            ci.descripcion AS problema_comun_descripcion,
+            ci.solucion AS problema_comun_solucion
+
         FROM incidente i
         INNER JOIN equipo eq ON i.equipo_id = eq.id
         INNER JOIN aula A ON eq.aula_id = A.id
@@ -660,6 +674,7 @@ IncidenciasTecnicoRouter.get("/incidenciasTecnico/:tecnicoId", async (req, res) 
         INNER JOIN persona p ON ed.encargado_id = p.id
         INNER JOIN prioridad pr ON i.prioridad_id = pr.id
         INNER JOIN persona t ON i.tecnico_id = t.id
+        LEFT JOIN CatalogoIncidentes ci ON i.problema_comun_id = ci.id
         WHERE t.id = $1 AND i.servicio_id IS NULL
     `;
 
@@ -736,7 +751,11 @@ ObtenerIncidenciasAdminRouter.get("/incidenciasAdmin", async (req, res) => {
             A.id AS aula_id,
             A.nombre AS aula,
             i.autorizada AS autorizada,
-            t.nombre AS tecnico_nombre
+            t.nombre AS tecnico_nombre,
+            ci.titulo AS problema_comun_titulo,
+            ci.descripcion AS problema_comun_descripcion,
+            ci.solucion AS problema_comun_solucion
+
         FROM incidente i
         INNER JOIN equipo eq ON i.equipo_id = eq.id
         INNER JOIN aula A ON eq.aula_id = A.id
@@ -744,6 +763,7 @@ ObtenerIncidenciasAdminRouter.get("/incidenciasAdmin", async (req, res) => {
         INNER JOIN persona p ON ed.encargado_id = p.id
         LEFT JOIN prioridad pr ON i.prioridad_id = pr.id
         LEFT JOIN persona t ON i.tecnico_id = t.id
+        LEFT JOIN CatalogoIncidentes ci ON i.problema_comun_id = ci.id
         WHERE 1=1
     `;
 
@@ -817,7 +837,10 @@ ObtenerIncidenciasLiberadasAdminRouter.get("/verIncidenciasLiberadasAdmin", asyn
                 A.id AS aula_id,
                 A.nombre AS aula,
                 i.autorizada AS autorizada,
-                t.nombre AS tecnico_nombre
+                t.nombre AS tecnico_nombre,
+                ci.titulo AS problema_comun_titulo,
+                ci.descripcion AS problema_comun_descripcion,
+                ci.solucion AS problema_comun_solucion
             FROM incidente i
             INNER JOIN equipo eq ON i.equipo_id = eq.id
             INNER JOIN aula A ON eq.aula_id = A.id
@@ -825,6 +848,7 @@ ObtenerIncidenciasLiberadasAdminRouter.get("/verIncidenciasLiberadasAdmin", asyn
             INNER JOIN persona p ON ed.encargado_id = p.id
             INNER JOIN prioridad pr ON i.prioridad_id = pr.id
             LEFT JOIN persona t ON i.tecnico_id = t.id
+            LEFT JOIN CatalogoIncidentes ci ON i.problema_comun_id = ci.id
             WHERE i.estado = 'LIBERADO'
             ORDER BY i.fecha DESC
         `);
@@ -837,5 +861,68 @@ ObtenerIncidenciasLiberadasAdminRouter.get("/verIncidenciasLiberadasAdmin", asyn
     } catch (err) {
         console.error("Error en la DB:", err);
         res.status(500).json({ success: false, msg: "Error en la base de datos" });
+    }
+});
+
+export const compararIndiceniasRouter = express.Router();
+compararIndiceniasRouter.get("/compararIncidencia/:idIncidencia", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { idIncidencia } = req.params;
+
+    const incidencia = await pool.query('SELECT descripcion FROM Incidente WHERE id = $1', [idIncidencia]);
+    const descripcionIncidencia = incidencia.rows[0].descripcion;
+
+    const resultadosCatalogo = await pool.query(
+        `SELECT
+            id,
+            titulo,
+            descripcion,
+            solucion,
+            similarity(descripcion, $1) AS desc_similarity,
+            similarity(titulo, $1) AS title_similarity
+        FROM CatalogoIncidentes
+        WHERE
+            similarity(descripcion, $1) > 0.3 OR
+            similarity(titulo, $1) > 0.3
+        ORDER BY
+            desc_similarity DESC, title_similarity DESC
+        LIMIT 5`,
+        [descripcionIncidencia]
+    );
+
+    res.json({ success: true, problemasComunes: resultadosCatalogo.rows });
+});
+
+export const seleccionarProblemaComunRouter = express.Router();
+seleccionarProblemaComunRouter.put("/seleccionarProblemaComun", async (req, res) => {
+    const customHeader = req.headers['x-frontend-header'];
+
+    if (customHeader !== 'frontend') {
+        return res.status(401).send('Unauthorized');
+    }
+
+    const { idCatalogo, idIncidencia } = req.body;
+
+    if (!idIncidencia || !idCatalogo) {
+        return res.status(400).json({ success: false, msg: "FALTAN DATOS" });
+    }
+
+    try {
+        const catalogo = await pool.query(
+            `UPDATE Incidente SET problema_comun_id = $1 WHERE id = $2`,
+            [idCatalogo, idIncidencia]
+        );
+
+        if (catalogo.rowCount === 0) {
+            return res.status(404).json({ success: false, msg: "INCIDENCIA NO ENCONTRADA" });
+        }
+        res.json({ success: true, msg: "PROBLEMA ASIGNADO" });
+    } catch (err) {
+        res.status(500).json({ success: false, msg: "OCURRIO UN ERROR" });
     }
 });

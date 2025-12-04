@@ -11,6 +11,7 @@ import AccordionActions from '@mui/material/AccordionActions';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ModalCrearProblema from "../components/ModalCrearProblema";
 
 function Problemas() {
     const { id } = useSesion();
@@ -45,18 +46,32 @@ function Problemas() {
         }
     }
 
+    const [openModalCrear, setOpenModalCrear] = useState(false);
 
+    const handleOpenModalCrearProblema = () => setOpenModalCrear(true);
+    const handleCloseModalCrearProblema = () => setOpenModalCrear(false);
 
     return (
 
         <>
+            <header>
+                <Button
+                    className="boton"
+                    variant="contained"
+                    startIcon={<AddCircleIcon />}
+                    onClick={handleOpenModalCrearProblema}
+                >
+                    CREAR
+                </Button>
+            </header>
+
             <main>
                 {isLoadingProblemas ? <p>Cargando...</p> :
 
                     problemas && problemas.length > 0 ? (
                         problemas.map((problema) => {
 
-                            
+
 
                             return (
                                 <Accordion key={problema.id_catalogo_incidente}>
@@ -80,7 +95,12 @@ function Problemas() {
                         })
                     ) : "No hay incidencias asignadas a tu cargo"}
             </main >
-            
+
+            <ModalCrearProblema
+                open={openModalCrear}
+                handleClose={handleCloseModalCrearProblema}
+                refetchProblemas={refetchProblemas}
+            />
 
         </>
 

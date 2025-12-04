@@ -167,6 +167,9 @@ function IncidenciasAsignadasTecnico() {
                                 case "baja":
                                     colorCirculo = "green";
                                     break;
+                                case "investigacion":
+                                    colorCirculo = "blue";
+                                    break;
                                 default:
                                     colorCirculo = "";
                             }
@@ -216,7 +219,16 @@ function IncidenciasAsignadasTecnico() {
                                         <Typography component="span">EDIFICIO: {incidencia.edificio.toUpperCase()} <br /></Typography>
                                         <Typography component="span">AULA: {incidencia.aula.toUpperCase()} <br /></Typography>
                                         <Typography component="span">EQUIPO: {incidencia.equipo_nombre.toUpperCase()} <br /></Typography>
-                                        <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
+                                        <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /><br /></Typography>
+
+                                        {incidencia.problema_comun_titulo ? (
+                                            <>
+                                                <Typography component="span" fontWeight="bold">POSIBLE PROBLEMA:</Typography><br />
+                                                <Typography component="span">TÍTULO: {incidencia.problema_comun_titulo.toUpperCase()} <br /></Typography>
+                                                <Typography component="span">DESCRIPCIÓN: {incidencia.problema_comun_descripcion?.toUpperCase()} <br /></Typography>
+                                                <Typography component="span">SOLUCIÓN: {incidencia.problema_comun_solucion?.toUpperCase()} <br /></Typography>
+                                            </>
+                                        ) : null}
 
                                     </AccordionDetails>
                                     <AccordionActions>

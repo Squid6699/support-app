@@ -23,6 +23,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ModalAsignarTecnico from "../components/ModalAsignarTecnico";
 import toast from "react-hot-toast";
 import ModalAsignarPrioridad from "../components/ModalAsignarPrioridad";
+import ModalComparacion from "../components/ModalComparacion";
 
 function IncidenciasAdmin() {
 
@@ -84,6 +85,19 @@ function IncidenciasAdmin() {
         setOpenModalAsignarPrioridad(false);
         setIncidenciaAsignarPrioridad(null);
     };
+
+    const [incidenciaComparar, setIncidenciaComparar] = useState<Incidencias | null>(null);
+    const [openModalComparacion, setOpenModalComparacion] = useState(false);
+
+    const handleOpenModalComparacion = (value: boolean, incidencia: Incidencias | null) => {
+        setOpenModalComparacion(value);
+        setIncidenciaComparar(incidencia);
+    }
+
+    const handleCloseModalComparacion = () => {
+        setOpenModalComparacion(false);
+        setIncidenciaComparar(null);
+    }
 
     //SACAR INCIDENCIAS DEL ENCARGADO
     async function obtenerIncidenciasAdmin() {
@@ -199,6 +213,9 @@ function IncidenciasAdmin() {
                                 case "baja":
                                     colorCirculo = "green";
                                     break;
+                                case "investigacion":
+                                    colorCirculo = "blue";
+                                    break;
                                 default:
                                     colorCirculo = "";
                             }
@@ -248,7 +265,16 @@ function IncidenciasAdmin() {
                                         <Typography component="span">EDIFICIO: {incidencia.edificio.toUpperCase()} <br /></Typography>
                                         <Typography component="span">AULA: {incidencia.aula.toUpperCase()} <br /></Typography>
                                         <Typography component="span">EQUIPO: {incidencia.equipo_nombre.toUpperCase()} <br /></Typography>
-                                        <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /></Typography>
+                                        <Typography component="span">TECNICO ASIGNADO: {incidencia.tecnico_nombre ? incidencia.tecnico_nombre.toUpperCase() : "NO ASIGNADO"} <br /><br /></Typography>
+
+                                        {incidencia.problema_comun_titulo ? (
+                                            <>
+                                                <Typography component="span" fontWeight="bold">POSIBLE PROBLEMA:</Typography><br />
+                                                <Typography component="span">TÍTULO: {incidencia.problema_comun_titulo.toUpperCase()} <br /></Typography>
+                                                <Typography component="span">DESCRIPCIÓN: {incidencia.problema_comun_descripcion?.toUpperCase()} <br /></Typography>
+                                                <Typography component="span">SOLUCIÓN: {incidencia.problema_comun_solucion?.toUpperCase()} <br /></Typography>
+                                            </>
+                                        ) : null}
 
                                     </AccordionDetails>
                                     <AccordionActions>
@@ -257,12 +283,8 @@ function IncidenciasAdmin() {
                                         <Button onClick={() => { handleOpenModalEliminarIncidencia(true); setIncidenciaEliminar(incidencia.incidencia_id); }} disabled={incidencia.autorizada}>ELIMINAR</Button>
                                         <Button disabled={incidencia.tecnico_nombre !== null} onClick={() => handleOpenModalAsignarTecnico(true, incidencia.incidencia_id)}>ASIGNAR TECNICO</Button>
                                         <Button disabled={incidencia.estado_incidencia.toLowerCase() === "terminado" || incidencia.autorizada} onClick={(() => aceptarIncidencia(incidencia.incidencia_id))}>ACEPTAR</Button>
-                                        {incidencia.prioridad.toLowerCase() === "sin prioridad" ? (
-                                            <Button onClick={() => handleOpenModalAsignarPrioridad(true, incidencia.incidencia_id)}>
-                                                ASIGNAR PRIORIDAD
-                                            </Button>
-                                        ) : null}
-
+                                        <Button onClick={() => handleOpenModalAsignarPrioridad(true, incidencia.incidencia_id)}>ASIGNAR PRIORIDAD </Button>
+                                        <Button onClick={() => handleOpenModalComparacion(true, incidencia)}>COMPARAR</Button>
 
                                     </AccordionActions>
                                 </Accordion>
@@ -308,6 +330,13 @@ function IncidenciasAdmin() {
                 open={openModalAsignarPrioridad}
                 handleCloseModalAsignarPrioridad={handleCloseModalAsignarPrioridad}
                 id={incidenciaAsignarPrioridad}
+                refetchIncidencias={refetchIncidencias}
+            />
+
+            <ModalComparacion
+                open={openModalComparacion}
+                handleCloseModalComparacion={handleCloseModalComparacion}
+                incidencia={incidenciaComparar}
                 refetchIncidencias={refetchIncidencias}
             />
 
